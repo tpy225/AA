@@ -1669,20 +1669,51 @@ ${W.join(`
 		return Array.isArray(y)?y.map(i).filter(Boolean):[] 
 	}
 	function c(y){
-		return Array.isArray(y)?y.map(M=>String(M??"").trim()).filter(Boolean).filter(M=>M!=="..."&&M!=="\u2026"):[] 
+		return Array.isArray(y)?y.map(M=>String(M??"").trim()).filter(Boolean).filter(M=>M!=="..."&&M!=="…"&&!/^\{\{\s*tag\s*\d*\s*\}\}$/i.test(M)&&!/\{\{[^}]*[一-鿿][^}]*\}\}/.test(M)):[]
 	}
 	function A(y){
 		const M=String(y??"").trim();
-		return M?M.split(/[\n\r,，]+/g).map(B=>String(B??"").trim()).filter(Boolean).filter(B=>B!=="..."&&B!=="\u2026"):[] 
+		return M?M.split(/[\n\r,，;；、]+/g).map(B=>String(B??"").trim()).filter(Boolean).filter(B=>B!=="..."&&B!=="…"):[]
+	}
+	function k(y){
+		if(y==null)return null;
+		if(typeof y=="string"||typeof y=="number"||typeof y=="boolean")return String(y);
+		if(Array.isArray(y))return{
+			composition:y
+		};
+		if(typeof y!="object")return null;
+		const ZC="人数构图区域焦点视角",ZR="人物",ZE="物品建筑生物",ZB="背景场景光照";
+		if(!Array.isArray(y.characters)&&y.composition==null&&(Array.isArray(y[ZR])||y[ZC]!=null||y[ZE]!=null||y[ZB]!=null))return{
+			composition:y[ZC],characters:(Array.isArray(y[ZR])?y[ZR]:[]).map(P=>P&&typeof P=="object"?{
+				name:P["姓名"]??P.name,traits:P["人物特征"],outfit:P["服装配饰"],action:P["动作姿态神态交互"],body_parts_visible:P["需强调的躯体元素"],nsfw:P["NSFW相关"]
+			}:P),entities:y[ZE],background:y[ZB]
+		};
+		return y
 	}
 	function p(y){
+		y=k(y);
+		if(typeof y=="string"){
+			if(/(^|\n)\s*(composition|characters|entities|background)\s*:/.test(y))try{
+				const Z=globalThis.YAML&&typeof globalThis.YAML.parse=="function"?globalThis.YAML.parse(y):null;
+				if(Z&&typeof Z=="object")return p(Z)
+			}catch{}
+			const T=A(y),CJK=T.filter(N=>/[一-鿿]/.test(N)).length;
+			console.info("[NovelAI] 标签模式收到字符串形式的 prompt，已按分隔符拆分为标签",{
+				segments:T.length,cjkSegments:CJK,preview:y.slice(0,120)
+			});
+			if(T.length>0&&CJK/T.length>.5)console.warn("[NovelAI] 该字符串 prompt 疑似中文自然语言，标签模式出图可能不相干，建议让文本模型按标签数组结构输出，或改用自然语言模式");
+			return T.join(", ")
+		}
+		if(!y||typeof y!="object")return"";
 		const M=[],B=N=>{
-			M.push(...c(N)) 
+			if(N==null)return;
+			const T=Array.isArray(N)?N.flatMap(P=>typeof P=="string"?A(P):[P]):typeof N=="string"?A(N):[N];
+			M.push(...c(T))
 		};
-		B(y?.composition);
-		const T=Array.isArray(y?.characters)?y.characters:[];
+		B(y.composition);
+		const T=Array.isArray(y.characters)?y.characters:[];
 		for(const N of T)B(N?.traits),B(N?.outfit),B(N?.action),B(N?.body_parts_visible),B(N?.interaction),B(N?.nsfw);
-		return B(y?.entities),B(y?.background),M.join(", ") 
+		return B(y.entities),B(y.background),M.join(", ")
 	}
 	function C(y){
 		return y==null?"":typeof y=="string"?y.trim():typeof y=="number"||typeof y=="boolean"?String(y):Array.isArray(y)?y.map(M=>C(M)).filter(Boolean).join(", "):"" 
@@ -1692,7 +1723,17 @@ ${W.join(`
 		T&&y.push(`${M}\uFF1A${T}`) 
 	}
 	function $(y){
-		if(typeof y=="string")return y.trim();
+		if(Array.isArray(y))y={
+			composition:y
+		};
+		if(typeof y=="string"){
+			y=y.trim();
+			if(/(^|\n)\s*(composition|characters|entities|background)\s*:/.test(y))try{
+				const Z=globalThis.YAML&&typeof globalThis.YAML.parse=="function"?globalThis.YAML.parse(y):null;
+				if(Z&&typeof Z=="object")return $(Z)
+			}catch{}
+			return y
+		}
 		if(!y||typeof y!="object")return"";
 		const M=y,B=[];
 		E(B,"\u4EBA\u6570\u6784\u56FE\u533A\u57DF\u7126\u70B9\u89C6\u89D2",M.\u4EBA\u6570\u6784\u56FE\u533A\u57DF\u7126\u70B9\u89C6\u89D2??M.composition);
