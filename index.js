@@ -69013,9 +69013,9 @@ function yr(){
 	const Oe=apiProfilesRef,je=(0,e.ref)(""),Pe=(0,e.ref)(""),lvP=(0,e.ref)(!1),cvP=(0,e.ref)("primary");
 	function UvP(o){
 		const s=o==="secondary"?Pe:je;
-		if(!s.value)return void Ie.warning("請先選擇方案");
+		if(!s.value)return void Ie.warning("请先选择方案");
 		const i=apiProfilesRef.value.find(l=>l.id===s.value);
-		if(!i)return void Ie.warning("請先選擇方案");
+		if(!i)return void Ie.warning("请先选择方案");
 		i.config=Object.assign({},o==="secondary"?rt.value:at.value),persistApiProfiles(),Ie.success("已保存到方案「"+i.name+"」")
 	}
 	function SvP(o){
@@ -69032,11 +69032,11 @@ function yr(){
 	}
 	async function DlP(o){
 		const s=o==="secondary"?Pe:je;
-		if(!s.value)return void Ie.warning("請先選擇方案");
+		if(!s.value)return void Ie.warning("请先选择方案");
 		const i=apiProfilesRef.value.find(l=>l.id===s.value);
 		if(!i)return;
-		if(!await Ie.confirm("確定刪除方案「"+i.name+"」？此操作無法復原。"))return;
-		apiProfilesRef.value=apiProfilesRef.value.filter(l=>l.id!==s.value),persistApiProfiles(),s.value="",Ie.success("已刪除方案")
+		if(!await Ie.confirm("确定删除方案“"+i.name+"”？此操作无法恢复。"))return;
+		apiProfilesRef.value=apiProfilesRef.value.filter(l=>l.id!==s.value),persistApiProfiles(),s.value="",Ie.success("已删除方案")
 	}
 	function ApP(o,s){
 		const i=apiProfilesRef.value.find(l=>l.id===s);
@@ -69226,18 +69226,18 @@ const W6={
 			"onUpdate:modelValue":B[66]||(B[66]=T=>(0,e.isRef)(Ve)?Ve.value=T:null),class:"input-field",onChange:B[67]||(B[67]=T=>(0,e.unref)(Ze)(T.target.value))
 		},[B[68]||(B[68]=(0,e.createElementVNode)("option",{
 			value:""
-		},"— 選擇方案 —",-1)),((0,e.openBlock)(!0),(0,e.createElementBlock)(e.Fragment,null,(0,e.renderList)((0,e.unref)(Ne),T=>((0,e.openBlock)(),(0,e.createElementBlock)("option",{
+		},"— 选择方案 —",-1)),((0,e.openBlock)(!0),(0,e.createElementBlock)(e.Fragment,null,(0,e.renderList)((0,e.unref)(Ne),T=>((0,e.openBlock)(),(0,e.createElementBlock)("option",{
 			key:T.id,value:T.id
 		},(0,e.toDisplayString)(T.name),9,JP))),128))],512),[[e.vModelSelect,(0,e.unref)(Ve)]]),(0,e.createElementVNode)("button",{
 			class:"profile-action-btn",title:"保存",onClick:B[78]||(B[78]=()=>(0,e.unref)(Ue)("primary"))
 		},[...B[79]||(B[79]=[(0,e.createElementVNode)("i",{
 			class:"fas fa-save"
 		},null,-1)])]),(0,e.createElementVNode)("button",{
-			class:"profile-action-btn",title:"另存為新方案",onClick:B[80]||(B[80]=()=>(0,e.unref)(ke)("primary"))
+			class:"profile-action-btn",title:"另存为新方案",onClick:B[80]||(B[80]=()=>(0,e.unref)(ke)("primary"))
 		},[...B[81]||(B[81]=[(0,e.createElementVNode)("i",{
 			class:"fas fa-copy"
 		},null,-1)])]),(0,e.createElementVNode)("button",{
-			class:"profile-action-btn danger",title:"刪除",onClick:B[82]||(B[82]=()=>(0,e.unref)(Ge)("primary"))
+			class:"profile-action-btn danger",title:"删除",onClick:B[82]||(B[82]=()=>(0,e.unref)(Ge)("primary"))
 		},[...B[83]||(B[83]=[(0,e.createElementVNode)("i",{
 			class:"fas fa-trash"
 		},null,-1)])])])]),(0,e.createElementVNode)("div",O6,[B[34]||(B[34]=(0,e.createElementVNode)("label",{
@@ -69320,18 +69320,18 @@ const W6={
 			"onUpdate:modelValue":B[72]||(B[72]=T=>(0,e.isRef)(De)?De.value=T:null),class:"input-field",onChange:B[73]||(B[73]=T=>(0,e.unref)(Je)(T.target.value))
 		},[B[74]||(B[74]=(0,e.createElementVNode)("option",{
 			value:""
-		},"— 選擇方案 —",-1)),((0,e.openBlock)(!0),(0,e.createElementBlock)(e.Fragment,null,(0,e.renderList)((0,e.unref)(Ne),T=>((0,e.openBlock)(),(0,e.createElementBlock)("option",{
+		},"— 选择方案 —",-1)),((0,e.openBlock)(!0),(0,e.createElementBlock)(e.Fragment,null,(0,e.renderList)((0,e.unref)(Ne),T=>((0,e.openBlock)(),(0,e.createElementBlock)("option",{
 			key:T.id,value:T.id
 		},(0,e.toDisplayString)(T.name),9,JP))),128))],512),[[e.vModelSelect,(0,e.unref)(De)]]),(0,e.createElementVNode)("button",{
 			class:"profile-action-btn",title:"保存",onClick:B[84]||(B[84]=()=>(0,e.unref)(Ue)("secondary"))
 		},[...B[85]||(B[85]=[(0,e.createElementVNode)("i",{
 			class:"fas fa-save"
 		},null,-1)])]),(0,e.createElementVNode)("button",{
-			class:"profile-action-btn",title:"另存為新方案",onClick:B[86]||(B[86]=()=>(0,e.unref)(ke)("secondary"))
+			class:"profile-action-btn",title:"另存为新方案",onClick:B[86]||(B[86]=()=>(0,e.unref)(ke)("secondary"))
 		},[...B[87]||(B[87]=[(0,e.createElementVNode)("i",{
 			class:"fas fa-copy"
 		},null,-1)])]),(0,e.createElementVNode)("button",{
-			class:"profile-action-btn danger",title:"刪除",onClick:B[88]||(B[88]=()=>(0,e.unref)(Ge)("secondary"))
+			class:"profile-action-btn danger",title:"删除",onClick:B[88]||(B[88]=()=>(0,e.unref)(Ge)("secondary"))
 		},[...B[89]||(B[89]=[(0,e.createElementVNode)("i",{
 			class:"fas fa-trash"
 		},null,-1)])])])]),(0,e.createElementVNode)("div",gF,[B[46]||(B[46]=(0,e.createElementVNode)("label",{
