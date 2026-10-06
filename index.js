@@ -69039,21 +69039,27 @@ async function Br(a){
 					}
 				}
 				return E.endsWith("/chat/completions")?E=E.replace("/chat/completions","/models"):E.endsWith("/models")||(/\/v\d+$/i.test(E)||/\/v\d+\//i.test(E)||(E+="/v1"),E+="/models"),E
-			})(r),i=(function(){
-				try{
-					return new URL(import.meta.url).origin
-				}catch{
-					return"http://127.0.0.1:8765"
-				}
-			})(),l=`${i}/_proxy?url=${encodeURIComponent(s)}`,c=await fetch(l,{
-				method:"GET",headers:r.apiFormat==="gemini"?{}:{
-					"x-resp-authorization":`Bearer ${r.key}`
-				}
-			});
-			if(!c.ok)throw new Error(`HTTP ${c.status}: ${c.statusText}`);
-			const A=(function(C){
-				const E=C;let $=[];return Array.isArray(E?.models)?$=E.models.map(O=>typeof O=="string"?O:O.name||O.id||O.displayName||"").filter(Boolean):Array.isArray(E?.data)?$=E.data.map(O=>O.id||O.name||"").filter(Boolean):Array.isArray(E)&&($=E.map(O=>typeof O=="string"?O:O.id||O.name||"").filter(Boolean)),$
-			})(await c.json());
+			})(r),pm=C=>{
+				let $=[];return Array.isArray(C?.models)?$=C.models.map(O=>typeof O=="string"?O:O.name||O.id||O.displayName||"").filter(Boolean):Array.isArray(C?.data)?$=C.data.map(O=>O.id||O.name||"").filter(Boolean):Array.isArray(C)&&($=C.map(O=>typeof O=="string"?O:O.id||O.name||"").filter(Boolean)),$
+			};
+			let A=[],be;
+			if(r.apiFormat!=="gemini"){
+				const base=r.url.trim().replace(/\/+$/,"").replace(/\/(chat\/completions|models)$/i,"");
+				const viaBackend=async b=>{
+					const h={"Content-Type":"application/json"};
+					try{const wh=window.getRequestHeaders&&window.getRequestHeaders(),tk=wh&&(wh["X-CSRF-Token"]||wh["x-csrf-token"]);tk&&(h["X-CSRF-Token"]=tk)}catch{}
+					const resp=await fetch("/api/backends/chat-completions/status",{method:"POST",headers:h,credentials:"include",body:JSON.stringify({chat_completion_source:"openai",custom_url:b,reverse_proxy:b,proxy_password:r.key})});
+					const txt=await resp.text();if(!resp.ok)throw new Error(`HTTP ${resp.status} ${txt.slice(0,200)}`);
+					return pm(JSON.parse(txt))
+				};
+				try{A=await viaBackend(base)}catch(q){be=q}
+				if(!A.length&&!/\/v\d+/i.test(base)){try{A=await viaBackend(base+"/v1")}catch(q){be=q}}
+			}
+			if(!A.length){
+				const c=await fetch(s,{method:"GET",headers:r.apiFormat==="gemini"?{}:{Authorization:`Bearer ${r.key}`}}),txt=await c.text();
+				if(!c.ok)throw new Error(be?`後端代理失敗:${be.message}；直連失敗:HTTP ${c.status}`:`HTTP ${c.status}: ${c.statusText}`);
+				A=pm(JSON.parse(txt))
+			}
 			if(A.length===0)return void Ie.warning("\u672A\u83B7\u53D6\u5230\u53EF\u7528\u6A21\u578B");
 			const p=A.sort();
 			n(p),localStorage.setItem(o,JSON.stringify(p)),Ie.success(`\u6210\u529F\u83B7\u53D6 ${p.length} \u4E2A\u6A21\u578B`)
