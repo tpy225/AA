@@ -27489,14 +27489,15 @@ watch(
 		const $=await E.json().catch(()=>null);
 		let O=typeof $?.path=="string"?$.path:"";
 		if(!O)throw new Error("\u4E0A\u4F20\u56FE\u7247\u5931\u8D25\uFF1A\u672A\u8FD4\u56DE\u56FE\u7247\u8DEF\u5F84");
-		if(O.startsWith("/")){
+		if(!/^(https?:|data:|blob:)/i.test(O)){
 			let w="";
 			try{
-				w=window.parent?.location?.origin||"" 
+				w=window.parent?.location?.origin||""
 			}catch{}
-			w||=location.origin||"",O=`${w}${O}` 
+			if(!w||w==="null"){try{w=location.origin==="null"?"":location.origin||""}catch{}}
+			if(w)O=`${w}${O.startsWith("/")?"":"/"}${O}`
 		}
-		return O 
+		return O
 	}
 	t.r(r),t.d(r,{
 		uploadImageDataUrlToSillyTavern:()=>o 
@@ -67547,7 +67548,13 @@ async function Cr(a){
 	const C=await p.json().catch(()=>null);
 	let E=String(C?.path||"");
 	if(!E)throw new Error("\u4E0A\u4F20\u5931\u8D25\uFF1A\u672A\u8FD4\u56DE\u8DEF\u5F84");
-	return E.startsWith("/")&&(E=`${location.origin||""}${E}`),E
+	if(!/^(https?:|data:|blob:)/i.test(E)){
+		let og="";
+		try{og=window.parent?.location?.origin||""}catch{}
+		if(!og||og==="null"){try{og=location.origin==="null"?"":location.origin||""}catch{}}
+		if(og)E=`${og}${E.startsWith("/")?"":"/"}${E}`
+	}
+	return E
 }
 const sw=(0,e.defineComponent)({
 	__name:"UrlInputModal",props:{
