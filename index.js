@@ -69063,28 +69063,20 @@ async function Br(a){
 			})(r),pm=C=>{
 				let $=[];return Array.isArray(C?.models)?$=C.models.map(O=>typeof O=="string"?O:O.name||O.id||O.displayName||"").filter(Boolean):Array.isArray(C?.data)?$=C.data.map(O=>O.id||O.name||"").filter(Boolean):Array.isArray(C)&&($=C.map(O=>typeof O=="string"?O:O.id||O.name||"").filter(Boolean)),$
 			};
-			let A=[],be;
-			if(r.apiFormat!=="gemini"){
-				const base=r.url.trim().replace(/\/+$/,"").replace(/\/(chat\/completions|models)$/i,"");
-				const getCsrf=async()=>{
-					try{const wh=window.getRequestHeaders&&window.getRequestHeaders(),tk=wh&&(wh["X-CSRF-Token"]||wh["x-csrf-token"]);if(tk)return tk}catch{}
-					try{const j=await(await fetch(`/csrf-token?_=${Date.now()}`,{credentials:"include",cache:"no-store"})).json();return j.token||""}catch{return""}
-				};
-				const viaBackend=async b=>{
-					const h={"Content-Type":"application/json"},tk=await getCsrf();
-					if(tk)h["X-CSRF-Token"]=tk;
-					const resp=await fetch("/api/backends/chat-completions/status",{method:"POST",headers:h,credentials:"include",body:JSON.stringify({chat_completion_source:"openai",custom_url:b,reverse_proxy:b,proxy_password:r.key})});
-					const txt=await resp.text();if(!resp.ok)throw new Error(`HTTP ${resp.status} ${txt.slice(0,200)}`);
-					return pm(JSON.parse(txt))
-				};
-				try{A=await viaBackend(base)}catch(q){be=q}
-				if(!A.length&&!/\/v\d+/i.test(base)){try{A=await viaBackend(base+"/v1")}catch(q){be=q}}
+			let A=[],be=null;
+			const __mksig=__ms=>{const __ac=new AbortController;const __tm=setTimeout(()=>__ac.abort(),__ms);try{__ac.signal.addEventListener("abort",()=>clearTimeout(__tm))}catch{}return __ac.signal};
+			const __direct=async()=>{const c=await fetch(s,{method:"GET",headers:r.apiFormat==="gemini"?{}:{Authorization:`Bearer ${r.key}`},signal:__mksig(12000)});const txt=await c.text();if(!c.ok)throw new Error(`HTTP ${c.status} ${txt.slice(0,150)}`);return pm(JSON.parse(txt))};
+			if(r.apiFormat==="gemini"){A=await __direct()}else{
+				try{A=await __direct()}catch(q){q&&q.name==="AbortError"&&(q=new Error("\u76F4\u9023\u8D85\u6642\uFF0812\u79D2\uFF09")),be=q}
+				if(!A.length){
+					const base=r.url.trim().replace(/\/+$/,"").replace(/\/(chat\/completions|models)$/i,"");
+					const getCsrf=async()=>{try{const wh=window.getRequestHeaders&&window.getRequestHeaders(),tk=wh&&(wh["X-CSRF-Token"]||wh["x-csrf-token"]);if(tk)return tk}catch{}try{const j=await(await fetch(`/csrf-token?_=${Date.now()}`,{credentials:"include",cache:"no-store"})).json();return j.token||""}catch{return""}};
+					const viaBackend=async __b=>{const h={"Content-Type":"application/json"},tk=await getCsrf();if(tk)h["X-CSRF-Token"]=tk;let __ab=!1;const resp=await fetch("/api/backends/chat-completions/status",{method:"POST",headers:h,credentials:"include",signal:__mksig(25000),body:JSON.stringify({chat_completion_source:"openai",custom_url:__b,reverse_proxy:__b,proxy_password:r.key})}).catch(__e=>{throw __e&&__e.name==="AbortError"?new Error("\u5F8C\u7AEF\u4EE3\u7406\u8D85\u6642\uFF0825\u79D2\uFF09"):__e});const txt=await resp.text();if(!resp.ok)throw new Error(`HTTP ${resp.status} ${txt.slice(0,200)}`);return pm(JSON.parse(txt))};
+					try{A=await viaBackend(base)}catch(q){be=q}
+					if(!A.length&&!/\/v\d+/i.test(base)){try{A=await viaBackend(base+"/v1")}catch(q){be=q}}
+				}
 			}
-			if(!A.length){
-				const c=await fetch(s,{method:"GET",headers:r.apiFormat==="gemini"?{}:{Authorization:`Bearer ${r.key}`}}),txt=await c.text();
-				if(!c.ok)throw new Error(be?`後端代理失敗:${be.message}；直連失敗:HTTP ${c.status}`:`HTTP ${c.status}: ${c.statusText}`);
-				A=pm(JSON.parse(txt))
-			}
+			if(!A.length)throw new Error(be?`\u7372\u53D6\u5931\u6557\uFF08\u76F4\u9023\u8207\u5F8C\u7AEF\u4EE3\u7406\u5747\u4E0D\u53EF\u7528\uFF09\uFF1A${be.message||be}`:"\u672A\u7372\u53D6\u5230\u53EF\u7528\u6A21\u578B");
 			if(A.length===0)return void Ie.warning("\u672A\u83B7\u53D6\u5230\u53EF\u7528\u6A21\u578B");
 			const p=A.sort();
 			n(p),localStorage.setItem(o,JSON.stringify(p)),Ie.success(`\u6210\u529F\u83B7\u53D6 ${p.length} \u4E2A\u6A21\u578B`)
