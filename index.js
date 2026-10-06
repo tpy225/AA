@@ -69045,9 +69045,13 @@ async function Br(a){
 			let A=[],be;
 			if(r.apiFormat!=="gemini"){
 				const base=r.url.trim().replace(/\/+$/,"").replace(/\/(chat\/completions|models)$/i,"");
+				const getCsrf=async()=>{
+					try{const wh=window.getRequestHeaders&&window.getRequestHeaders(),tk=wh&&(wh["X-CSRF-Token"]||wh["x-csrf-token"]);if(tk)return tk}catch{}
+					try{const j=await(await fetch(`/csrf-token?_=${Date.now()}`,{credentials:"include",cache:"no-store"})).json();return j.token||""}catch{return""}
+				};
 				const viaBackend=async b=>{
-					const h={"Content-Type":"application/json"};
-					try{const wh=window.getRequestHeaders&&window.getRequestHeaders(),tk=wh&&(wh["X-CSRF-Token"]||wh["x-csrf-token"]);tk&&(h["X-CSRF-Token"]=tk)}catch{}
+					const h={"Content-Type":"application/json"},tk=await getCsrf();
+					if(tk)h["X-CSRF-Token"]=tk;
 					const resp=await fetch("/api/backends/chat-completions/status",{method:"POST",headers:h,credentials:"include",body:JSON.stringify({chat_completion_source:"openai",custom_url:b,reverse_proxy:b,proxy_password:r.key})});
 					const txt=await resp.text();if(!resp.ok)throw new Error(`HTTP ${resp.status} ${txt.slice(0,200)}`);
 					return pm(JSON.parse(txt))
