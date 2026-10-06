@@ -62216,7 +62216,12 @@ const jm=(0,Ye.A)(Tm,[["__scopeId","data-v-63adae68"]]),Ym={
 				"--post-image-aspect":x
 			}:{}
 		},y=v=>{
-			const x=String(v?.imageUrl||v?.image||"").trim();if(!x)return "";if(/^https?:\/\//i.test(x))return x;const __g=(0,Ue.Gf)(x)||"";if(/^https?:\/\//i.test(__g))return __g;return(globalThis.__phoneAbsUrl||(q=>q))(x.startsWith("/")?x:(__g||x))
+			const __u=String(v?.imageUrl||"").trim();let x=__u;
+			if(!x){const __t=String(v?.image||"").trim();if(/^(https?:|data:|blob:|\/|\.\/)/i.test(__t)||/\.(png|jpe?g|gif|webp|avif|bmp|svg)(\?|#|$)/i.test(__t))x=__t}
+			if(!x)return"";
+			if(/^(https?:|data:|blob:)/i.test(x))return x;
+			if(x[0]==="/"||x.slice(0,2)==="./")return(globalThis.__phoneAbsUrl||(z=>z))(x);
+			return""
 		},M=async v=>{
 			if(H(v))return;const x=l.value.posts?.[v];if(!x)return;if(!x.prompt)return void toastr.warning("\u8BE5\u52A8\u6001\u6CA1\u6709 prompt\uFF0C\u65E0\u6CD5\u751F\u56FE");const f=(0,En.loadNovelAiConfig)(),D=f.apiFormat==="openai"?"OpenAI":f.apiFormat==="gemini"?"Gemini":"NovelAI",Y=f.apiFormat==="novelai"?f.novelai:f.apiFormat==="openai"?f.openai:f.gemini;if(!Y.url||!Y.key)return void toastr.warning(`\u8BF7\u5148\u5728\u8BBE\u7F6E-\u7ED8\u56FE\u914D\u7F6E\u4E2D\u586B\u5199 ${D} URL \u548C Key`);if((f.apiFormat==="openai"||f.apiFormat==="gemini")&&!String(Y.model||"").trim())return void toastr.warning(`\u8BF7\u5148\u5728\u8BBE\u7F6E-\u7ED8\u56FE\u914D\u7F6E\u4E2D\u586B\u5199 ${D} \u6A21\u578B`);const{
 				promptText:j,referenceImages:g
@@ -63233,7 +63238,12 @@ const T0=(0,Ye.A)(I0,[["__scopeId","data-v-0076818b"]]),j0={
 				"--post-image-aspect":ge
 			}:{}
 		},q=Be=>{
-			const ge=String(Be?.imageUrl||Be?.image||"").trim();if(!ge)return "";if(/^https?:\/\//i.test(ge))return ge;const __g2=(0,Ue.Gf)(ge)||"";if(/^https?:\/\//i.test(__g2))return __g2;return(globalThis.__phoneAbsUrl||(Q=>Q))(ge.startsWith("/")?ge:(__g2||ge))
+			const __u=String(Be?.imageUrl||"").trim();let ge=__u;
+			if(!ge){const __t=String(Be?.image||"").trim();if(/^(https?:|data:|blob:|\/|\.\/)/i.test(__t)||/\.(png|jpe?g|gif|webp|avif|bmp|svg)(\?|#|$)/i.test(__t))ge=__t}
+			if(!ge)return"";
+			if(/^(https?:|data:|blob:)/i.test(ge))return ge;
+			if(ge[0]==="/"||ge.slice(0,2)==="./")return(globalThis.__phoneAbsUrl||(z=>z))(ge);
+			return""
 		},v=async Be=>{
 			if(se(Be))return;const ge=Le.data;if(!ge||!Array.isArray(ge.posts))return void toastr.error("\u52A8\u6001\u6570\u636E\u672A\u52A0\u8F7D\uFF0C\u65E0\u6CD5\u751F\u56FE");const ve=ge.posts?.[Be];if(!ve)return;if(!ve.prompt)return void toastr.warning("\u8BE5\u52A8\u6001\u6CA1\u6709 prompt\uFF0C\u65E0\u6CD5\u751F\u56FE");const Ve=(0,En.loadNovelAiConfig)(),ae=Ve.apiFormat==="openai"?"OpenAI":Ve.apiFormat==="gemini"?"Gemini":"NovelAI",W=Ve.apiFormat==="novelai"?Ve.novelai:Ve.apiFormat==="openai"?Ve.openai:Ve.gemini;if(!W.url||!W.key)return void toastr.warning(`\u8BF7\u5148\u5728\u8BBE\u7F6E-\u7ED8\u56FE\u914D\u7F6E\u4E2D\u586B\u5199 ${ae} URL \u548C Key`);if((Ve.apiFormat==="openai"||Ve.apiFormat==="gemini")&&!String(W.model||"").trim())return void toastr.warning(`\u8BF7\u5148\u5728\u8BBE\u7F6E-\u7ED8\u56FE\u914D\u7F6E\u4E2D\u586B\u5199 ${ae} \u6A21\u578B`);const{
 				promptText:L,referenceImages:k
