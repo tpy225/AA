@@ -1966,6 +1966,16 @@ ${W.join(`
 		})(u);
 		return G||P(String(y?.text??y?.output_text??""))||null 
 	}
+	async function __oaiProxy(__ep,__cfg,__body,__sig){
+		const __b=String(__ep).replace(/\/chat\/completions$/i,"").replace(/\/+$/,"");
+		const __p=Object.assign({chat_completion_source:"openai",reverse_proxy:__b,custom_url:__ep,proxy_password:__cfg.key||"",custom_include_headers:{"Content-Type":"application/json",Authorization:"Bearer "+(__cfg.key||"")}},__body||{},{mode:"chat",instruction_mode:"chat"});
+		const __h={"Content-Type":"application/json","X-ST-Phone-Internal-API":"1"};
+		let __t="";
+		try{const __w=(window.getRequestHeaders&&window.getRequestHeaders())||{};__t=__w["X-CSRF-Token"]||__w["x-csrf-token"]||""}catch(__e){}
+		if(!__t){try{const __r=await fetch("/csrf-token",{credentials:"include",cache:"no-store"});if(__r.ok){const __j=await __r.json().catch(()=>null);__t=__j&&__j.token||""}}catch(__e){}}
+		if(__t)__h["X-CSRF-Token"]=__t;
+		return fetch("/api/backends/chat-completions/generate",{method:"POST",headers:__h,credentials:"include",body:JSON.stringify(__p),signal:__sig});
+	}
 	async function oe(y,M){
 		const B=M?.config||(0,n.loadNovelAiConfig)(),T=B.promptComposeMode||"tags",N=Array.isArray(M?.referenceImages)?M.referenceImages.map(ne=>String(ne??"").trim()).filter(Boolean):[],P=ne=>{
 			const I=String(ne||"").trim().match(/^data:([^;]+);base64,([\s\S]+)$/i);
@@ -2056,11 +2066,25 @@ ${W.join(`
 			let ae=!1;
 			try{
 				console.groupCollapsed(`[AI] image (openai/${Q})`),ae=!0,console.info("[AI] prompt",String(Se||"")),console.info("[AI] referenceImages",l(N)),console.info("[AI] request body",Ve);
-				const W=await fetch(be,{
+				let W=null,L=null,__pr=!1;
+				try{W=await __oaiProxy(be,ne,Ve,M?.signal);__pr=!0;if(W&&!W.ok&&W.status===404)W=null}catch(__e){W=null}
+				if(!W){__pr=!1;W=await fetch(be,{
 					method:"POST",headers:{
-						Authorization:`Bearer ${ne.key}`,"x-api-key":ne.key,"Content-Type":"application/json",Accept:"application/json, image/png, image/jpeg, application/zip" 
-					},body:JSON.stringify(Ve),signal:M?.signal 
-				}),L=await h(W);
+						Authorization:`Bearer ${ne.key}`,"x-api-key":ne.key,"Content-Type":"application/json",Accept:"application/json, image/png, image/jpeg, application/zip"
+					},body:JSON.stringify(Ve),signal:M?.signal
+				})}
+				if(__pr){
+					const __tx=await W.text();
+					if(!W.ok)throw new Error(String(__tx||("HTTP "+W.status)).slice(0,300));
+					let __u=null,__j=null;
+					try{__j=JSON.parse(__tx)}catch(__e){}
+					if(__j)__u=K(__j);
+					if(!__u&&/(?:^|\n)data:|\[DONE\]/.test(__tx)){let __a="";__tx.split(/\r?\n/).forEach(__ln=>{const __mm=/^data:\s?(.+)$/.exec(__ln);if(__mm&&__mm[1]!=="[DONE]")__a+=__mm[1]});try{__u=K(JSON.parse(__a))}catch(__e){}}
+					if(!__u)throw new Error("\u672A\u8BC6\u522B\u7684\u751F\u56FE\u8FD4\u56DE\u683C\u5F0F\uFF08\u540E\u7AEF\u4EE3\u7406\uFF09");
+					L={dataUrl:__u};
+				}else{
+					L=await h(W);
+				}
 				return console.info("[AI] image result",{
 					url:i(L.dataUrl),length:L.dataUrl.length 
 				}),L 
@@ -27489,14 +27513,7 @@ watch(
 		const $=await E.json().catch(()=>null);
 		let O=typeof $?.path=="string"?$.path:"";
 		if(!O)throw new Error("\u4E0A\u4F20\u56FE\u7247\u5931\u8D25\uFF1A\u672A\u8FD4\u56DE\u56FE\u7247\u8DEF\u5F84");
-		if(!/^(https?:|data:|blob:)/i.test(O)){
-			let w="";
-			try{
-				w=window.parent?.location?.origin||""
-			}catch{}
-			if(!w||w==="null"){try{w=location.origin==="null"?"":location.origin||""}catch{}}
-			if(w)O=`${w}${O.startsWith("/")?"":"/"}${O}`
-		}
+		O=(globalThis.__phoneAbsUrl||(x=>x))(O);
 		return O
 	}
 	t.r(r),t.d(r,{
@@ -62193,7 +62210,7 @@ const jm=(0,Ye.A)(Tm,[["__scopeId","data-v-63adae68"]]),Ym={
 				"--post-image-aspect":x
 			}:{}
 		},y=v=>{
-			const x=String(v?.imageUrl||v?.image||"").trim();return x?/^https?:\/\//i.test(x)||x.startsWith("/")?x:(0,Ue.Gf)(x)||"":""
+			const x=String(v?.imageUrl||v?.image||"").trim();if(!x)return "";if(/^https?:\/\//i.test(x))return x;const __g=(0,Ue.Gf)(x)||"";if(/^https?:\/\//i.test(__g))return __g;return(globalThis.__phoneAbsUrl||(q=>q))(x.startsWith("/")?x:(__g||x))
 		},M=async v=>{
 			if(H(v))return;const x=l.value.posts?.[v];if(!x)return;if(!x.prompt)return void toastr.warning("\u8BE5\u52A8\u6001\u6CA1\u6709 prompt\uFF0C\u65E0\u6CD5\u751F\u56FE");const f=(0,En.loadNovelAiConfig)(),D=f.apiFormat==="openai"?"OpenAI":f.apiFormat==="gemini"?"Gemini":"NovelAI",Y=f.apiFormat==="novelai"?f.novelai:f.apiFormat==="openai"?f.openai:f.gemini;if(!Y.url||!Y.key)return void toastr.warning(`\u8BF7\u5148\u5728\u8BBE\u7F6E-\u7ED8\u56FE\u914D\u7F6E\u4E2D\u586B\u5199 ${D} URL \u548C Key`);if((f.apiFormat==="openai"||f.apiFormat==="gemini")&&!String(Y.model||"").trim())return void toastr.warning(`\u8BF7\u5148\u5728\u8BBE\u7F6E-\u7ED8\u56FE\u914D\u7F6E\u4E2D\u586B\u5199 ${D} \u6A21\u578B`);const{
 				promptText:j,referenceImages:g
@@ -63210,7 +63227,7 @@ const T0=(0,Ye.A)(I0,[["__scopeId","data-v-0076818b"]]),j0={
 				"--post-image-aspect":ge
 			}:{}
 		},q=Be=>{
-			const ge=String(Be?.imageUrl||Be?.image||"").trim();return ge?/^https?:\/\//i.test(ge)||ge.startsWith("/")?ge:(0,Ue.Gf)(ge)||"":""
+			const ge=String(Be?.imageUrl||Be?.image||"").trim();if(!ge)return "";if(/^https?:\/\//i.test(ge))return ge;const __g2=(0,Ue.Gf)(ge)||"";if(/^https?:\/\//i.test(__g2))return __g2;return(globalThis.__phoneAbsUrl||(Q=>Q))(ge.startsWith("/")?ge:(__g2||ge))
 		},v=async Be=>{
 			if(se(Be))return;const ge=Le.data;if(!ge||!Array.isArray(ge.posts))return void toastr.error("\u52A8\u6001\u6570\u636E\u672A\u52A0\u8F7D\uFF0C\u65E0\u6CD5\u751F\u56FE");const ve=ge.posts?.[Be];if(!ve)return;if(!ve.prompt)return void toastr.warning("\u8BE5\u52A8\u6001\u6CA1\u6709 prompt\uFF0C\u65E0\u6CD5\u751F\u56FE");const Ve=(0,En.loadNovelAiConfig)(),ae=Ve.apiFormat==="openai"?"OpenAI":Ve.apiFormat==="gemini"?"Gemini":"NovelAI",W=Ve.apiFormat==="novelai"?Ve.novelai:Ve.apiFormat==="openai"?Ve.openai:Ve.gemini;if(!W.url||!W.key)return void toastr.warning(`\u8BF7\u5148\u5728\u8BBE\u7F6E-\u7ED8\u56FE\u914D\u7F6E\u4E2D\u586B\u5199 ${ae} URL \u548C Key`);if((Ve.apiFormat==="openai"||Ve.apiFormat==="gemini")&&!String(W.model||"").trim())return void toastr.warning(`\u8BF7\u5148\u5728\u8BBE\u7F6E-\u7ED8\u56FE\u914D\u7F6E\u4E2D\u586B\u5199 ${ae} \u6A21\u578B`);const{
 				promptText:L,referenceImages:k
@@ -63261,7 +63278,7 @@ const T0=(0,Ye.A)(I0,[["__scopeId","data-v-0076818b"]]),j0={
 			S.value||(w.value=ia()),S.value=!S.value
 		},Ee=()=>{
 			Z.value=null
-		},fe=Be=>H.value.findIndex(ge=>ge.content===Be.content&&ge.name===Be.name),ne=Be=>{
+		},__lpPick=()=>{if(__lpPick._b)return;const __i=document.createElement("input");__i.type="file";__i.accept="image/*";__i.onchange=async()=>{const __f=__i.files&&__i.files[0];__i.value="";if(!__f)return;__lpPick._b=1;try{const __du=await new Promise((rs,rj)=>{const rd=new FileReader;rd.onload=()=>rs(rd.result);rd.onerror=rj;rd.readAsDataURL(__f)});const __u=await(0,tt.uploadImageDataUrlToSillyTavern)(__du,{characterName:"dynamic"});Z.value={url:__u,content:""};S.value=!1;toastr&&toastr.success&&toastr.success("\u56FE\u7247\u5DF2\u4E0A\u4F20");}catch(__e){toastr&&toastr.error&&toastr.error("\u4E0A\u4F20\u5931\u8D25: "+(__e&&__e.message||__e));}finally{__lpPick._b=0;}};__i.click();},fe=Be=>H.value.findIndex(ge=>ge.content===Be.content&&ge.name===Be.name),ne=Be=>{
 			const ge=q(Be);ge?I(ge):(ve=>{
 				const Ve=fe(ve);if(Ve===-1)return;const ae=oe.value.get(Ve)||{
 					liked:!1,shared:!1,showCaption:!1
@@ -63456,7 +63473,7 @@ const T0=(0,Ye.A)(I0,[["__scopeId","data-v-0076818b"]]),j0={
 				class:"post-image-pick-btn",type:"button",onClick:Ce
 			},[ge[25]||(ge[25]=(0,e.createElementVNode)("i",{
 				class:"fas fa-images"
-			},null,-1)),(0,e.createElementVNode)("span",null,(0,e.toDisplayString)(Z.value?"\u66F4\u6362":"\u4ECE\u56FE\u5E93\u9009\u62E9"),1)])]),Z.value?((0,e.openBlock)(),(0,e.createElementBlock)("div",Sf,[(0,e.createElementVNode)("img",{
+			},null,-1)),(0,e.createElementVNode)("span",null,(0,e.toDisplayString)(Z.value?"\u66F4\u6362":"\u4ECE\u56FE\u5E93\u9009\u62E9"),1)]),(0,e.createElementVNode)("button",{class:"post-image-local-btn",type:"button",style:{display:"inline-flex",alignItems:"center",gap:"6px",padding:"6px 12px",marginLeft:"8px",borderRadius:"8px",border:"1px solid #6c8cd5",background:"#eef3fd",color:"#5a78c0",fontSize:"12px",cursor:"pointer"},onClick:__lpPick},[(0,e.createElementVNode)("i",{class:"fas fa-upload"}),(0,e.createTextVNode)(" \u672C\u5730\u9009\u62E9\u56FE\u7247 ")] )]),Z.value?((0,e.openBlock)(),(0,e.createElementBlock)("div",Sf,[(0,e.createElementVNode)("img",{
 				src:Z.value.url,class:"post-image-thumb",alt:"selected",draggable:"false"
 			},null,8,zf),(0,e.createElementVNode)("div",Mf,[(0,e.createElementVNode)("div",If,(0,e.toDisplayString)(Z.value.content||"\uFF08\u65E0\u63CF\u8FF0\uFF09"),1),(0,e.createElementVNode)("button",{
 				class:"post-image-remove-btn",type:"button",onClick:Ee
@@ -67548,12 +67565,7 @@ async function Cr(a){
 	const C=await p.json().catch(()=>null);
 	let E=String(C?.path||"");
 	if(!E)throw new Error("\u4E0A\u4F20\u5931\u8D25\uFF1A\u672A\u8FD4\u56DE\u8DEF\u5F84");
-	if(!/^(https?:|data:|blob:)/i.test(E)){
-		let og="";
-		try{og=window.parent?.location?.origin||""}catch{}
-		if(!og||og==="null"){try{og=location.origin==="null"?"":location.origin||""}catch{}}
-		if(og)E=`${og}${E.startsWith("/")?"":"/"}${E}`
-	}
+	E=(globalThis.__phoneAbsUrl||(q=>q))(E);
 	return E
 }
 const sw=(0,e.defineComponent)({
@@ -70310,4 +70322,4 @@ ${Qe().stringify(o)}</chat_history>`;if((0,Cn.Q)().chatAppendToLastMessage){cons
 \u6700\u540E\u4E00\u5757\uFF1A${y}
 \u5F53\u524D\u5171 ${le.length} \u5757`,SillyTavern.POPUP_TYPE.CONFIRM,void 0,{okButton:"\u786E\u8BA4",cancelButton:"\u53D6\u6D88"})===SillyTavern.POPUP_RESULT.AFFIRMATIVE)try{if(H)return await deleteChatMessages([K]),toastr.success("\u5DF2\u5220\u9664\u6700\u540E\u4E00\u5C42\u6D88\u606F"),void console.log(`[Improved Phone] Deleted message #${K}`);const M=(function(B,T){if(!T.length)return String(B||"");const N=T[T.length-1],P=String(B||"");let U=P.slice(0,N.start)+P.slice(N.end);return U=U.replace(/\n{3,}/g,`
 
-`).trim(),U})(oe,le);if(!M)return await deleteChatMessages([K]),toastr.success("\u5DF2\u5220\u9664\u6700\u540E\u4E00\u5C42\u6D88\u606F"),void console.log(`[Improved Phone] Deleted message #${K} after trimming empty`);await setChatMessages([{message_id:K,message:M}]),toastr.success("\u5DF2\u5220\u9664\u6700\u540E\u4E00\u5757"),console.log(`[Improved Phone] Removed last block in message #${K}`)}catch(M){console.error("[Improved Phone] Failed to delete message:",M),toastr.error("\u5220\u9664\u5931\u8D25")}});const te=getButtonEvent("\u590D\u4F4D");eventOn(te,()=>{localStorage.removeItem("phone_drag_position"),toastr.success("\u624B\u673A\u4F4D\u7F6E\u5DF2\u590D\u4F4D"),console.log("[Improved Phone] Phone position reset"),window.location.reload()});const X=getButtonEvent("\u5237\u65B0");eventOn(X,()=>{window.location.reload()}),console.log("[AutoMessage] ========================================"),console.log("[AutoMessage] \u521D\u59CB\u5316\u81EA\u52A8\u56DE\u590D\u6A21\u5757"),console.log("[AutoMessage] \u8C03\u8BD5\u6A21\u5F0F:","\u5F00\u542F"),eventOn(tavern_events.GENERATION_ENDED,QT),console.log("[AutoMessage] \u5DF2\u6CE8\u518C\u4E8B\u4EF6: tavern_events.GENERATION_ENDED"),rz(),console.log("[AutoMessage] \u52A0\u597D\u53CB\u6A21\u5757\u5DF2\u521D\u59CB\u5316"),console.log("[AutoMessage] \u521D\u59CB\u5316\u5B8C\u6210"),console.log("[AutoMessage] ========================================"),(0,We.n6)(),console.log("[Improved Phone] Mounted successfully.")}function nj(){try{return typeof eventOn=="function"&&typeof tavern_events<"u"&&!!SillyTavern?.getCurrentChatId&&typeof replaceScriptButtons=="function"&&typeof getButtonEvent=="function"}catch{return!1}}(async function(){const a=Date.now();for(;!nj();){if(Date.now()-a>15e3)return void console.warn("[Improved Phone] Tavern APIs not ready, aborting init.");await new Promise(n=>setTimeout(n,50))}let r="";try{r=String(SillyTavern.getCurrentChatId?.()||"")}catch{r=""}eventOn(tavern_events.CHAT_CHANGED,async n=>{const o=String(n||"");console.log("[Improved Phone] CHAT_CHANGED event fired:",o),o!==r?(r=o,await mo("chat_changed"),So(),window.location.reload()):console.log("[Improved Phone] CHAT_CHANGED chat_id unchanged, skip reload.")});const t=SillyTavern.getCurrentChatId()||"";console.log("[Improved Phone] Script loaded, initial chat_id:",t),(function(){try{const n=window.parent;n&&n.toastr&&(window.toastr=n.toastr)}catch{}})(),(function(){try{const n=an();if(!n?.body)return;HT(n)}catch(n){console.warn("[InlineMsgStyle] init failed:",n)}})(),t&&ej(),(function(){try{var d=an();var css=".phone-wrapper *,.phone-wrapper *::before,.phone-wrapper *::after{scrollbar-width:none;-ms-overflow-style:none}.phone-wrapper *::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}html,body{overflow-x:hidden!important}.phone-wrapper,.phone-container,.phone-screen{overflow-x:hidden!important}";if(d&&d.head&&!d.getElementById("phone-ui-scrollbar-fix")){var st=d.createElement("style");st.id="phone-ui-scrollbar-fix";st.textContent=css;d.head.appendChild(st);var lk=d.createElement("link");lk.rel="preconnect";lk.href="https://files.catbox.moe";d.head.appendChild(lk)}}catch(n){console.warn("[PhoneUI] style init failed:",n)}})()})();
+`).trim(),U})(oe,le);if(!M)return await deleteChatMessages([K]),toastr.success("\u5DF2\u5220\u9664\u6700\u540E\u4E00\u5C42\u6D88\u606F"),void console.log(`[Improved Phone] Deleted message #${K} after trimming empty`);await setChatMessages([{message_id:K,message:M}]),toastr.success("\u5DF2\u5220\u9664\u6700\u540E\u4E00\u5757"),console.log(`[Improved Phone] Removed last block in message #${K}`)}catch(M){console.error("[Improved Phone] Failed to delete message:",M),toastr.error("\u5220\u9664\u5931\u8D25")}});const te=getButtonEvent("\u590D\u4F4D");eventOn(te,()=>{localStorage.removeItem("phone_drag_position"),toastr.success("\u624B\u673A\u4F4D\u7F6E\u5DF2\u590D\u4F4D"),console.log("[Improved Phone] Phone position reset"),window.location.reload()});const X=getButtonEvent("\u5237\u65B0");eventOn(X,()=>{window.location.reload()}),console.log("[AutoMessage] ========================================"),console.log("[AutoMessage] \u521D\u59CB\u5316\u81EA\u52A8\u56DE\u590D\u6A21\u5757"),console.log("[AutoMessage] \u8C03\u8BD5\u6A21\u5F0F:","\u5F00\u542F"),eventOn(tavern_events.GENERATION_ENDED,QT),console.log("[AutoMessage] \u5DF2\u6CE8\u518C\u4E8B\u4EF6: tavern_events.GENERATION_ENDED"),rz(),console.log("[AutoMessage] \u52A0\u597D\u53CB\u6A21\u5757\u5DF2\u521D\u59CB\u5316"),console.log("[AutoMessage] \u521D\u59CB\u5316\u5B8C\u6210"),console.log("[AutoMessage] ========================================"),(0,We.n6)(),console.log("[Improved Phone] Mounted successfully.")}function nj(){try{return typeof eventOn=="function"&&typeof tavern_events<"u"&&!!SillyTavern?.getCurrentChatId&&typeof replaceScriptButtons=="function"&&typeof getButtonEvent=="function"}catch{return!1}}(async function(){const a=Date.now();for(;!nj();){if(Date.now()-a>15e3)return void console.warn("[Improved Phone] Tavern APIs not ready, aborting init.");await new Promise(n=>setTimeout(n,50))}let r="";try{r=String(SillyTavern.getCurrentChatId?.()||"")}catch{r=""}eventOn(tavern_events.CHAT_CHANGED,async n=>{const o=String(n||"");console.log("[Improved Phone] CHAT_CHANGED event fired:",o),o!==r?(r=o,await mo("chat_changed"),So(),window.location.reload()):console.log("[Improved Phone] CHAT_CHANGED chat_id unchanged, skip reload.")});const t=SillyTavern.getCurrentChatId()||"";console.log("[Improved Phone] Script loaded, initial chat_id:",t),(function(){try{const n=window.parent;n&&n.toastr&&(window.toastr=n.toastr)}catch{}})(),(function(){try{const n=an();if(!n?.body)return;HT(n)}catch(n){console.warn("[InlineMsgStyle] init failed:",n)}})(),(function(){try{if(globalThis.__phoneAbsUrl)return;globalThis.__phoneAbsUrl=function(p){p=String(p==null?"":p);if(!p)return p;if(/^(https?:|data:|blob:)/i.test(p))return p;var base="";try{base=document.baseURI||""}catch(e){}if(!base||/^about:/i.test(base)){try{base=window.parent&&window.parent!==window?window.parent.location.origin:location.origin||""}catch(e2){try{base=location.origin==="null"?"":location.origin||""}catch(e3){base=""}}}try{return new URL(p,base||"/").href}catch(e4){return p}};}catch(e){}})(),t&&ej(),(function(){try{var d=an();var css=".phone-wrapper *,.phone-wrapper *::before,.phone-wrapper *::after{scrollbar-width:none;-ms-overflow-style:none}.phone-wrapper *::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}html,body{overflow-x:hidden!important}.phone-wrapper,.phone-container,.phone-screen{overflow-x:hidden!important}";if(d&&d.head&&!d.getElementById("phone-ui-scrollbar-fix")){var st=d.createElement("style");st.id="phone-ui-scrollbar-fix";st.textContent=css;d.head.appendChild(st);var lk=d.createElement("link");lk.rel="preconnect";lk.href="https://files.catbox.moe";d.head.appendChild(lk)}}catch(n){console.warn("[PhoneUI] style init failed:",n)}})()})();
