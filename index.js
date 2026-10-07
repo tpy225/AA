@@ -64888,11 +64888,13 @@ const qx=(0,Ye.A)(Px,[["__scopeId","data-v-9aadda54"]]),_x={
 				class:(0,e.normalizeClass)(["follow-btn",{
 					following:c.value 
 				}]),onClick:R 
-			},(0,e.toDisplayString)(c.value?"\u5DF2\u5173\u6CE8":"+ \u5173\u6CE8"),3)]),(0,e.createCommentVNode)(" \u76F4\u64AD\u89C6\u9891\u533A\u57DF "),(0,e.createElementVNode)("div",Hx,[(0,e.createElementVNode)("img",{
-				src:(b=i.value.image,(0,Ue.jH)(b)||b),alt:"\u76F4\u64AD\u753B\u9762",style:{
-					width:"100%",height:"100%","object-fit":"cover",display:"block" 
-				},onError:P,onLoad:U 
-			},null,40,Jx),i.value.prompt?((0,e.openBlock)(),(0,e.createElementBlock)("button",{
+			},(0,e.toDisplayString)(c.value?"\u5DF2\u5173\u6CE8":"+ \u5173\u6CE8"),3)]),(0,e.createCommentVNode)(" \u76F4\u64AD\u89C6\u9891\u533A\u57DF "),(0,e.createElementVNode)("div",Hx,[((b=i.value.image,(0,Ue.jH)(b)||b)?((0,e.openBlock)(),(0,e.createElementBlock)("img",{
+				src:(0,Ue.jH)(b)||b,alt:"直播画面",style:{
+					width:"100%",height:"100%","object-fit":"cover",display:"block"
+				},onError:P,onLoad:U
+			},null,40,Jx)):((0,e.openBlock)(),(0,e.createElementBlock)("div",{
+				style:"position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.55);font-size:13px;text-align:center;padding:0 34px;line-height:1.7;letter-spacing:1px"
+			},"画面尚未生成，点击左下角按钮生成直播画面"))),i.value.prompt?((0,e.openBlock)(),(0,e.createElementBlock)("button",{
 				key:0,class:"live-image-generate-btn",disabled:H.value,title:"\u91CD\u65B0\u751F\u6210\u753B\u9762",onClick:(0,e.withModifiers)(se,["stop"]) 
 			},[H.value?((0,e.openBlock)(),(0,e.createElementBlock)("i",n1)):((0,e.openBlock)(),(0,e.createElementBlock)("i",e1))],8,Kx)):(0,e.createCommentVNode)("v-if",!0),d[18]||(d[18]=(0,e.createElementVNode)("div",{
 				class:"live-indicator" 
