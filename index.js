@@ -70424,8 +70424,89 @@ ${Qe().stringify(o)}</chat_history>`;if((0,Cn.Q)().chatAppendToLastMessage){cons
     document.body.appendChild(panel);
   }
   function tryBuild() {
-    if (document.body) build();
-    else setTimeout(tryBuild, 200);
+    function docs() {
+      var out = [];
+      function walk(win) {
+        try { out.push(win.document); } catch (e) { return; }
+        var fs;
+        try { fs = win.frames; } catch (e) { return; }
+        for (var i = 0; i < (fs ? fs.length : 0); i++) {
+          try { walk(fs[i]); } catch (e) {}
+        }
+      }
+      walk(window);
+      return out;
+    }
+    var injected = {};
+    function scan() {
+      docs().forEach(function (d) {
+        var key = d.URL || String(d);
+        if (injected[key]) return;
+        if (!d.body) return;
+        injected[key] = true;
+        buildInto(d);
+      });
+    }
+    function buildInto(doc) {
+      if (doc.getElementById("phone-log-panel")) return;
+      var localBtn, localPanel, localList;
+      localBtn = doc.createElement("button");
+      localBtn.textContent = "LOG";
+      localBtn.style.cssText = "position:fixed;left:0;top:45%;z-index:2147483647;width:42px;height:42px;" +
+        "border-radius:0 21px 21px 0;border:0;background:#2563eb;color:#fff;font-size:12px;" +
+        "font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.3);opacity:.9;";
+      localPanel = doc.createElement("div");
+      localPanel.style.cssText = "position:fixed;left:8px;right:8px;top:60px;bottom:80px;z-index:2147483647;" +
+        "background:rgba(15,23,42,.96);border-radius:12px;display:none;flex-direction:column;" +
+        "box-shadow:0 8px 30px rgba(0,0,0,.5);overflow:hidden;";
+      var bar = doc.createElement("div");
+      bar.style.cssText = "display:flex;gap:8px;padding:8px;";
+      function mkBtn(t, fn) {
+        var b = doc.createElement("button");
+        b.textContent = t;
+        b.style.cssText = "font-size:13px;padding:6px 12px;border-radius:8px;border:0;background:#334155;color:#fff;";
+        b.onclick = fn;
+        return b;
+      }
+      var copyB = mkBtn("复制", function () {
+        var t = lines.join("\n");
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(t).then(function () { copyB.textContent = "已复制"; setTimeout(function(){copyB.textContent="复制";},1500); });
+        } else {
+          var ta = doc.createElement("textarea");
+          ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
+          doc.body.appendChild(ta); ta.select();
+          try { doc.execCommand("copy"); copyB.textContent = "已复制"; setTimeout(function(){copyB.textContent="复制";},1500); } catch (e) {}
+          doc.body.removeChild(ta);
+        }
+      });
+      bar.appendChild(copyB);
+      bar.appendChild(mkBtn("清空", function () { lines = []; renderInto(); }));
+      bar.appendChild(mkBtn("关闭", function () { localPanel.style.display = "none"; }));
+      localPanel.appendChild(bar);
+      localList = doc.createElement("pre");
+      localList.style.cssText = "flex:1;margin:0;padding:8px 10px;color:#a7f3d0;font-size:11px;line-height:1.45;" +
+        "overflow:auto;white-space:pre-wrap;word-break:break-all;font-family:ui-monospace,Menlo,monospace;";
+      localPanel.appendChild(localList);
+      localBtn.onclick = function () {
+        localPanel.style.display = localPanel.style.display === "none" ? "flex" : "none";
+        renderInto();
+      };
+      doc.body.appendChild(localBtn);
+      doc.body.appendChild(localPanel);
+      panels.push({ btn: localBtn, list: localList });
+      renderInto();
+    }
+    var panels = [];
+    function renderInto() {
+      panels.forEach(function (p) {
+        p.list.textContent = lines.slice(-120).join("\n");
+        var bad = lines.some(function (l) { return /ERR|UNCAUGHT|PROMISE/.test(l); });
+        p.btn.textContent = "LOG" + (bad ? "!" : "");
+      });
+    }
+    scan();
+    setInterval(scan, 1000);
   }
   tryBuild();
 })();
