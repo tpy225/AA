@@ -64571,9 +64571,11 @@ const ux=(0,Ye.A)(gx,[["__scopeId","data-v-7485b218"]]),fx={
 				key:X,class:"live-card",onClick:le=>(ce=>{
 					console.log("\u8FDB\u5165\u76F4\u64AD\u95F4:",ce.name),t("enter-room",ce) 
 				})(te) 
-			},[(0,e.createCommentVNode)(" \u5C01\u9762\u56FE "),(0,e.createElementVNode)("div",Ex,[(0,e.createElementVNode)("img",{
-				src:(oe=te.image,(0,Ue.jH)(oe)||oe),alt:"cover" 
-			},null,8,wx),(0,e.createElementVNode)("div",{
+			},[(0,e.createCommentVNode)(" \u5C01\u9762\u56FE "),(0,e.createElementVNode)("div",Ex,[((oe=te.image,r=(0,Ue.jH)(oe)||(/^(https?:|data:|blob:|tauri:)/.test(oe)?oe:""))?((0,e.openBlock)(),(0,e.createElementBlock)("img",{
+				src:r,alt:"cover"
+			},null,8,wx)):((0,e.openBlock)(),(0,e.createElementBlock)("div",{
+				style:"position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.35);font-size:12px;letter-spacing:1px"
+			},"封面未生成"))),(0,e.createElementVNode)("div",{
 				class:(0,e.normalizeClass)(["live-badge",{
 					ended:te.status==="\u5DF2\u7ED3\u675F" 
 				}]) 
