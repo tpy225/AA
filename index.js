@@ -64574,8 +64574,8 @@ const ux=(0,Ye.A)(gx,[["__scopeId","data-v-7485b218"]]),fx={
 			},[(0,e.createCommentVNode)(" \u5C01\u9762\u56FE "),(0,e.createElementVNode)("div",Ex,[((oe=te.image,r=(0,Ue.jH)(oe)||(/^(https?:|data:|blob:|tauri:)/.test(oe)?oe:""))?((0,e.openBlock)(),(0,e.createElementBlock)("img",{
 				src:r,alt:"cover"
 			},null,8,wx)):((0,e.openBlock)(),(0,e.createElementBlock)("div",{
-				style:"position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.35);font-size:12px;letter-spacing:1px"
-			},"封面未生成"))),(0,e.createElementVNode)("div",{
+				style:"position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a1a2e,#16213e)"
+			},[(0,e.createElementVNode)("i",{class:"fas fa-image",style:"font-size:30px;color:rgba(255,255,255,0.2)"})]))),(0,e.createElementVNode)("div",{
 				class:(0,e.normalizeClass)(["live-badge",{
 					ended:te.status==="\u5DF2\u7ED3\u675F" 
 				}]) 
@@ -64895,8 +64895,8 @@ const qx=(0,Ye.A)(Px,[["__scopeId","data-v-9aadda54"]]),_x={
 					width:"100%",height:"100%","object-fit":"cover",display:"block"
 				},onError:P,onLoad:U
 			},null,40,Jx)):((0,e.openBlock)(),(0,e.createElementBlock)("div",{
-				style:"position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.55);font-size:13px;text-align:center;padding:0 34px;line-height:1.7;letter-spacing:1px"
-			},"画面尚未生成，点击左下角按钮生成直播画面"))),i.value.prompt?((0,e.openBlock)(),(0,e.createElementBlock)("button",{
+				style:"position:absolute;inset:0;display:flex;align-items:center;justify-content:center"
+			},[(0,e.createElementVNode)("i",{class:"fas fa-image",style:"font-size:42px;color:rgba(255,255,255,0.22)"})]))),i.value.prompt?((0,e.openBlock)(),(0,e.createElementBlock)("button",{
 				key:0,class:"live-image-generate-btn",disabled:H.value,title:"\u91CD\u65B0\u751F\u6210\u753B\u9762",onClick:(0,e.withModifiers)(se,["stop"]) 
 			},[H.value?((0,e.openBlock)(),(0,e.createElementBlock)("i",n1)):((0,e.openBlock)(),(0,e.createElementBlock)("i",e1))],8,Kx)):(0,e.createCommentVNode)("v-if",!0),d[18]||(d[18]=(0,e.createElementVNode)("div",{
 				class:"live-indicator" 
@@ -64905,12 +64905,12 @@ const qx=(0,Ye.A)(Px,[["__scopeId","data-v-9aadda54"]]),_x={
 			}),(0,e.createTextVNode)(" \u76F4\u64AD\u4E2D ")],-1)),(0,e.createElementVNode)("div",t1,[d[17]||(d[17]=(0,e.createElementVNode)("i",{
 				class:"fas fa-eye" 
 			},null,-1)),(0,e.createTextVNode)(" "+(0,e.toDisplayString)(le(i.value.viewers)),1)]),(0,e.createCommentVNode)(" \u5F39\u5E55\u533A\u57DF - \u5728\u56FE\u7247\u4E0A\u6ED1\u8FC7 "),(0,e.createElementVNode)("div",a1,[(0,e.createCommentVNode)(" \u666E\u901A\u5F39\u5E55 - \u4F7F\u7528\u8F68\u9053 0, 2, 4, 6 "),((0,e.openBlock)(!0),(0,e.createElementBlock)(e.Fragment,null,(0,e.renderList)(oe.value,(m,u)=>((0,e.openBlock)(),(0,e.createElementBlock)("div",{
-				key:"normal-"+u,class:"barrage-item",style:(0,e.normalizeStyle)({
-					position:"absolute",top:2*u*24+10+"px",left:"100%",whiteSpace:"nowrap",padding:"2px 8px",borderRadius:"15px",backgroundColor:"rgba(0, 0, 0, 0.3)",fontSize:"11px",color:"#fff",animation:`barrageScroll ${6+Math.min(8,String(m.c).length/5)+1.5*u}s linear infinite`,animationDelay:2.5*u+"s" 
+				key:"n-"+m.name+"-"+m.c,class:"barrage-item",style:(0,e.normalizeStyle)({
+					position:"absolute",top:2*u*24+10+"px",left:"100%",whiteSpace:"nowrap",padding:"2px 8px",borderRadius:"15px",backgroundColor:"rgba(0, 0, 0, 0.3)",fontSize:"11px",color:"#fff",animation:`barrageScroll ${6+Math.min(8,String(m.c).length/5)+1.5*u}s linear forwards`,animationDelay:0.8*u+"s" 
 				}) 
 			},[(0,e.createElementVNode)("span",r1,(0,e.toDisplayString)(m.name),1),(0,e.createElementVNode)("span",null,(0,e.toDisplayString)(m.c),1)],4))),128)),(0,e.createCommentVNode)(" \u9192\u76EE\u7559\u8A00\u5F39\u5E55 - \u4F7F\u7528\u8F68\u9053 1, 3 "),((0,e.openBlock)(!0),(0,e.createElementBlock)(e.Fragment,null,(0,e.renderList)(i.value.superchat.slice(0,2),(m,u)=>((0,e.openBlock)(),(0,e.createElementBlock)("div",{
-				key:"sc-"+u,style:(0,e.normalizeStyle)({
-					position:"absolute",top:24*(2*u+1)+10+"px",left:"100%",whiteSpace:"nowrap",padding:"2px 8px",borderRadius:"15px",background:m.amount>=100?"linear-gradient(135deg, #f59e0b, #fbbf24)":m.amount>=50?"linear-gradient(135deg, #ec4899, #f472b6)":"linear-gradient(135deg, #3b82f6, #60a5fa)",fontSize:"11px",color:"#fff",animation:`barrageScroll ${8+Math.min(10,String(m.c).length/4)+1.5*u}s linear infinite`,animationDelay:4*u+1+"s" 
+				key:"sc-"+m.name+"-"+m.c+"-"+m.amount,style:(0,e.normalizeStyle)({
+					position:"absolute",top:24*(2*u+1)+10+"px",left:"100%",whiteSpace:"nowrap",padding:"2px 8px",borderRadius:"15px",background:m.amount>=100?"linear-gradient(135deg, #f59e0b, #fbbf24)":m.amount>=50?"linear-gradient(135deg, #ec4899, #f472b6)":"linear-gradient(135deg, #3b82f6, #60a5fa)",fontSize:"11px",color:"#fff",animation:`barrageScroll ${8+Math.min(10,String(m.c).length/4)+1.5*u}s linear forwards`,animationDelay:0.8*u+"s" 
 				}) 
 			},[(0,e.createElementVNode)("span",o1,(0,e.toDisplayString)(m.name),1),(0,e.createElementVNode)("span",i1,"\xA5"+(0,e.toDisplayString)(m.amount),1),(0,e.createElementVNode)("span",null,(0,e.toDisplayString)(m.c),1)],4))),128))])]),(0,e.createCommentVNode)(" \u76F4\u64AD\u95F4\u4FE1\u606F "),(0,e.createElementVNode)("div",s1,[(0,e.createElementVNode)("div",l1,(0,e.toDisplayString)(i.value.roomTitle),1),(0,e.createElementVNode)("div",c1,(0,e.toDisplayString)(i.value.roomDesc),1),(0,e.createElementVNode)("div",A1,[(0,e.createElementVNode)("span",d1,[d[19]||(d[19]=(0,e.createElementVNode)("i",{
 				class:"fas fa-eye" 
