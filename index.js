@@ -70345,3 +70345,151 @@ ${Qe().stringify(o)}</chat_history>`;if((0,Cn.Q)().chatAppendToLastMessage){cons
 \u5F53\u524D\u5171 ${le.length} \u5757`,SillyTavern.POPUP_TYPE.CONFIRM,void 0,{okButton:"\u786E\u8BA4",cancelButton:"\u53D6\u6D88"})===SillyTavern.POPUP_RESULT.AFFIRMATIVE)try{if(H)return await deleteChatMessages([K]),toastr.success("\u5DF2\u5220\u9664\u6700\u540E\u4E00\u5C42\u6D88\u606F"),void console.log(`[Improved Phone] Deleted message #${K}`);const M=(function(B,T){if(!T.length)return String(B||"");const N=T[T.length-1],P=String(B||"");let U=P.slice(0,N.start)+P.slice(N.end);return U=U.replace(/\n{3,}/g,`
 
 `).trim(),U})(oe,le);if(!M)return await deleteChatMessages([K]),toastr.success("\u5DF2\u5220\u9664\u6700\u540E\u4E00\u5C42\u6D88\u606F"),void console.log(`[Improved Phone] Deleted message #${K} after trimming empty`);await setChatMessages([{message_id:K,message:M}]),toastr.success("\u5DF2\u5220\u9664\u6700\u540E\u4E00\u5757"),console.log(`[Improved Phone] Removed last block in message #${K}`)}catch(M){console.error("[Improved Phone] Failed to delete message:",M),toastr.error("\u5220\u9664\u5931\u8D25")}});const te=getButtonEvent("\u590D\u4F4D");eventOn(te,()=>{localStorage.removeItem("phone_drag_position"),toastr.success("\u624B\u673A\u4F4D\u7F6E\u5DF2\u590D\u4F4D"),console.log("[Improved Phone] Phone position reset"),window.location.reload()});const X=getButtonEvent("\u5237\u65B0");eventOn(X,()=>{window.location.reload()}),console.log("[AutoMessage] ========================================"),console.log("[AutoMessage] \u521D\u59CB\u5316\u81EA\u52A8\u56DE\u590D\u6A21\u5757"),console.log("[AutoMessage] \u8C03\u8BD5\u6A21\u5F0F:","\u5F00\u542F"),eventOn(tavern_events.GENERATION_ENDED,QT),console.log("[AutoMessage] \u5DF2\u6CE8\u518C\u4E8B\u4EF6: tavern_events.GENERATION_ENDED"),rz(),console.log("[AutoMessage] \u52A0\u597D\u53CB\u6A21\u5757\u5DF2\u521D\u59CB\u5316"),console.log("[AutoMessage] \u521D\u59CB\u5316\u5B8C\u6210"),console.log("[AutoMessage] ========================================"),(0,We.n6)(),console.log("[Improved Phone] Mounted successfully.")}function nj(){try{return typeof eventOn=="function"&&typeof tavern_events<"u"&&!!SillyTavern?.getCurrentChatId&&typeof replaceScriptButtons=="function"&&typeof getButtonEvent=="function"}catch{return!1}}(async function(){const a=Date.now();for(;!nj();){if(Date.now()-a>15e3)return void console.warn("[Improved Phone] Tavern APIs not ready, aborting init.");await new Promise(n=>setTimeout(n,50))}let r="";try{r=String(SillyTavern.getCurrentChatId?.()||"")}catch{r=""}eventOn(tavern_events.CHAT_CHANGED,async n=>{const o=String(n||"");console.log("[Improved Phone] CHAT_CHANGED event fired:",o),o!==r?(r=o,await mo("chat_changed"),So(),window.location.reload()):console.log("[Improved Phone] CHAT_CHANGED chat_id unchanged, skip reload.")});const t=SillyTavern.getCurrentChatId()||"";console.log("[Improved Phone] Script loaded, initial chat_id:",t),(function(){try{const n=window.parent;n&&n.toastr&&(window.toastr=n.toastr)}catch{}})(),(function(){try{const n=an();if(!n?.body)return;HT(n)}catch(n){console.warn("[InlineMsgStyle] init failed:",n)}})(),(function(){try{if(globalThis.__phoneAbsUrl)return;globalThis.__phoneAbsUrl=function(p){p=String(p==null?"":p);if(!p)return p;if(/^(https?:|data:|blob:)/i.test(p))return p;var base="";try{base=document.baseURI||""}catch(e){}if(!base||/^about:/i.test(base)){try{base=window.parent&&window.parent!==window?window.parent.location.origin:location.origin||""}catch(e2){try{base=location.origin==="null"?"":location.origin||""}catch(e3){base=""}}}try{return new URL(p,base||"/").href}catch(e4){return p}};}catch(e){}})(),t&&ej(),(function(){globalThis.__phoneAiGate=function(){var limit=3;try{var __pv=parseInt(localStorage.getItem("phone_ai_concurrency"));if(__pv>=1&&__pv<=10)limit=__pv}catch(e){}var active=0,q=[],strikes=0,timer=null;function baseLimit(){try{var v=parseInt(localStorage.getItem("phone_ai_concurrency"));return v>=1&&v<=10?v:3}catch(e){return 3}}function pump(){while(active<limit&&q.length){active++;q.shift()()}}function acquire(){return new Promise(function(res){q.push(res);pump()})}function release(){active=Math.max(0,active-1);pump()}return{run:function(fn){return acquire().then(function(){return Promise.resolve().then(fn).finally(release)})},setLimit:function(n){n=Math.max(1,Math.min(10,parseInt(n)||3));try{localStorage.setItem("phone_ai_concurrency",String(n))}catch(e){}limit=n;pump()},getLimit:function(){return limit},noteRateLimited:function(){strikes++;if(strikes>=2&&limit>1){limit=1;if(timer)clearTimeout(timer);timer=setTimeout(function(){strikes=0;limit=baseLimit();pump()},30000)}},noteOk:function(){strikes=0}}}();})(),(function(){try{if(!localStorage.getItem("phone_hist10_v1")){var __mig=function(o){if(o&&typeof o=="object"){if(o.historyConfig&&o.historyConfig.maxMessages===100)o.historyConfig.maxMessages=10;if(Array.isArray(o.presets))o.presets.forEach(function(p){if(p&&p.historyConfig&&p.historyConfig.maxMessages===100)p.historyConfig.maxMessages=10})}};var __a=localStorage.getItem("phone_other_settings");if(__a){var __o=JSON.parse(__a);__mig(__o);localStorage.setItem("phone_other_settings",JSON.stringify(__o))}var __b=localStorage.getItem("phone_presets");if(__b){var __q=JSON.parse(__b);__mig(__q);localStorage.setItem("phone_presets",JSON.stringify(__q))}localStorage.setItem("phone_hist10_v1","1")}}catch(e){try{localStorage.setItem("phone_hist10_v1","1")}catch(e2){}}})(),(function(){try{var css="*{scrollbar-width:none!important;-ms-overflow-style:none!important}*::-webkit-scrollbar{width:0!important;height:0!important;display:none!important;background:0 0!important;-webkit-appearance:none!important}html,body{overflow-x:hidden!important;scrollbar-width:none!important;-ms-overflow-style:none!important}.phone-wrapper,.phone-container,.phone-screen{overflow-x:hidden!important}.nai-preset-group{margin:0 0 16px!important}.nai-preset-label{display:block!important;font-size:13px!important;font-weight:500!important;color:#64748b!important;margin:0 0 8px!important}.nai-preset-row{display:flex!important;align-items:center!important;gap:6px!important;margin-top:0!important}.nai-preset-select{flex:1 1 auto!important;min-width:0!important;width:auto!important;margin:0!important;height:36px!important;padding:0 12px!important;font-size:14px!important;color:#475569!important;background:#fff!important;border:1px solid rgba(143,184,237,.45)!important;border-radius:10px!important;box-sizing:border-box!important;-webkit-appearance:none!important;appearance:none!important}.nai-preset-btn{width:36px!important;height:36px!important;flex:0 0 36px!important;padding:0!important;border:none!important;border-radius:10px!important;background:linear-gradient(135deg,#8FB8ED,#7AA8E0)!important;color:#fff!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:14px!important;cursor:pointer!important;box-shadow:0 2px 8px rgba(143,184,237,.25)!important}.nai-preset-btn:active{transform:scale(.95)!important}.nai-preset-btn.danger{background:linear-gradient(135deg,#f87171,#ef4444)!important;box-shadow:0 2px 8px rgba(239,68,68,.25)!important}.jailbreak-textarea{width:100%!important;min-height:96px;margin-top:8px;padding:10px 12px;font-size:13px;color:#475569;background:#fff;border:1px solid rgba(143,184,237,.45);border-radius:10px;box-sizing:border-box;resize:vertical;font-family:inherit;line-height:1.5}";var __docs=[];var __push=function(x){if(x&&x.head&&__docs.indexOf(x)<0)__docs.push(x)};__push(an());__push(document);try{window.parent&&window.parent!==window&&__push(window.parent.document)}catch(n1){}try{window.top&&window.top!==window&&__push(window.top.document)}catch(n2){}try{var __fr=document.querySelectorAll("iframe");for(var __fi=0;__fi<__fr.length;__fi++){try{__fr[__fi].contentDocument&&__push(__fr[__fi].contentDocument)}catch(n3){}}}catch(n4){}try{var __pf=window.parent&&window.parent.document;if(__pf){var __fr2=__pf.querySelectorAll("iframe");for(var __fi2=0;__fi2<__fr2.length;__fi2++){try{__fr2[__fi2].contentDocument&&__push(__fr2[__fi2].contentDocument)}catch(n5){}}}}catch(n6){}var __first=__docs[0];for(var __di=0;__di<__docs.length;__di++){var d=__docs[__di];if(d&&d.head&&!d.getElementById("phone-ui-scrollbar-fix")){var st=d.createElement("style");st.id="phone-ui-scrollbar-fix";st.textContent=css;d.head.appendChild(st);if(d===__first){var lk=d.createElement("link");lk.rel="preconnect";lk.href="https://files.catbox.moe";d.head.appendChild(lk)}}}}catch(n){console.warn("[PhoneUI] style init failed:",n)}})()})();
+;(function(){
+	if(globalThis.__phoneDiagInstalled)return;
+	globalThis.__phoneDiagInstalled=!0;
+	var BUILD="selfcheck-1 2026-10-07";
+	var errors=[];
+	function pushErr(s){try{errors.push(new Date().toISOString().slice(11,19)+" "+s);if(errors.length>30)errors.shift()}catch(e){}}
+	window.addEventListener("error",function(e){pushErr("ERROR: "+(e.message||"")+" @ "+(e.filename||"")+":"+(e.lineno||"")+"\n"+((e.error&&e.error.stack)||""));},!0);
+	window.addEventListener("unhandledrejection",function(e){var r=e.reason;pushErr("REJECT: "+((r&&(r.stack||r.message))||String(r)));});
+	function pad(n){return n<10?"0"+n:""+n}
+	function lsDump(){
+		var out=[];
+		for(var i=0;i<localStorage.length;i++){
+			var k=localStorage.key(i);
+			if(!/^phone_/.test(k))continue;
+			var v=localStorage.getItem(k)||"";
+			var extra="";
+			try{var j=JSON.parse(v);extra=" keys:["+Object.keys(j).join(",")+"]";if(j.novelai&&j.novelai.model)extra+=" model="+j.novelai.model;}catch(e){}
+			out.push(k+" ("+v.length+"B)"+extra);
+		}
+		return out.join("\n");
+	}
+	function allRoots(){
+		var roots=[document],seen=new Set();
+		for(var q=0;q<roots.length;q++){
+			var rt=roots[q];
+			if(seen.has(rt))continue;
+			seen.add(rt);
+			var els;
+			try{els=rt.querySelectorAll("*");}catch(e){continue;}
+			for(var i=0;i<els.length;i++){
+				if(els[i].shadowRoot)roots.push(els[i].shadowRoot);
+			}
+		}
+		return roots;
+	}
+	function qsa(sel){
+		var out=[];
+		allRoots().forEach(function(rt){
+			try{Array.prototype.push.apply(out,rt.querySelectorAll(sel));}catch(e){}
+		});
+		return out;
+	}
+	function findEntry(){
+		var roots=allRoots();
+		for(var r=0;r<roots.length;r++){
+			var divs;
+			try{divs=roots[r].querySelectorAll(".config-item-action, div");}catch(e){continue;}
+			for(var i=0;i<divs.length;i++){
+				var d=divs[i],t=d.textContent||"";
+				if(/(标签过滤规则|標籤過濾規則)/.test(t)&&t.length<60)return d;
+			}
+		}
+		return null;
+	}
+	function entryTest(){
+		var lines=[];
+		var el=findEntry();
+		if(!el)return "入口元素 NOT FOUND";
+		var r=el.getBoundingClientRect();
+		var cx=r.left+r.width/2,cy=r.top+r.height/2,top=document.elementFromPoint(cx,cy);
+		var chain=[];var n=top;
+		while(n&&chain.length<6){chain.push(n.tagName+"."+String(n.className||"").split(" ").join(".")+"#"+n.id);if(n===el)break;n=n.parentElement;}
+		var cs=getComputedStyle(el);
+		lines.push("入口 rect: "+JSON.stringify({x:Math.round(r.x),y:Math.round(r.y),w:Math.round(r.width),h:Math.round(r.height)}));
+		lines.push("pointer-events="+cs.pointerEvents+" visibility="+cs.visibility);
+		lines.push("center top元素: "+chain.join(" < "));
+		var within=!1;var x=top;
+		while(x){if(x===el){within=!0;break;}x=x.parentElement;}
+		lines.push("命中点落在入口内部: "+(within?"是":"否 ← 被其他元素遮挡"));
+		var before=qsa(".tag-filter-modal-overlay").length;
+		try{
+			["pointerdown","mousedown","pointerup","mouseup","click"].forEach(function(type){
+				var Ctor=/mouse/.test(type)?MouseEvent:PointerEvent;
+				var ev;
+				try{ev=new Ctor(type,{bubbles:!0,cancelable:!0,view:window,clientX:cx,clientY:cy});}catch(e){ev=new MouseEvent(type,{bubbles:!0,cancelable:!0,view:window,clientX:cx,clientY:cy});}
+				el.dispatchEvent(ev);
+			});
+		}catch(e){lines.push("派发异常: "+e);}
+		return new Promise(function(res){
+			setTimeout(function(){
+				var overlays=qsa(".tag-filter-modal-overlay");
+				var modal=qsa(".tag-filter-modal");
+				lines.push("点击后 overlay 数: "+before+" → "+overlays.length+"，modal "+(modal.length?"出现 ✓":"未出现 ✗"));
+				resolve(lines.join("\n"));
+			},400);
+		});
+	}
+	function endpointCheck(){
+		return new Promise(function(res){
+			try{
+				var cfg=JSON.parse(localStorage.getItem("phone_novelai_config")||"{}");
+				var profiles=JSON.parse(localStorage.getItem("phone_api_profiles")||"[]");
+				var p=profiles.find(function(x){return x.id===cfg.activeProfileId})||profiles[0]||{};
+				var base=p.baseUrl||p.baseURL||p.url||"";
+				if(!base)return res("无可用 profile baseUrl");
+				var t0=Date.now();
+				fetch(base,{method:"GET",mode:"no-cors",cache:"no-store"}).then(function(){
+					res("端点可达 (no-cors opaque) "+base+" "+(Date.now()-t0)+"ms");
+				}).catch(function(e){
+					res("端点请求失败: "+e.message+" "+base);
+				});
+			}catch(e){res("endpointCheck: "+e);}
+		});
+	}
+	async function buildReport(){
+		var R=[];
+		R.push("==== Phone 自检报告 ====");
+		R.push("build: "+BUILD);
+		R.push("time: "+new Date().toString());
+		R.push("UA: "+navigator.userAgent);
+		R.push("\n-- localStorage --\n"+lsDump());
+		R.push("\n-- 全局错误(近30条, 自检安装后) --\n"+(errors.join("\n")||"无"));
+		R.push("\n-- 标签过滤入口测试 --\n"+await entryTest());
+		R.push("\n-- 生图端点 --\n"+await endpointCheck());
+		return R.join("\n");
+	}
+	function css(el,o){for(var k in o)el.style[k]=o[k];}
+	function openPanel(){
+		var mask=document.createElement("div");
+		css(mask,{position:"fixed",inset:"0",zIndex:"2147483646",background:"rgba(0,0,0,.45)"});
+		var box=document.createElement("div");
+		css(box,{position:"fixed",zIndex:"2147483647",left:"12px",right:"12px",top:"40px",bottom:"40px",background:"#fff",borderRadius:"14px",display:"flex",flexDirection:"column",overflow:"hidden",fontFamily:"sans-serif"});
+		var bar=document.createElement("div");
+		css(bar,{display:"flex",gap:"8px",padding:"10px",borderBottom:"1px solid #e2e8f0",flexShrink:"0"});
+		var ta=document.createElement("textarea");
+		ta.readOnly=!0;
+		ta.value="生成中…（若测标签过滤，请先停在「对话历史」页再点测试）";
+		css(ta,{flex:"1",border:"none",padding:"10px",fontSize:"11px",lineHeight:"1.4",resize:"none",outline:"none",color:"#334155",WebkitUserSelect:"text"});
+		function btn(txt,fn){
+			var b=document.createElement("button");b.textContent=txt;
+			css(b,{flex:"1",padding:"8px 4px",fontSize:"13px",border:"1px solid #cbd5e1",borderRadius:"8px",background:"#f8fafc",color:"#334155"});
+			b.onclick=fn;bar.appendChild(b);
+		}
+		btn("生成报告",async function(){ta.value="生成中…";ta.value=await buildReport();});
+		btn("复制",function(){ta.focus();ta.select();var ok=!1;try{ok=document.execCommand("copy");}catch(e){}if(!ok){var s=window.getSelection();var r=document.createRange();r.selectNodeContents(ta);s.removeAllRanges();s.addRange(r);}});
+		btn("关闭",function(){mask.remove();box.remove();});
+		box.appendChild(bar);box.appendChild(ta);
+		document.body.appendChild(mask);document.body.appendChild(box);
+	}
+	var fab=document.createElement("div");
+	fab.textContent="檢";
+	css(fab,{position:"fixed",left:"6px",bottom:"80px",zIndex:"2147483645",width:"34px",height:"34px",borderRadius:"50%",background:"#8FB8ED",color:"#fff",fontSize:"15px",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 2px 8px rgba(0,0,0,.25)",fontFamily:"sans-serif"});
+	fab.onclick=openPanel;
+	function addFab(){if(document.body)document.body.appendChild(fab);else setTimeout(addFab,200);}
+	addFab();
+	globalThis.__phoneDiag={open:openPanel,report:buildReport};
+	console.log("[PhoneDiag] installed "+BUILD);
+})();
