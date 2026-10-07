@@ -63292,7 +63292,7 @@ const T0=(0,Ye.A)(I0,[["__scopeId","data-v-0076818b"]]),j0={
 						config:Ve,referenceImages:k
 					}),ie=ee.startsWith("data:image/")?await(0,tt.uploadImageDataUrlToSillyTavern)(ee,{
 						characterName:String(ve.name||"")
-					}):ee;ve.image=ie,ve.imageUrl=ie,Le.data={...ge,posts:[...ge.posts]},__diag("dataUrl len="+ee.length+" head="+ee.slice(0,40)),__diag("uploaded="+ie),__diag("q(post)="+q(ve)),(await dt("dynamic",ge))?__diag("dt done"):__diag("WARN: no dynamic source floor, not persisted"),toastr.success("生图完成")
+					}):ee;ve.image=ie,ve.imageUrl=ie,Le.data={...ge,posts:[...ge.posts]},__diag("dataUrl len="+ee.length+" head="+ee.slice(0,40)),__diag("uploaded="+ie),__diag("q(post)="+q(ve)),toastr.info("自检 q="+q(ve).slice(0,90)+" | raw="+ie.slice(0,50),"",{timeOut:20000}),(await dt("dynamic",ge))?__diag("dt done"):__diag("WARN: no dynamic source floor, not persisted"),toastr.success("生图完成")
 				}catch(ee){
 					__diag("ERROR: "+(ee instanceof Error?ee.stack||ee.message:String(ee))),console.error("[Dynamic] \u751F\u56FE\u5931\u8D25:",ee),toastr.error("\u751F\u56FE\u5931\u8D25: "+(ee instanceof Error?ee.message:"\u672A\u77E5\u9519\u8BEF"))
 				}finally{
