@@ -70338,3 +70338,94 @@ ${Qe().stringify(o)}</chat_history>`;if((0,Cn.Q)().chatAppendToLastMessage){cons
 \u5F53\u524D\u5171 ${le.length} \u5757`,SillyTavern.POPUP_TYPE.CONFIRM,void 0,{okButton:"\u786E\u8BA4",cancelButton:"\u53D6\u6D88"})===SillyTavern.POPUP_RESULT.AFFIRMATIVE)try{if(H)return await deleteChatMessages([K]),toastr.success("\u5DF2\u5220\u9664\u6700\u540E\u4E00\u5C42\u6D88\u606F"),void console.log(`[Improved Phone] Deleted message #${K}`);const M=(function(B,T){if(!T.length)return String(B||"");const N=T[T.length-1],P=String(B||"");let U=P.slice(0,N.start)+P.slice(N.end);return U=U.replace(/\n{3,}/g,`
 
 `).trim(),U})(oe,le);if(!M)return await deleteChatMessages([K]),toastr.success("\u5DF2\u5220\u9664\u6700\u540E\u4E00\u5C42\u6D88\u606F"),void console.log(`[Improved Phone] Deleted message #${K} after trimming empty`);await setChatMessages([{message_id:K,message:M}]),toastr.success("\u5DF2\u5220\u9664\u6700\u540E\u4E00\u5757"),console.log(`[Improved Phone] Removed last block in message #${K}`)}catch(M){console.error("[Improved Phone] Failed to delete message:",M),toastr.error("\u5220\u9664\u5931\u8D25")}});const te=getButtonEvent("\u590D\u4F4D");eventOn(te,()=>{localStorage.removeItem("phone_drag_position"),toastr.success("\u624B\u673A\u4F4D\u7F6E\u5DF2\u590D\u4F4D"),console.log("[Improved Phone] Phone position reset"),window.location.reload()});const X=getButtonEvent("\u5237\u65B0");eventOn(X,()=>{window.location.reload()}),console.log("[AutoMessage] ========================================"),console.log("[AutoMessage] \u521D\u59CB\u5316\u81EA\u52A8\u56DE\u590D\u6A21\u5757"),console.log("[AutoMessage] \u8C03\u8BD5\u6A21\u5F0F:","\u5F00\u542F"),eventOn(tavern_events.GENERATION_ENDED,QT),console.log("[AutoMessage] \u5DF2\u6CE8\u518C\u4E8B\u4EF6: tavern_events.GENERATION_ENDED"),rz(),console.log("[AutoMessage] \u52A0\u597D\u53CB\u6A21\u5757\u5DF2\u521D\u59CB\u5316"),console.log("[AutoMessage] \u521D\u59CB\u5316\u5B8C\u6210"),console.log("[AutoMessage] ========================================"),(0,We.n6)(),console.log("[Improved Phone] Mounted successfully.")}function nj(){try{return typeof eventOn=="function"&&typeof tavern_events<"u"&&!!SillyTavern?.getCurrentChatId&&typeof replaceScriptButtons=="function"&&typeof getButtonEvent=="function"}catch{return!1}}(async function(){const a=Date.now();for(;!nj();){if(Date.now()-a>15e3)return void console.warn("[Improved Phone] Tavern APIs not ready, aborting init.");await new Promise(n=>setTimeout(n,50))}let r="";try{r=String(SillyTavern.getCurrentChatId?.()||"")}catch{r=""}eventOn(tavern_events.CHAT_CHANGED,async n=>{const o=String(n||"");console.log("[Improved Phone] CHAT_CHANGED event fired:",o),o!==r?(r=o,await mo("chat_changed"),So(),window.location.reload()):console.log("[Improved Phone] CHAT_CHANGED chat_id unchanged, skip reload.")});const t=SillyTavern.getCurrentChatId()||"";console.log("[Improved Phone] Script loaded, initial chat_id:",t),(function(){try{const n=window.parent;n&&n.toastr&&(window.toastr=n.toastr)}catch{}})(),(function(){try{const n=an();if(!n?.body)return;HT(n)}catch(n){console.warn("[InlineMsgStyle] init failed:",n)}})(),(function(){try{if(globalThis.__phoneAbsUrl)return;globalThis.__phoneAbsUrl=function(p){p=String(p==null?"":p);if(!p)return p;if(/^(https?:|data:|blob:)/i.test(p))return p;var base="";try{base=document.baseURI||""}catch(e){}if(!base||/^about:/i.test(base)){try{base=window.parent&&window.parent!==window?window.parent.location.origin:location.origin||""}catch(e2){try{base=location.origin==="null"?"":location.origin||""}catch(e3){base=""}}}try{return new URL(p,base||"/").href}catch(e4){return p}};}catch(e){}})(),t&&ej(),(function(){try{var css="*{scrollbar-width:none!important;-ms-overflow-style:none!important}*::-webkit-scrollbar{width:0!important;height:0!important;display:none!important;background:0 0!important;-webkit-appearance:none!important}html,body{overflow-x:hidden!important;scrollbar-width:none!important;-ms-overflow-style:none!important}.phone-wrapper,.phone-container,.phone-screen{overflow-x:hidden!important}.nai-preset-group{margin:0 0 16px!important}.nai-preset-label{display:block!important;font-size:13px!important;font-weight:500!important;color:#64748b!important;margin:0 0 8px!important}.nai-preset-row{display:flex!important;align-items:center!important;gap:6px!important;margin-top:0!important}.nai-preset-select{flex:1 1 auto!important;min-width:0!important;width:auto!important;margin:0!important;height:36px!important;padding:0 12px!important;font-size:14px!important;color:#475569!important;background:#fff!important;border:1px solid rgba(143,184,237,.45)!important;border-radius:10px!important;box-sizing:border-box!important;-webkit-appearance:none!important;appearance:none!important}.nai-preset-btn{width:36px!important;height:36px!important;flex:0 0 36px!important;padding:0!important;border:none!important;border-radius:10px!important;background:linear-gradient(135deg,#8FB8ED,#7AA8E0)!important;color:#fff!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:14px!important;cursor:pointer!important;box-shadow:0 2px 8px rgba(143,184,237,.25)!important}.nai-preset-btn:active{transform:scale(.95)!important}.nai-preset-btn.danger{background:linear-gradient(135deg,#f87171,#ef4444)!important;box-shadow:0 2px 8px rgba(239,68,68,.25)!important}";var __docs=[];var __push=function(x){if(x&&x.head&&__docs.indexOf(x)<0)__docs.push(x)};__push(an());__push(document);try{window.parent&&window.parent!==window&&__push(window.parent.document)}catch(n1){}try{window.top&&window.top!==window&&__push(window.top.document)}catch(n2){}try{var __fr=document.querySelectorAll("iframe");for(var __fi=0;__fi<__fr.length;__fi++){try{__fr[__fi].contentDocument&&__push(__fr[__fi].contentDocument)}catch(n3){}}}catch(n4){}try{var __pf=window.parent&&window.parent.document;if(__pf){var __fr2=__pf.querySelectorAll("iframe");for(var __fi2=0;__fi2<__fr2.length;__fi2++){try{__fr2[__fi2].contentDocument&&__push(__fr2[__fi2].contentDocument)}catch(n5){}}}}catch(n6){}var __first=__docs[0];for(var __di=0;__di<__docs.length;__di++){var d=__docs[__di];if(d&&d.head&&!d.getElementById("phone-ui-scrollbar-fix")){var st=d.createElement("style");st.id="phone-ui-scrollbar-fix";st.textContent=css;d.head.appendChild(st);if(d===__first){var lk=d.createElement("link");lk.rel="preconnect";lk.href="https://files.catbox.moe";d.head.appendChild(lk)}}}}catch(n){console.warn("[PhoneUI] style init failed:",n)}})()})();
+;
+/* ===== 临时屏幕日志面板（排障后移除）===== */
+(function () {
+  if (window.__phoneLogPanel) return;
+  window.__phoneLogPanel = true;
+  var lines = [];
+  function add(level, args) {
+    try {
+      var text = Array.prototype.map.call(args, function (a) {
+        if (a instanceof Error) return a.stack || (a.name + ": " + a.message);
+        if (typeof a === "object") { try { return JSON.stringify(a); } catch (e) { return String(a); } }
+        return String(a);
+      }).join(" ");
+      lines.push("[" + level + "] " + text);
+      if (lines.length > 300) lines.shift();
+      render();
+    } catch (e) {}
+  }
+  var oc = console.log.bind(console), oe = console.error.bind(console), ow = console.warn.bind(console);
+  console.log = function () { add("log", arguments); oc.apply(null, arguments); };
+  console.error = function () { add("ERR", arguments); oe.apply(null, arguments); };
+  console.warn = function () { add("warn", arguments); ow.apply(null, arguments); };
+  window.addEventListener("error", function (e) {
+    add("UNCAUGHT", [e.message + " @ " + (e.filename || "") + ":" + (e.lineno || "")]);
+  });
+  window.addEventListener("unhandledrejection", function (e) {
+    add("PROMISE", [e.reason && (e.reason.stack || e.reason.message) || e.reason]);
+  });
+
+  var box, list, btn, panel;
+  function render() {
+    if (!list) return;
+    list.textContent = lines.slice(-120).join("\n");
+    btn.textContent = "LOG" + (lines.some(function (l) { return /ERR|UNCAUGHT|PROMISE/.test(l); }) ? "!" : "");
+  }
+  function build() {
+    if (document.getElementById("phone-log-panel")) return;
+    btn = document.createElement("button");
+    btn.id = "phone-log-btn";
+    btn.textContent = "LOG";
+    var bs = "position:fixed;left:0;top:45%;z-index:2147483647;width:42px;height:42px;" +
+      "border-radius:0 21px 21px 0;border:0;background:#2563eb;color:#fff;font-size:12px;" +
+      "font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.3);opacity:.85;";
+    btn.style.cssText = bs;
+    panel = document.createElement("div");
+    panel.id = "phone-log-panel";
+    panel.style.cssText = "position:fixed;left:8px;right:8px;top:60px;bottom:80px;z-index:2147483647;" +
+      "background:rgba(15,23,42,.96);border-radius:12px;display:none;flex-direction:column;" +
+      "box-shadow:0 8px 30px rgba(0,0,0,.5);overflow:hidden;";
+    var bar = document.createElement("div");
+    bar.style.cssText = "display:flex;gap:8px;padding:8px;";
+    function mkBtn(t, fn) {
+      var b = document.createElement("button");
+      b.textContent = t;
+      b.style.cssText = "font-size:13px;padding:6px 12px;border-radius:8px;border:0;background:#334155;color:#fff;";
+      b.onclick = fn;
+      return b;
+    }
+    var copyB = mkBtn("复制", function () {
+      var t = lines.join("\n");
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(t).then(function () { copyB.textContent = "已复制"; setTimeout(function(){copyB.textContent="复制";},1500); });
+      } else {
+        var ta = document.createElement("textarea");
+        ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand("copy"); copyB.textContent = "已复制"; setTimeout(function(){copyB.textContent="复制";},1500); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+    });
+    var clearB = mkBtn("清空", function () { lines = []; render(); });
+    var closeB = mkBtn("关闭", function () { panel.style.display = "none"; });
+    bar.appendChild(copyB); bar.appendChild(clearB); bar.appendChild(closeB);
+    panel.appendChild(bar);
+    list = document.createElement("pre");
+    list.style.cssText = "flex:1;margin:0;padding:8px 10px;color:#a7f3d0;font-size:11px;line-height:1.45;" +
+      "overflow:auto;white-space:pre-wrap;word-break:break-all;font-family:ui-monospace,Menlo,monospace;";
+    panel.appendChild(list);
+    btn.onclick = function () {
+      panel.style.display = panel.style.display === "none" ? "flex" : "none";
+      render();
+    };
+    document.body.appendChild(btn);
+    document.body.appendChild(panel);
+  }
+  function tryBuild() {
+    if (document.body) build();
+    else setTimeout(tryBuild, 200);
+  }
+  tryBuild();
+})();
