@@ -70404,16 +70404,18 @@ ${Qe().stringify(o)}</chat_history>`;if((0,Cn.Q)().chatAppendToLastMessage){cons
 		var el=findEntry();
 		if(!el)return "入口元素 NOT FOUND";
 		var r=el.getBoundingClientRect();
-		var cx=r.left+r.width/2,cy=r.top+r.height/2,top=document.elementFromPoint(cx,cy);
-		var chain=[];var n=top;
-		while(n&&chain.length<6){chain.push(n.tagName+"."+String(n.className||"").split(" ").join(".")+"#"+n.id);if(n===el)break;n=n.parentElement;}
+		var cx=r.left+r.width/2,cy=r.top+r.height/2;
+		var stackAll=document.elementsFromPoint(cx,cy)||[document.elementFromPoint(cx,cy)];
+		var chain=stackAll.map(function(n){
+			if(!n)return"(null)";
+			return n.tagName+"."+String(n.className||"").split(" ").join(".")+"#"+n.id;
+		});
 		var cs=getComputedStyle(el);
 		lines.push("入口 rect: "+JSON.stringify({x:Math.round(r.x),y:Math.round(r.y),w:Math.round(r.width),h:Math.round(r.height)}));
 		lines.push("pointer-events="+cs.pointerEvents+" visibility="+cs.visibility);
-		lines.push("center top元素: "+chain.join(" < "));
-		var within=!1;var x=top;
-		while(x){if(x===el){within=!0;break;}x=x.parentElement;}
-		lines.push("命中点落在入口内部: "+(within?"是":"否 ← 被其他元素遮挡"));
+		lines.push("该坐标完整元素堆疊(顶→底):\n  "+chain.join("\n  "));
+		var within=stackAll.indexOf(el)>=0;
+		lines.push("入口在命中堆疊中: "+(within?"是（第"+stackAll.indexOf(el)+"层）":"否 ← 被其他元素遮挡"));
 		var before=qsa(".tag-filter-modal-overlay").length;
 		try{
 			["pointerdown","mousedown","pointerup","mouseup","click"].forEach(function(type){
