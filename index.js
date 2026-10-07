@@ -64888,8 +64888,8 @@ const qx=(0,Ye.A)(Px,[["__scopeId","data-v-9aadda54"]]),_x={
 				class:(0,e.normalizeClass)(["follow-btn",{
 					following:c.value 
 				}]),onClick:R 
-			},(0,e.toDisplayString)(c.value?"\u5DF2\u5173\u6CE8":"+ \u5173\u6CE8"),3)]),(0,e.createCommentVNode)(" \u76F4\u64AD\u89C6\u9891\u533A\u57DF "),(0,e.createElementVNode)("div",Hx,[((b=i.value.image,(0,Ue.jH)(b)||b)?((0,e.openBlock)(),(0,e.createElementBlock)("img",{
-				src:(0,Ue.jH)(b)||b,alt:"直播画面",style:{
+			},(0,e.toDisplayString)(c.value?"\u5DF2\u5173\u6CE8":"+ \u5173\u6CE8"),3)]),(0,e.createCommentVNode)(" \u76F4\u64AD\u89C6\u9891\u533A\u57DF "),(0,e.createElementVNode)("div",Hx,[((b=i.value.image,r=(0,Ue.jH)(b)||(/^(https?:|data:|blob:|tauri:)/.test(b)?b:""))?((0,e.openBlock)(),(0,e.createElementBlock)("img",{
+				src:r,alt:"直播画面",style:{
 					width:"100%",height:"100%","object-fit":"cover",display:"block"
 				},onError:P,onLoad:U
 			},null,40,Jx)):((0,e.openBlock)(),(0,e.createElementBlock)("div",{
