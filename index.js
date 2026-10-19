@@ -57509,7 +57509,7 @@ const submit = () => {
 },9970(a,r,t){	t.d(r,{
 		NightCityApp:()=>Nc,fetchNightCityDataFromAi:()=>nc
 	});
-	var n=t(4061),o=t(112),s=t(2224),i=t.n(s),l=t(7856),c=t.n(l),a=t(8700),p=t(9852);
+	var n=t(4061),o=t(112),s=t(2224),i=t.n(s),l=t(7856),c=t.n(l),a=t(8700),p=t(9852),En=t(920),Fn=t(685),tt=t(4660);
 
 	// 不夜城板块定义
 	const BOARDS=[
@@ -57651,6 +57651,7 @@ ${contactInfo||"暂无角色名单，使用路人网名"}
 4. 每条帖子必须有标题、正文、作者、板块
 5. 帖子要有深夜论坛的氛围：口语化、带情绪、具体
 6. 可以带评论（2-5 条），评论要像深夜论坛：起哄、追问、约
+7. 每条帖子可选带 prompt 字段：用于配图的生图提示词（英文或中英混合，50-150词），描述帖子氛围、人物、场景、风格。如果帖子不需要配图则省略此字段
 
 【输出格式】
 只输出一个 JSON 对象，不要有其他文字：
@@ -57663,6 +57664,8 @@ ${contactInfo||"暂无角色名单，使用路人网名"}
       "content": "正文40-160字",
       "author": "发帖人",
       "tags": ["标签1","标签2"],
+      "prompt": "可选：生图提示词，描述氛围、人物、场景、风格",
+      "imageUrl": "",
       "comments": [
         {"name": "评论人", "c": "评论10-40字"}
       ],
@@ -57704,6 +57707,7 @@ ${contactInfo||"暂无角色名单，使用路人网名"}
 			const loading=(0,n.ref)(!1);
 			const activeBoard=(0,n.ref)("");
 			const errorMsg=(0,n.ref)("");
+			const imgLoading=(0,n.ref)({}); // {[postIdx]: true}
 
 			const boardName=(0,n.computed)(()=>{
 				const map={};
@@ -57718,6 +57722,31 @@ ${contactInfo||"暂无角色名单，使用路人网名"}
 
 			function goHome(){
 				emit("back");
+			}
+
+			async function generateImage(postIdx){
+				const post=posts.value[postIdx];
+				if(!post||!post.prompt)return void toastr.warning("这条帖子没有生图 prompt");
+				if(imgLoading.value[postIdx])return;
+				const cfg=En.loadNovelAiConfig();
+				const fmt=cfg.apiFormat==="openai"?"OpenAI":cfg.apiFormat==="gemini"?"Gemini":"NovelAI";
+				const provider=cfg.apiFormat==="novelai"?cfg.novelai:cfg.apiFormat==="openai"?cfg.openai:cfg.gemini;
+				if(!provider.url||!provider.key)return void toastr.warning(`请先在设置-绘图配置中填写 ${fmt} URL 和 Key`);
+				if((cfg.apiFormat==="openai"||cfg.apiFormat==="gemini")&&!String(provider.model||"").trim())return void toastr.warning(`请先在设置-绘图配置中填写 ${fmt} 模型`);
+				const{promptText:pt,referenceImages:ri}=Fn.buildPromptRequestByMode(post.prompt,cfg.promptComposeMode);
+				if(!pt)return void toastr.warning("prompt 为空");
+				imgLoading.value[postIdx]=!0;
+				try{
+					const{dataUrl:du}=await Fn.queueNovelAiImageGeneration(pt,{config:cfg,referenceImages:ri});
+					post.imageUrl=du.startsWith("data:image/")?await tt.uploadImageDataUrlToSillyTavern(du,{characterName:"不夜城"}):du;
+					await saveNightPosts(posts.value,null);
+					toastr.success("生图完成");
+				}catch(e){
+					console.error("[NightCity] 生图失败:",e);
+					toastr.error("生图失败: "+(e instanceof Error?e.message:"未知错误"));
+				}finally{
+					imgLoading.value[postIdx]=!1;
+				}
 			}
 
 			async function refresh(){
@@ -57754,8 +57783,8 @@ ${contactInfo||"暂无角色名单，使用路人网名"}
 			});
 
 			return{
-				posts,loading,activeBoard,errorMsg,boardName,filteredPosts,
-				BOARDS,goHome,refresh
+				posts,loading,activeBoard,errorMsg,imgLoading,boardName,filteredPosts,
+				BOARDS,goHome,refresh,generateImage
 			};
 		},
 		render(){
@@ -57798,23 +57827,40 @@ ${contactInfo||"暂无角色名单，使用路人网名"}
 						h("p",{class:"night-empty-hint"},"点击右上角刷新，看看今夜有什么"),
 						h("button",{class:"night-refresh-main",onClick:self.refresh},"刷新帖子")
 					]):null,
-					...self.filteredPosts.map((post,idx)=>h("div",{class:"night-post",key:idx},[
-						h("div",{class:"night-post-header"},[
-							h("span",{class:"night-author"},post.author||"匿名"),
-							h("span",{class:"night-board-tag"},self.boardName[post.board]||post.board)
-						]),
-						post.title?h("div",{class:"night-post-title"},post.title):null,
-						h("div",{class:"night-post-content"},post.content||""),
-						post.tags&&post.tags.length?h("div",{class:"night-tags"},[
-							...post.tags.map(tag=>h("span",{class:"night-tag"},tag))
-						]):null,
-						post.comments&&post.comments.length?h("div",{class:"night-comments"},[
-							...post.comments.slice(0,5).map((cmt,ci)=>h("div",{class:"night-comment",key:ci},[
-								h("span",{class:"night-comment-name"},cmt.name||""),
-								h("span",{class:"night-comment-text"},cmt.c||"")
-							]))
-						]):null
-					]))
+					...self.filteredPosts.map((post,idx)=>{
+						const realIdx=self.posts.indexOf(post);
+						const hasImg=!!(post.imageUrl||post.image);
+						const isImgLoading=!!self.imgLoading[realIdx];
+						return h("div",{class:"night-post",key:idx},[
+							h("div",{class:"night-post-header"},[
+								h("span",{class:"night-author"},post.author||"匿名"),
+								h("span",{class:"night-board-tag"},self.boardName[post.board]||post.board)
+							]),
+							post.title?h("div",{class:"night-post-title"},post.title):null,
+							h("div",{class:"night-post-content"},post.content||""),
+							// 图片/生图按钮
+							hasImg?h("div",{class:"night-post-image-wrap"},[
+								h("img",{class:"night-post-image",src:post.imageUrl||post.image,alt:"post"})
+							]):null,
+							!hasImg&&post.prompt?h("button",{
+								class:{"night-gen-img":!0,loading:isImgLoading},
+								onClick:()=>self.generateImage(realIdx),
+								disabled:isImgLoading
+							},[
+								h("i",{class:isImgLoading?"fas fa-spinner fa-spin":"fas fa-wand-magic-sparkles"}),
+								h("span",isImgLoading?"生图中...":"生成配图")
+							]):null,
+							post.tags&&post.tags.length?h("div",{class:"night-tags"},[
+								...post.tags.map(tag=>h("span",{class:"night-tag"},tag))
+							]):null,
+							post.comments&&post.comments.length?h("div",{class:"night-comments"},[
+								...post.comments.slice(0,5).map((cmt,ci)=>h("div",{class:"night-comment",key:ci},[
+									h("span",{class:"night-comment-name"},cmt.name||""),
+									h("span",{class:"night-comment-text"},cmt.c||"")
+								]))
+							]):null
+						]);
+					})
 				]),
 				// 样式
 				h("style",{innerHTML:`
@@ -57833,6 +57879,11 @@ ${contactInfo||"暂无角色名单，使用路人网名"}
 					.night-board-tag{font-size:10px;padding:2px 8px;background:rgba(177,75,255,0.15);color:#b14bff;border-radius:8px;}
 					.night-post-title{font-size:14px;font-weight:600;color:#fff;margin-bottom:4px;}
 					.night-post-content{font-size:12px;line-height:1.6;color:#ccc;}
+					.night-post-image-wrap{margin:8px 0;border-radius:8px;overflow:hidden;background:#16162a;}
+					.night-post-image{width:100%;display:block;max-height:240px;object-fit:cover;border-radius:8px;}
+					.night-gen-img{display:flex;align-items:center;gap:6px;margin:8px 0;padding:6px 14px;background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.3);color:#22d3ee;border-radius:14px;font-size:12px;cursor:pointer;}
+					.night-gen-img:hover:not(:disabled){background:rgba(34,211,238,0.2);}
+					.night-gen-img:disabled{opacity:0.6;cursor:not-allowed;}
 					.night-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
 					.night-tag{font-size:10px;padding:2px 6px;background:rgba(34,211,238,0.1);color:#22d3ee;border-radius:6px;}
 					.night-comments{margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.05);display:flex;flex-direction:column;gap:4px;}
