@@ -57911,7 +57911,14 @@ ${BOARDS.map(b=>`- ${b.name}(${b.id})：${b.desc}`).join("\n")}
 							h("div",{class:"night-post-content"},post.content||""),
 							// 图片/生图按钮
 							hasImg?h("div",{class:"night-post-image-wrap"},[
-								h("img",{class:"night-post-image",src:post.imageUrl||post.image,alt:"post"})
+								h("img",{class:"night-post-image",src:post.imageUrl||post.image,alt:"post"}),
+								h("button",{
+									class:{"night-reroll":!0,loading:isImgLoading},
+									onClick:()=>self.generateImage(realIdx),
+									disabled:isImgLoading
+								},[
+									h("i",{class:isImgLoading?"fas fa-spinner fa-spin":"fas fa-rotate-right"})
+								])
 							]):null,
 							!hasImg&&post.prompt?h("button",{
 								class:{"night-gen-img":!0,loading:isImgLoading},
@@ -57950,8 +57957,11 @@ ${BOARDS.map(b=>`- ${b.name}(${b.id})：${b.desc}`).join("\n")}
 					.night-board-tag{font-size:10px;padding:2px 8px;background:rgba(177,75,255,0.15);color:#b14bff;border-radius:8px;}
 					.night-post-title{font-size:14px;font-weight:600;color:#fff;margin-bottom:4px;}
 					.night-post-content{font-size:12px;line-height:1.6;color:#ccc;}
-					.night-post-image-wrap{margin:8px 0;border-radius:8px;overflow:hidden;background:#16162a;}
+					.night-post-image-wrap{position:relative;margin:8px 0;border-radius:8px;overflow:hidden;background:#16162a;}
 					.night-post-image{width:100%;display:block;max-height:240px;object-fit:cover;border-radius:8px;}
+					.night-reroll{position:absolute;top:6px;right:6px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.55);border:none;border-radius:50%;color:#22d3ee;font-size:13px;cursor:pointer;backdrop-filter:blur(4px);transition:all 0.15s;}
+					.night-reroll:hover:not(:disabled){background:rgba(34,211,238,0.3);transform:scale(1.1);}
+					.night-reroll:disabled{opacity:0.5;cursor:not-allowed;}
 					.night-gen-img{display:flex;align-items:center;gap:6px;margin:8px 0;padding:6px 14px;background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.3);color:#22d3ee;border-radius:14px;font-size:12px;cursor:pointer;}
 					.night-gen-img:hover:not(:disabled){background:rgba(34,211,238,0.2);}
 					.night-gen-img:disabled{opacity:0.6;cursor:not-allowed;}
