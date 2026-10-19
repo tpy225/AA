@@ -57597,14 +57597,19 @@ const submit = () => {
 
 	// 直接 fetch API（绕开 phone preset，让不夜城 prompt 纯净执行）
 	async function fetchNightCityDirect(prompt){
-		// 读 phone 的绘图 API 配置（跟生图共用，省去存两份）
-		let cfg=null;
-		try{
-			cfg=JSON.parse(localStorage.getItem("phone_image_gen_config")||"null")||null;
-		}catch(e){}
+		// 读手机文本 API 配置（破限过的那个）
+		let raw=null,cfg=null;
+		try{raw=JSON.parse(localStorage.getItem("phone_api_config")||"null");}catch(e){}
+		if(raw&&raw.primary){
+			// 新版嵌套结构
+			cfg=raw.primary;
+		}else if(raw&&raw.url){
+			// 旧版扁平结构
+			cfg=raw;
+		}
 		if(!cfg||!cfg.url||!cfg.key||!cfg.model){
-			try{toastr.error("[NightCity] 请先在设置-绘图配置中填写 API URL、Key 和模型");}catch(e){}
-			return{success:!1,error:"请先配置绘图 API（URL/Key/模型）"};
+			try{toastr.error("[NightCity] 请先在手机设置-AI配置中填写 API URL、Key 和模型");}catch(e){}
+			return{success:!1,error:"请先配置手机文本 API"};
 		}
 		try{toastr.info("[NightCity] 直连 API: "+cfg.apiFormat+"/"+cfg.model);}catch(e){}
 		// 组装 endpoint
