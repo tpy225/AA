@@ -57597,6 +57597,9 @@ const submit = () => {
 
 	// AI 生成不夜城帖子
 	async function nc(){
+		try{
+			toastr.info("[NightCity] 开始生成帖子，preset=night");
+		}catch(e){}
 		console.info("[NightCity] 开始生成帖子");
 		const roster=getRoster();
 		const userInput=buildNightPrompt(roster);
@@ -57604,16 +57607,22 @@ const submit = () => {
 			const result=await o.callAiWithPreset(userInput,"night",{currentPage:"不夜城"});
 			if(!result.success){
 				console.error("[NightCity] AI 生成失败:",result.error);
+				try{toastr.error("[NightCity] AI 生成失败: "+(result.error||"无错误信息"));}catch(e){}
 				return{success:!1,error:result.error||"AI 生成失败"};
 			}
-			console.info("[NightCity] AI 返回原始内容:",result.content);
-			const data=parseNightResponse(result.content);
+			const raw=String(result.content||"");
+			console.info("[NightCity] AI 返回原始内容:",raw);
+			try{toastr.info("[NightCity] AI 返回长度="+raw.length+"，前150字: "+raw.slice(0,150));}catch(e){}
+			const data=parseNightResponse(raw);
 			if(!data||!Array.isArray(data.posts)||!data.posts.length){
+				try{toastr.error("[NightCity] 解析失败，原始前200字: "+raw.slice(0,200));}catch(e){}
 				return{success:!1,error:"无法解析 AI 返回的帖子数据"};
 			}
+			try{toastr.success("[NightCity] 解析成功，posts="+data.posts.length);}catch(e){}
 			return{success:!0,data};
 		}catch(e){
 			console.error("[NightCity] 生成异常:",e);
+			try{toastr.error("[NightCity] 异常: "+(e instanceof Error?e.message:String(e)));}catch(_){}
 			return{success:!1,error:e instanceof Error?e.message:"未知错误"};
 		}
 	}
