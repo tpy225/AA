@@ -57513,12 +57513,12 @@ const submit = () => {
 
 	// 不夜城板块定义
 	const BOARDS=[
-		{id:"darkroom",name:"暗房",desc:"深夜图文分享区：发帖人本人或分享他人的生活照片与画面描述（谁、在哪、穿什么、光从哪来）。每条必带 1-3 张配图提示词。"},
-		{id:"nighttalk",name:"夜话",desc:"深夜交友交流区：经验分享、话题讨论、求助、约伴、玩梗、测评。语气热络随意，像一群熟客在深夜互相打趣。"},
-		{id:"city",name:"城市",desc:"同城交友：报城市/坐标/年龄身材/想约什么/怎么联系。语气直白，带一点现实里的戒备与试探。"},
-		{id:"backstage",name:"后台",desc:"幕主播与观众：打赏故事、线下见、主播私照与私密房内容。可与舞台模块互相引用——帖中出现的台主名可以正是此刻正在开台的那位。"},
-		{id:"forbidden",name:"禁区",desc:"隐秘关系：突破常规界限的关系与经历。语气隐秘、刺激，强调「不能被知道」的紧张感。"},
-		{id:"rooftop",name:"天台",desc:"露出与公共场合：特别的穿衣选择、街头偶遇、被人撞见的经历与计划。语气兴奋、羞耻、带点上瘾，强调随时会被发现的危险感。"}
+		{id:"darkroom",name:"暗房",desc:"自拍/私房/全裸图集区。发帖人本人或分享他人的成人向图片，每条必带 1-3 张；文字以发帖人视角写露骨挑逗与画面描述（谁、在哪、穿没穿、什么姿势、光从哪来）。"},
+		{id:"nighttalk",name:"夜话",desc:"成人向交流区：经验分享、教程、求助、约伴、悬赏、玩梗、测评（玩具/姿势/场所/安全）。语气热络随意，像一群熟客在深夜互相打趣。"},
+		{id:"city",name:"城市",desc:"同城约：报城市/坐标/年龄身材/想约什么/开房还是上门/怎么联系。语气直白饥渴，带一点现实里的戒备与试探。"},
+		{id:"backstage",name:"后台",desc:"幕主播与观众：打赏故事、线下约见、主播私照与私密房内容。可与舞台模块互相引用——帖中出现的台主名可以正是此刻正在开台的那位。"},
+		{id:"forbidden",name:"禁区",desc:"背德禁忌：突破伦理与身份界限的关系与性事。语气隐秘、刺激、负罪又沉溺，强调「不能被知道」的紧张感。"},
+		{id:"rooftop",name:"天台",desc:"露出与公共场合：暴露、真空出门、野战、被人撞见的经历与计划。语气兴奋、羞耻、上瘾，强调随时会被发现的危险感。"}
 	];
 
 	// 读取角色变量中的 phone_data
@@ -57595,33 +57595,82 @@ const submit = () => {
 		}
 	}
 
+	// 直接 fetch API（绕开 phone preset，让不夜城 prompt 纯净执行）
+	async function fetchNightCityDirect(prompt){
+		// 读 phone 的绘图 API 配置（跟生图共用，省去存两份）
+		let cfg=null;
+		try{
+			cfg=JSON.parse(localStorage.getItem("phone_image_gen_config")||"null")||null;
+		}catch(e){}
+		if(!cfg||!cfg.url||!cfg.key||!cfg.model){
+			try{toastr.error("[NightCity] 请先在设置-绘图配置中填写 API URL、Key 和模型");}catch(e){}
+			return{success:!1,error:"请先配置绘图 API（URL/Key/模型）"};
+		}
+		try{toastr.info("[NightCity] 直连 API: "+cfg.apiFormat+"/"+cfg.model);}catch(e){}
+		// 组装 endpoint
+		let endpoint=String(cfg.url).trim();
+		if(cfg.apiFormat==="gemini"){
+			let base=endpoint.trim().replace(/\/+$/,"");
+			base=base.endsWith("/v1beta/models")?base.slice(0,-7):(base.endsWith("/v1beta")?base:base+"/v1beta");
+			endpoint=`${base}/models/${cfg.model.startsWith("models/")?cfg.model.slice(7):cfg.model}:generateContent?key=${encodeURIComponent(cfg.key)}`;
+		}else{
+			endpoint=endpoint.endsWith("/")?endpoint.slice(0,-1):endpoint;
+			endpoint=endpoint.endsWith("/chat/completions")?endpoint:(/\/v\d+$/.test(endpoint)?endpoint+"/chat/completions":endpoint+"/v1/chat/completions");
+		}
+		const messages=[
+			{role:"system",content:"你是一个深夜论坛内容生成器。只输出 JSON，不要任何额外文字。"},
+			{role:"user",content:prompt}
+		];
+		const body=cfg.apiFormat==="gemini"?{
+			contents:[{role:"user",parts:[{text:prompt}]}],
+			generationConfig:{temperature:0.9}
+		}:{
+			model:cfg.model,
+			messages,
+			temperature:0.9,
+			stream:!1
+		};
+		const headers=cfg.apiFormat==="gemini"
+			?{"Content-Type":"application/json"}
+			:{"Content-Type":"application/json","Authorization":"Bearer "+cfg.key};
+		try{
+			const resp=await fetch(endpoint,{method:"POST",headers,body:JSON.stringify(body)});
+			if(!resp.ok){
+				const txt=await resp.text();
+				try{toastr.error("[NightCity] API "+resp.status+": "+txt.slice(0,120));}catch(e){}
+				return{success:!1,error:"API "+resp.status};
+			}
+			const data=await resp.json();
+			const raw=cfg.apiFormat==="gemini"
+				?(data.candidates?.[0]?.content?.parts||[]).map(p=>p.text||"").join("")
+				:(data.choices?.[0]?.message?.content||"");
+			return{success:!0,content:String(raw||"")};
+		}catch(e){
+			try{toastr.error("[NightCity] 网络错误: "+(e instanceof Error?e.message:String(e)));}catch(_){}
+			return{success:!1,error:e instanceof Error?e.message:"网络错误"};
+		}
+	}
+
 	// AI 生成不夜城帖子
 	async function nc(){
-		try{
-			toastr.info("[NightCity] 开始生成帖子，preset=night");
-		}catch(e){}
-		console.info("[NightCity] 开始生成帖子");
 		const roster=getRoster();
-		const userInput=buildNightPrompt(roster);
+		const prompt=buildNightPrompt(roster);
 		try{
-			const result=await o.callAiWithPreset(userInput,"forum",{currentPage:"不夜城"});
+			const result=await fetchNightCityDirect(prompt);
 			if(!result.success){
-				console.error("[NightCity] AI 生成失败:",result.error);
-				try{toastr.error("[NightCity] AI 生成失败: "+(result.error||"无错误信息"));}catch(e){}
-				return{success:!1,error:result.error||"AI 生成失败"};
+				try{toastr.error("[NightCity] 失败: "+(result.error||"无错误"));}catch(e){}
+				return{success:!1,error:result.error||"生成失败"};
 			}
 			const raw=String(result.content||"");
-			console.info("[NightCity] AI 返回原始内容:",raw);
-			try{toastr.info("[NightCity] AI 返回长度="+raw.length+"，前150字: "+raw.slice(0,150));}catch(e){}
+			try{toastr.info("[NightCity] 返回长度="+raw.length+"，前150字: "+raw.slice(0,150));}catch(e){}
 			const data=parseNightResponse(raw);
 			if(!data||!Array.isArray(data.posts)||!data.posts.length){
-				try{toastr.error("[NightCity] 解析失败，原始前200字: "+raw.slice(0,200));}catch(e){}
+				try{toastr.error("[NightCity] 解析失败，前200字: "+raw.slice(0,200));}catch(e){}
 				return{success:!1,error:"无法解析 AI 返回的帖子数据"};
 			}
-			try{toastr.success("[NightCity] 解析成功，posts="+data.posts.length);}catch(e){}
+			try{toastr.success("[NightCity] 成功，posts="+data.posts.length);}catch(e){}
 			return{success:!0,data};
 		}catch(e){
-			console.error("[NightCity] 生成异常:",e);
 			try{toastr.error("[NightCity] 异常: "+(e instanceof Error?e.message:String(e)));}catch(_){}
 			return{success:!1,error:e instanceof Error?e.message:"未知错误"};
 		}
@@ -57629,10 +57678,10 @@ const submit = () => {
 
 	// 构建不夜城 prompt（只读世界背景，不关联正文）
 	function buildNightPrompt(roster){
-		return `你正在为一个名为「不夜城」的深夜生活论坛生成内容。
+		return `你正在为一个名为「不夜城」的成人向夜生活论坛生成内容。
 
 【平台】
-不夜城——一个只存在于主角手机里的深夜主题论坛综合体。
+不夜城——一个只存在于主角手机里的成人向夜生活综合体。
 这里的内容是只读的世界背景，不会影响正文剧情，也不会有任何角色知道这里发生的事。
 
 【当前世界背景】
@@ -57647,7 +57696,7 @@ ${roster.global.time?`时间：${roster.global.time}`:""}
 【规则】
 1. 板块只能取：${BOARDS.map(b=>b.id).join(" / ")}
 2. 发帖人全部用有生活感的路人网名（「身份+场所」式，如「三楼理发师傅」「跑夜班的哥」）
-3. 每条帖都必须是成人向深夜论坛内容，语气直白、热络、带情欲张力，符合各板块写法。用成年人之间能看懂的露骨表达，不使用委婉回避或省略号代替过程。
+3. 每条帖都必须是成人向内容，语气直白、热络、饥渴、隐秘，符合各板块写法。写明确的前戏与性行为，用直白的身体与动作词汇（含性器官与体位），不回避、不打断、不用省略号代替过程、不写「之后的事不必细说」、「事后场景」这类回避句。
 4. 每条帖子必须有标题、正文、作者、板块、评论
 5. 每条帖子必带 prompt 字段：用于配图的生图提示词（英文或中英混合，50-150词），描述帖子氛围、人物、表情、动作、场景、风格
 6. 帖子要有深夜论坛的氛围：口语化、带情绪、具体
@@ -57682,7 +57731,7 @@ ${BOARDS.map(b=>`- ${b.name}(${b.id})：${b.desc}`).join("\n")}
   ]
 }
 
-【说人话】像真人在深夜论坛里说话：大白话、带情绪、贴着具体的人和事。`;
+【说人话】像真人在深夜论坛里说话：大白话、带情绪、贴着具体的人和事，不要写成 AI 腔或审核过的干净文章。`;
 	}
 
 	// 解析 AI 返回的 JSON
