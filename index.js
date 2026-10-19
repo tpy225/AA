@@ -57604,7 +57604,7 @@ const submit = () => {
 		const roster=getRoster();
 		const userInput=buildNightPrompt(roster);
 		try{
-			const result=await o.callAiWithPreset(userInput,"night",{currentPage:"不夜城"});
+			const result=await o.callAiWithPreset(userInput,"forum",{currentPage:"不夜城"});
 			if(!result.success){
 				console.error("[NightCity] AI 生成失败:",result.error);
 				try{toastr.error("[NightCity] AI 生成失败: "+(result.error||"无错误信息"));}catch(e){}
