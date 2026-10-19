@@ -57625,15 +57625,15 @@ const submit = () => {
 	// 直接 fetch API（绕开 phone preset，让不夜城 prompt 纯净执行）
 	async function fetchNightCityDirect(prompt){
 		// 读手机文本 API 配置，支持副 API（viewApiMap.night → secondary，否则 primary）
-		let raw=null,cfg=null;
-		try{raw=JSON.parse(localStorage.getItem("phone_api_config")||"null");}catch(e){}
-		if(raw&&raw.primary){
+		let rawCfg=null,cfg=null;
+		try{rawCfg=JSON.parse(localStorage.getItem("phone_api_config")||"null");}catch(e){}
+		if(rawCfg&&rawCfg.primary){
 			// 新版嵌套结构
-			const useSecondary=raw.enableSecondApi&&raw.viewApiMap&&raw.viewApiMap.night==="secondary"&&raw.secondary&&raw.secondary.url&&raw.secondary.key&&raw.secondary.model;
-			cfg=useSecondary?raw.secondary:raw.primary;
-		}else if(raw&&raw.url){
+			const useSecondary=rawCfg.enableSecondApi&&rawCfg.viewApiMap&&rawCfg.viewApiMap.night==="secondary"&&rawCfg.secondary&&rawCfg.secondary.url&&rawCfg.secondary.key&&rawCfg.secondary.model;
+			cfg=useSecondary?rawCfg.secondary:rawCfg.primary;
+		}else if(rawCfg&&rawCfg.url){
 			// 旧版扁平结构
-			cfg=raw;
+			cfg=rawCfg;
 		}
 		if(!cfg||!cfg.url||!cfg.key||!cfg.model){
 			try{toastr.error("[NightCity] 请先在手机设置-AI配置中填写 API URL、Key 和模型");}catch(e){}
@@ -57666,22 +57666,38 @@ const submit = () => {
 		const headers=cfg.apiFormat==="gemini"
 			?{"Content-Type":"application/json"}
 			:{"Content-Type":"application/json","Authorization":"Bearer "+cfg.key};
+		// 发送请求：先直连，失败时（CORS）fallback 本地代理
+		const payload=JSON.stringify(body);
+		const directFetch=async()=>await fetch(endpoint,{method:"POST",headers,body:payload});
+		const proxyFetch=async()=>{
+			const proxyUrl=(location.origin||"http://127.0.0.1:8765")+"/_proxy?url="+encodeURIComponent(endpoint);
+			const proxyHeaders=cfg.apiFormat==="gemini"
+				?{"Content-Type":"application/json"}
+				:{"Content-Type":"application/json","x-resp-authorization":"Bearer "+cfg.key};
+			return await fetch(proxyUrl,{method:"POST",headers:proxyHeaders,body:payload});
+		};
+		let resp=null;
 		try{
-			const resp=await fetch(endpoint,{method:"POST",headers,body:JSON.stringify(body)});
-			if(!resp.ok){
-				const txt=await resp.text();
-				try{toastr.error("[NightCity] API "+resp.status+": "+txt.slice(0,120));}catch(e){}
-				return{success:!1,error:"API "+resp.status};
-			}
-			const data=await resp.json();
-			const raw=cfg.apiFormat==="gemini"
-				?(data.candidates?.[0]?.content?.parts||[]).map(p=>p.text||"").join("")
-				:(data.choices?.[0]?.message?.content||"");
-			return{success:!0,content:String(raw||"")};
+			resp=await directFetch();
 		}catch(e){
-			try{toastr.error("[NightCity] 网络错误: "+(e instanceof Error?e.message:String(e)));}catch(_){}
-			return{success:!1,error:e instanceof Error?e.message:"网络错误"};
+			// 直连失败（CORS / Load failed），尝试本地代理
+			console.info("[NightCity] 直连失败，尝试本地代理...");
+			try{toastr.info("[NightCity] 直连失败，尝试本地代理...");}catch(e){}
+			try{resp=await proxyFetch();}catch(e2){
+				try{toastr.error("[NightCity] 网络错误: "+(e instanceof Error?e.message:String(e)));}catch(_){}
+				return{success:!1,error:e instanceof Error?e.message:"网络错误（CORS 被拦？尝试跑本地 serve.py 代理）"};
+			}
 		}
+		if(!resp.ok){
+			const txt=await resp.text();
+			try{toastr.error("[NightCity] API "+resp.status+": "+txt.slice(0,120));}catch(e){}
+			return{success:!1,error:"API "+resp.status};
+		}
+		const data=await resp.json();
+		const raw=cfg.apiFormat==="gemini"
+			?(data.candidates?.[0]?.content?.parts||[]).map(p=>p.text||"").join("")
+			:(data.choices?.[0]?.message?.content||"");
+		return{success:!0,content:String(raw||"")};
 	}
 
 	// AI 生成不夜城帖子
