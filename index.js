@@ -57698,8 +57698,8 @@ ${contactInfo||"暂无角色名单，使用路人网名"}
 	// 不夜城 UI 组件
 	const Nc=(0,n.defineComponent)({
 		__name:"NightCity",
-		props:{onBack:{}},
-		setup(props){
+		emits:["back"],
+		setup(props,{emit}){
 			const posts=(0,n.ref)([]);
 			const loading=(0,n.ref)(!1);
 			const activeBoard=(0,n.ref)("");
@@ -57717,7 +57717,7 @@ ${contactInfo||"暂无角色名单，使用路人网名"}
 			});
 
 			function goHome(){
-				props.onBack?.();
+				emit("back");
 			}
 
 			async function refresh(){
