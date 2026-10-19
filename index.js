@@ -57582,9 +57582,36 @@ const submit = () => {
 		}
 	}
 
-	// 保存不夜城帖子到聊天历史
+	// 查找并删除已有的 night module 消息
+	async function deleteExistingNightMessages(){
+		try{
+			const lastId=getLastMessageId();
+			if(lastId<0)return;
+			const readCount=(0,p.Q)().historyReadCount;
+			const start=readCount===0?0:Math.max(0,lastId-readCount+1);
+			const msgs=getChatMessages(`${start}-${lastId}`);
+			if(!msgs||!msgs.length)return;
+			const re=/<phone_module\b[^>]*\btype="night"[^>]*>/g;
+			const toDelete=[];
+			for(const msg of msgs){
+				if(re.test(String(msg.message||""))){
+					toDelete.push(msg.message_id);
+				}
+				re.lastIndex=0;
+			}
+			if(toDelete.length){
+				await deleteChatMessages(toDelete);
+				console.info("[NightCity] 已删除 "+toDelete.length+" 条旧消息");
+			}
+		}catch(e){
+			console.warn("[NightCity] 删除旧消息失败:",e);
+		}
+	}
+
+	// 保存不夜城帖子到聊天历史（先删旧的再创建，避免重复）
 	async function saveNightPosts(posts,boards){
 		try{
+			await deleteExistingNightMessages();
 			const data={boards:boards||BOARDS.map(b=>b.id),posts:posts.slice(0,100),time:new Date().toLocaleString("zh-CN")};
 			const t=c().stringify(data);
 			const msg=`<phone_module type="night" timestamp="${Date.now()}">\n${t}\n</phone_module>`;
@@ -57854,9 +57881,16 @@ ${BOARDS.map(b=>`- ${b.name}(${b.id})：${b.desc}`).join("\n")}
 				}
 			});
 
+			async function deletePost(idx){
+				if(idx<0||idx>=posts.value.length)return;
+				posts.value.splice(idx,1);
+				await saveNightPosts(posts.value,null);
+				toastr.success("已删除");
+			}
+
 			return{
 				posts,loading,activeBoard,errorMsg,imgLoading,boardName,filteredPosts,
-				BOARDS,goHome,refresh,generateImage
+				BOARDS,goHome,refresh,generateImage,deletePost
 			};
 		},
 		render(){
@@ -57906,7 +57940,10 @@ ${BOARDS.map(b=>`- ${b.name}(${b.id})：${b.desc}`).join("\n")}
 						return h("div",{class:"night-post",key:idx},[
 							h("div",{class:"night-post-header"},[
 								h("span",{class:"night-author"},post.author||"匿名"),
-								h("span",{class:"night-board-tag"},self.boardName[post.board]||post.board)
+								h("div",{class:"night-header-right"},[
+									h("span",{class:"night-board-tag"},self.boardName[post.board]||post.board),
+									h("button",{class:"night-delete-btn",onClick:()=>self.deletePost(realIdx),title:"删除"},[h("i",{class:"fas fa-trash"})])
+								])
 							]),
 							post.title?h("div",{class:"night-post-title"},post.title):null,
 							h("div",{class:"night-post-content"},post.content||""),
@@ -57954,6 +57991,9 @@ ${BOARDS.map(b=>`- ${b.name}(${b.id})：${b.desc}`).join("\n")}
 					.night-feed{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:10px;}
 					.night-post{background:#22223a;border-radius:12px;padding:12px;border:1px solid rgba(255,255,255,0.05);}
 					.night-post-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+					.night-header-right{display:flex;align-items:center;gap:6px;}
+					.night-delete-btn{width:22px;height:22px;display:flex;align-items:center;justify-content:center;background:none;border:none;color:#666;font-size:11px;cursor:pointer;border-radius:4px;padding:0;transition:all 0.15s;}
+					.night-delete-btn:hover{color:#ef4444;background:rgba(239,68,68,0.1);}
 					.night-author{font-size:13px;font-weight:600;color:#b14bff;}
 					.night-board-tag{font-size:10px;padding:2px 8px;background:rgba(177,75,255,0.15);color:#b14bff;border-radius:8px;}
 					.night-post-title{font-size:14px;font-weight:600;color:#fff;margin-bottom:4px;}
