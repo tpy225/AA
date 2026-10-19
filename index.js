@@ -57597,12 +57597,13 @@ const submit = () => {
 
 	// 直接 fetch API（绕开 phone preset，让不夜城 prompt 纯净执行）
 	async function fetchNightCityDirect(prompt){
-		// 读手机文本 API 配置（破限过的那个）
+		// 读手机文本 API 配置，支持副 API（viewApiMap.night → secondary，否则 primary）
 		let raw=null,cfg=null;
 		try{raw=JSON.parse(localStorage.getItem("phone_api_config")||"null");}catch(e){}
 		if(raw&&raw.primary){
 			// 新版嵌套结构
-			cfg=raw.primary;
+			const useSecondary=raw.enableSecondApi&&raw.viewApiMap&&raw.viewApiMap.night==="secondary"&&raw.secondary&&raw.secondary.url&&raw.secondary.key&&raw.secondary.model;
+			cfg=useSecondary?raw.secondary:raw.primary;
 		}else if(raw&&raw.url){
 			// 旧版扁平结构
 			cfg=raw;
