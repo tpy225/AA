@@ -57856,8 +57856,8 @@ ${BOARDS.map(b=>`- ${b.name}(${b.id})：${b.desc}`).join("\n")}
 					const result=await nc();
 					if(result.success&&result.data){
 						const newPosts=result.data.posts||[];
-						// 新帖子在前，保留历史
-						posts.value=[...newPosts,...posts.value].slice(0,80);
+						// 独立刷新：清掉旧帖子，只保留新生成的
+						posts.value=newPosts;
 						await saveNightPosts(posts.value,result.data.boards);
 						(0,a.uH)({boards:result.data.boards,posts:newPosts});
 						toastr.success(`已刷新 ${newPosts.length} 条帖子`);
