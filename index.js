@@ -57679,23 +57679,30 @@ ${BOARDS.map(b=>`- ${b.name}(${b.id})：${b.desc}`).join("\n")}
 	// 解析 AI 返回的 JSON
 	function parseNightResponse(text){
 		if(!text)return null;
+		let cleaned=String(text).trim();
+		// 剥 markdown 代码块
+		const fenceMatch=cleaned.match(/```(?:json)?\s*([\s\S]*?)```/i);
+		if(fenceMatch){
+			cleaned=fenceMatch[1].trim();
+			console.info("[NightCity] 从 markdown 代码块提取 JSON");
+		}
 		// 尝试直接解析
 		try{
-			return JSON.parse(text.trim());
+			const r=JSON.parse(cleaned);
+			if(r&&Array.isArray(r.posts))return r;
 		}catch(e){}
-		// 尝试提取 JSON 块
-		const jsonMatch=text.match(/\{[\s\S]*\}/);
-		if(jsonMatch){
-			try{
-				return JSON.parse(jsonMatch[0]);
-			}catch(e){
-				console.warn("[NightCity] JSON 解析失败:",e);
+		// 尝试提取 JSON 块（取最大的 {} 配对）
+		const braceMatch=cleaned.match(/\{[\s\S]*\}/g);
+		if(braceMatch){
+			braceMatch.sort((a,b)=>b.length-a.length);
+			for(const cand of braceMatch){
+				try{
+					const r=JSON.parse(cand);
+					if(r&&Array.isArray(r.posts))return r;
+				}catch(e){}
 			}
 		}
-		// 尝试 YAML
-		try{
-			const yaml=t(2224); // lodash has no yaml, use simple parse
-		}catch(e){}
+		console.warn("[NightCity] parseNightResponse 失败，原始内容前200字:",cleaned.slice(0,200));
 		return null;
 	}
 
