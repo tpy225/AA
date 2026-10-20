@@ -1,0 +1,13 @@
+{
+    "display_name": "Abstract 手機",
+    "loading_order": 100,
+    "requires": [],
+    "optional": [],
+    "dependencies": [],
+    "js": "index.js",
+    "css": "",
+    "author": "tpy225",
+    "version": "1.0.0",
+    "homePage": "https://github.com/tpy225/AA",
+    "auto_update": true
+}
