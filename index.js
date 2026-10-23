@@ -71023,6 +71023,73 @@ ${Qe().stringify(o)}</chat_history>`;if((0,Cn.Q)().chatAppendToLastMessage){cons
 
 `).trim(),U})(oe,le);if(!M)return await deleteChatMessages([K]),toastr.success("\u5DF2\u5220\u9664\u6700\u540E\u4E00\u5C42\u6D88\u606F"),void console.log(`[Improved Phone] Deleted message #${K} after trimming empty`);await setChatMessages([{message_id:K,message:M}]),toastr.success("\u5DF2\u5220\u9664\u6700\u540E\u4E00\u5757"),console.log(`[Improved Phone] Removed last block in message #${K}`)}catch(M){console.error("[Improved Phone] Failed to delete message:",M),toastr.error("\u5220\u9664\u5931\u8D25")}});const te=getButtonEvent("\u590D\u4F4D");eventOn(te,()=>{localStorage.removeItem("phone_drag_position"),toastr.success("\u624B\u673A\u4F4D\u7F6E\u5DF2\u590D\u4F4D"),console.log("[Improved Phone] Phone position reset"),window.location.reload()});const X=getButtonEvent("\u5237\u65B0");eventOn(X,()=>{window.location.reload()}),console.log("[AutoMessage] ========================================"),console.log("[AutoMessage] \u521D\u59CB\u5316\u81EA\u52A8\u56DE\u590D\u6A21\u5757"),console.log("[AutoMessage] \u8C03\u8BD5\u6A21\u5F0F:","\u5F00\u542F"),eventOn(tavern_events.GENERATION_ENDED,QT),console.log("[AutoMessage] \u5DF2\u6CE8\u518C\u4E8B\u4EF6: tavern_events.GENERATION_ENDED"),rz(),console.log("[AutoMessage] \u52A0\u597D\u53CB\u6A21\u5757\u5DF2\u521D\u59CB\u5316"),console.log("[AutoMessage] \u521D\u59CB\u5316\u5B8C\u6210"),console.log("[AutoMessage] ========================================"),(0,We.n6)(),console.log("[Improved Phone] Mounted successfully.")}
 // 插件模式兜底：腳本注入 API 在插件上下文不存在，補空殼
-typeof replaceScriptButtons!="function"&&(globalThis.replaceScriptButtons=()=>{});
-typeof getButtonEvent!="function"&&(globalThis.getButtonEvent=(n)=>({addEventListener:()=>{}}));
+// ========== 插件模式：Slash Runner globals 兼容層 ==========
+(function _phonePluginShim(){
+  const ST=globalThis.SillyTavern||{};
+  const ctx=typeof ST.getContext==='function'?ST.getContext():{};
+  const es=ST.eventSource;
+  // 事件系統
+  if(typeof globalThis.eventOn!=='function'){
+    globalThis.eventOn=function(ev,cb){try{if(es&&es.on)return es.on(ev,cb);}catch{}return()=>{};};
+  }
+  if(typeof globalThis.offEvent!=='function'){
+    globalThis.offEvent=function(ev,cb){try{if(es&&es.off)return es.off(ev,cb);}catch{}return;};
+  }
+  if(typeof globalThis.eventEmit!=='function'){
+    globalThis.eventEmit=function(ev){try{if(es&&es.emit)return es.emit(ev);}catch{}return;};
+  }
+  if(typeof globalThis.tavern_events==='undefined'){
+    globalThis.tavern_events=ST.event_types||{};
+  }
+  // toastr（插件模式下酒館全局已有，但保險）
+  try{if(!globalThis.toastr&&globalThis.window&&globalThis.window.toastr)globalThis.toastr=globalThis.window.toastr;}catch{}
+  // getCurrentChatId
+  if(typeof globalThis.getCurrentChatId!=='function'){
+    globalThis.getCurrentChatId=function(){try{return ST.getCurrentChatId?.()||'';}catch{return'';}};
+  }
+  // getContext
+  if(typeof globalThis.getContext!=='function'){
+    globalThis.getContext=function(){return ctx;};
+  }
+  // 消息操作（從 context.chat 讀）
+  if(typeof globalThis.getLastMessageId!=='function'){
+    globalThis.getLastMessageId=function(){try{return (ctx.chat?.length||0)-1;}catch{return-1;}};
+  }
+  if(typeof globalThis.getChatMessages!=='function'){
+    globalThis.getChatMessages=function(){try{return ctx.chat||[];}catch{return[];}};
+  }
+  if(typeof globalThis.setChatMessages!=='function'){
+    globalThis.setChatMessages=function(){return Promise.resolve();};
+  }
+  if(typeof globalThis.deleteChatMessages!=='function'){
+    globalThis.deleteChatMessages=function(){return Promise.resolve();};
+  }
+  // 變量系統（空殼，手機 UI 在插件模式下可能無法讀寫角色變量）
+  if(typeof globalThis.getVariables!=='function'){
+    globalThis.getVariables=function(){return {};};
+  }
+  if(typeof globalThis.replaceVariables!=='function'){
+    globalThis.replaceVariables=function(){return Promise.resolve();};
+  }
+  // TavernRegex（空殼）
+  if(typeof globalThis.importRawTavernRegex!=='function'){
+    globalThis.importRawTavernRegex=function(){return Promise.resolve();};
+  }
+  if(typeof globalThis.getTavernRegexes!=='function'){
+    globalThis.getTavernRegexes=function(){return [];};
+  }
+  if(typeof globalThis.updateTavernRegexesWith!=='function'){
+    globalThis.updateTavernRegexesWith=function(fn){fn([]);return Promise.resolve();};
+  }
+  // 腳本按鈕（空殼）
+  if(typeof globalThis.replaceScriptButtons!=='function'){
+    globalThis.replaceScriptButtons=function(){};
+  }
+  if(typeof globalThis.getButtonEvent!=='function'){
+    globalThis.getButtonEvent=function(){return{addEventListener:function(){},removeEventListener:function(){}};};
+  }
+  if(typeof globalThis.loadApiConfig!=='function'){
+    globalThis.loadApiConfig=function(){};
+  }
+})();
 function nj(){try{return typeof eventOn=="function"&&typeof tavern_events<"u"&&!!SillyTavern?.getCurrentChatId}catch{return!1}}(async function(){const a=Date.now();for(;!nj();){if(Date.now()-a>15e3)return void console.warn("[Improved Phone] Tavern APIs not ready, aborting init.");await new Promise(n=>setTimeout(n,50))}let r="";try{r=String(SillyTavern.getCurrentChatId?.()||"")}catch{r=""}eventOn(tavern_events.CHAT_CHANGED,async n=>{const o=String(n||"");console.log("[Improved Phone] CHAT_CHANGED event fired:",o),o!==r?(r=o,await mo("chat_changed"),So(),window.location.reload()):console.log("[Improved Phone] CHAT_CHANGED chat_id unchanged, skip reload.")});const t=SillyTavern.getCurrentChatId()||"";console.log("[Improved Phone] Script loaded, initial chat_id:",t),(function(){try{const n=window.parent;n&&n.toastr&&(window.toastr=n.toastr)}catch{}})(),(function(){try{const n=an();if(!n?.body)return;HT(n)}catch(n){console.warn("[InlineMsgStyle] init failed:",n)}})(),(function(){try{if(globalThis.__phoneAbsUrl)return;globalThis.__phoneAbsUrl=function(p){p=String(p==null?"":p);if(!p)return p;if(/^(https?:|data:|blob:|tauri:)/i.test(p))return p;var base="";try{base=document.baseURI||""}catch(e){}if(!base||/^about:/i.test(base)){try{base=window.parent&&window.parent!==window?window.parent.location.origin:location.origin||""}catch(e2){try{base=location.origin==="null"?"":location.origin||""}catch(e3){base=""}}}try{return new URL(p,base||"/").href}catch(e4){return p}};}catch(e){}})(),ej(),(function(){try{var css="*{scrollbar-width:none!important;-ms-overflow-style:none!important}*::-webkit-scrollbar{width:0!important;height:0!important;display:none!important;background:0 0!important;-webkit-appearance:none!important}html,body{overflow-x:hidden!important;scrollbar-width:none!important;-ms-overflow-style:none!important}.phone-wrapper,.phone-container,.phone-screen{overflow-x:hidden!important}.nai-preset-group{margin:0 0 16px!important}.nai-preset-label{display:block!important;font-size:13px!important;font-weight:500!important;color:#64748b!important;margin:0 0 8px!important}.nai-preset-row{display:flex!important;align-items:center!important;gap:6px!important;margin-top:0!important}.nai-preset-select{flex:1 1 auto!important;min-width:0!important;width:auto!important;margin:0!important;height:36px!important;padding:0 12px!important;font-size:14px!important;color:#475569!important;background:#fff!important;border:1px solid rgba(143,184,237,.45)!important;border-radius:10px!important;box-sizing:border-box!important;-webkit-appearance:none!important;appearance:none!important}.nai-preset-btn{width:36px!important;height:36px!important;flex:0 0 36px!important;padding:0!important;border:none!important;border-radius:10px!important;background:linear-gradient(135deg,#8FB8ED,#7AA8E0)!important;color:#fff!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:14px!important;cursor:pointer!important;box-shadow:0 2px 8px rgba(143,184,237,.25)!important}.nai-preset-btn:active{transform:scale(.95)!important}.nai-preset-btn.danger{background:linear-gradient(135deg,#f87171,#ef4444)!important;box-shadow:0 2px 8px rgba(239,68,68,.25)!important}";var __docs=[];var __push=function(x){if(x&&x.head&&__docs.indexOf(x)<0)__docs.push(x)};__push(an());__push(document);try{window.parent&&window.parent!==window&&__push(window.parent.document)}catch(n1){}try{window.top&&window.top!==window&&__push(window.top.document)}catch(n2){}try{var __fr=document.querySelectorAll("iframe");for(var __fi=0;__fi<__fr.length;__fi++){try{__fr[__fi].contentDocument&&__push(__fr[__fi].contentDocument)}catch(n3){}}}catch(n4){}try{var __pf=window.parent&&window.parent.document;if(__pf){var __fr2=__pf.querySelectorAll("iframe");for(var __fi2=0;__fi2<__fr2.length;__fi2++){try{__fr2[__fi2].contentDocument&&__push(__fr2[__fi2].contentDocument)}catch(n5){}}}}catch(n6){}var __first=__docs[0];for(var __di=0;__di<__docs.length;__di++){var d=__docs[__di];if(d&&d.head&&!d.getElementById("phone-ui-scrollbar-fix")){var st=d.createElement("style");st.id="phone-ui-scrollbar-fix";st.textContent=css;d.head.appendChild(st);if(d===__first){var lk=d.createElement("link");lk.rel="preconnect";lk.href="https://files.catbox.moe";d.head.appendChild(lk)}}}}catch(n){console.warn("[PhoneUI] style init failed:",n)}})()})();
