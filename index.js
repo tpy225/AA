@@ -71227,12 +71227,45 @@ ${Qe().stringify(o)}</chat_history>`;if((0,Cn.Q)().chatAppendToLastMessage){cons
   if(typeof globalThis.deleteChatMessages!=='function'){
     globalThis.deleteChatMessages=function(){return Promise.resolve();};
   }
-  // 變量系統（空殼，手機 UI 在插件模式下可能無法讀寫角色變量）
+  // 變量系統（真實現：讀寫 ST 角色卡 extensions.tavern_helper.variables / chat_metadata.variables / 全局）
+  const TH_FIELD='tavern_helper.variables';
+  function __freshCtx(){try{return typeof ST.getContext==='function'?ST.getContext():ctx;}catch{return ctx;}}
+  function __varsRead(opt){
+    const t=(opt&&opt.type)||'chat';const c=__freshCtx();
+    if(t==='character'){
+      try{return (c.characters&&c.characters[c.characterId]&&c.characters[c.characterId].data&&c.characters[c.characterId].data.extensions&&c.characters[c.characterId].data.extensions.tavern_helper&&c.characters[c.characterId].data.extensions.tavern_helper.variables)||{};}catch{return{}}
+    }
+    if(t==='global'){
+      try{return (c.extensionSettings&&c.extensionSettings.variables&&c.extensionSettings.variables.global)||{};}catch{return{}}
+    }
+    try{return (c.chatMetadata&&c.chatMetadata.variables)||{};}catch{return{}}
+  }
+  async function __varsWrite(vars,opt){
+    const t=(opt&&opt.type)||'chat';const c=__freshCtx();const v=vars&&typeof vars==='object'?vars:{};
+    if(t==='character'){
+      try{await c.writeExtensionField(c.characterId,TH_FIELD,v);}catch(e){console.warn('[AA] writeExtensionField failed:',e);}
+      return;
+    }
+    if(t==='global'){
+      try{const es=c.extensionSettings;if(es){es.variables=es.variables||{};es.variables.global=v;c.saveSettingsDebounced&&c.saveSettingsDebounced();}}catch(e){}
+      return;
+    }
+    try{if(c.chatMetadata){c.chatMetadata.variables=v;c.saveMetadataDebounced&&c.saveMetadataDebounced();}}catch(e){}
+  }
   if(typeof globalThis.getVariables!=='function'){
-    globalThis.getVariables=function(){return {};};
+    globalThis.getVariables=function(opt){try{return JSON.parse(JSON.stringify(__varsRead(opt)));}catch{return{};}};
   }
   if(typeof globalThis.replaceVariables!=='function'){
-    globalThis.replaceVariables=function(){return Promise.resolve();};
+    globalThis.replaceVariables=function(vars,opt){try{return __varsWrite(JSON.parse(JSON.stringify(vars||{})),opt);}catch(e){console.warn('[AA] replaceVariables failed:',e);return Promise.resolve();}};
+  }
+  if(typeof globalThis.insertOrAssignVariables!=='function'){
+    globalThis.insertOrAssignVariables=function(vars,opt){
+      try{
+        const inc=JSON.parse(JSON.stringify(vars||{}));const cur=__varsRead(opt);
+        Object.keys(inc).forEach(k=>{cur[k]=inc[k];});
+        return __varsWrite(cur,opt);
+      }catch(e){console.warn('[AA] insertOrAssignVariables failed:',e);return Promise.resolve();}
+    };
   }
   // TavernRegex（空殼）
   if(typeof globalThis.importRawTavernRegex!=='function'){
