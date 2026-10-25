@@ -71212,14 +71212,42 @@ ${Qe().stringify(o)}</chat_history>`;if((0,Cn.Q)().chatAppendToLastMessage){cons
   }
   // getContext
   if(typeof globalThis.getContext!=='function'){
-    globalThis.getContext=function(){return ctx;};
+    globalThis.getContext=function(){return __freshCtx();};
   }
-  // 消息操作（從 context.chat 讀）
+  // 消息操作（每次現場取活 context.chat，語義對齊 Slash Runner getChatMessages(range)）
+  function __liveChat(){try{return __freshCtx().chat||[];}catch{return[];}}
   if(typeof globalThis.getLastMessageId!=='function'){
-    globalThis.getLastMessageId=function(){try{return (ctx.chat?.length||0)-1;}catch{return-1;}};
+    globalThis.getLastMessageId=function(){try{return __liveChat().length-1;}catch{return-1;}};
   }
   if(typeof globalThis.getChatMessages!=='function'){
-    globalThis.getChatMessages=function(){try{return ctx.chat||[];}catch{return[];}};
+    globalThis.getChatMessages=function(range,opt){
+      try{
+        const chat=__liveChat();const len=chat.length;
+        const role=(opt&&opt.role)||'all',hide=(opt&&opt.hide_state)||'all',incSw=(opt&&opt.include_swipes)||false;
+        const s=String(range==null?'':range).trim();
+        let start=0,end=len-1;
+        if(s){
+          let m=s.match(/^(-?\d+)\s*-\s*(-?\d+)$/);
+          if(m){let a=parseInt(m[1],10),b=parseInt(m[2],10);if(a<0)a=len+a;if(b<0)b=len+b;if(a>b){const t=a;a=b;b=t;}a=Math.max(0,a);b=Math.min(len-1,b);if(len===0||a>b)return[];start=a;end=b;}
+          else if(/^-?\d+$/.test(s)){let n=parseInt(s,10);if(n<0)n=len+n;if(n<0)n=0;if(len>0&&n>len-1)n=len-1;if(len===0)return[];start=n;end=n;}
+          else return[];
+        } else return[];
+        const out=[];
+        for(let id=start;id<=end;id++){
+          const msg=chat[id];if(!msg)continue;
+          const role_of=msg.is_user?'user':(msg.extra&&msg.extra.type==='narrator'?'system':'assistant');
+          if(role!=='all'&&role_of!==role)continue;
+          if(hide!=='all'&&((hide==='hidden')!==!!msg.is_system))continue;
+          const swipe_id=msg.swipe_id??0;
+          const swipes=msg.swipes||[msg.mes];
+          const swipes_data=msg.variables||[{}];
+          const swipes_info=msg.swipe_info||[msg.extra||{}];
+          if(incSw){out.push({message_id:id,name:msg.name||'',role:role_of,is_hidden:!!msg.is_system,swipe_id,swipes,swipes_data,swipes_info});}
+          else{out.push({message_id:id,name:msg.name||'',role:role_of,is_hidden:!!msg.is_system,message:msg.mes??'',data:swipes_data[swipe_id]||{},extra:swipes_info[swipe_id]||{},swipe_id,swipes,swipes_data});}
+        }
+        return out;
+      }catch(e){console.warn('[AA] getChatMessages failed:',e);return[];}
+    };
   }
   if(typeof globalThis.setChatMessages!=='function'){
     globalThis.setChatMessages=function(){return Promise.resolve();};
