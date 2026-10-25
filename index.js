@@ -71183,6 +71183,13 @@ ${Qe().stringify(o)}</chat_history>`;if((0,Cn.Q)().chatAppendToLastMessage){cons
 (function _phonePluginShim(){
   const ST=globalThis.SillyTavern||{};
   const ctx=typeof ST.getContext==='function'?ST.getContext():{};
+  // 舊版 ST 全局 SillyTavern 只有 {libs,getContext}：補齊守衛依賴的 getCurrentChatId 等
+  if(typeof ST.getCurrentChatId!=='function'){
+    try{ST.getCurrentChatId=function(){try{return ST.getContext().getCurrentChatId?.()||'';}catch{return'';}};}catch(e){}
+  }
+  try{if(typeof ST.POPUP_TYPE==='undefined'&&typeof ctx.POPUP_TYPE!=='undefined')ST.POPUP_TYPE=ctx.POPUP_TYPE;}catch(e){}
+  try{if(typeof ST.POPUP_RESULT==='undefined'&&typeof ctx.POPUP_RESULT!=='undefined')ST.POPUP_RESULT=ctx.POPUP_RESULT;}catch(e){}
+  try{if(typeof ST.callGenericPopup!=='function'&&typeof ctx.callGenericPopup==='function')ST.callGenericPopup=function(){return ctx.callGenericPopup.apply(ctx,arguments);};}catch(e){}
   const es=ST.eventSource||ctx.eventSource;
   // 事件系統
   if(typeof globalThis.eventOn!=='function'){
