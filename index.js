@@ -17481,6 +17481,11 @@ const getFileExtension = (filename?: string) => {
   max-width: calc(100% - 46px);
 }
 
+/* 无头像时不预留 46px，防止气泡宽度塌缩成竖排文字 */
+.message:not(:has(.avatar-wrapper)) .message-wrapper {
+  max-width: 100%;
+}
+
 .message-bubble-wrapper {
   display: flex;
   flex-direction: column;
