@@ -71334,6 +71334,109 @@ ${Qe().stringify(o)}</chat_history>`;if((0,Cn.Q)().chatAppendToLastMessage){cons
       }catch(e){console.warn('[AA] insertOrAssignVariables failed:',e);return Promise.resolve();}
     };
   }
+  // 世界書（真實現：角色卡 data.extensions.world + loadWorldInfo/saveWorldInfo，條目格式雙向映射）
+  const __WI_POS={0:'before_character_definition',1:'after_character_definition',2:'before_author_note',3:'after_author_note',4:'at_depth',5:'before_example_messages',6:'after_example_messages',7:'outlet'};
+  const __WI_POS_R={before_character_definition:0,after_character_definition:1,before_author_note:2,after_author_note:3,at_depth:4,before_example_messages:5,after_example_messages:6,outlet:7};
+  const __WI_LOGIC={0:'and_any',1:'not_all',2:'not_any',3:'and_all'};
+  const __WI_LOGIC_R={and_any:0,not_all:1,not_any:2,and_all:3};
+  const __WI_ROLE={0:'system',1:'user',2:'assistant'};
+  const __WI_ROLE_R={system:0,user:1,assistant:2};
+  function __parseRe(v){if(v instanceof RegExp)return v;const s=String(v??'');const m=s.match(/^\/(.*)\/([gimsuy]*)$/s);if(m){try{return new RegExp(m[1],m[2]);}catch{}}return s;}
+  function __strRe(v){if(v instanceof RegExp)return `/${v.source}/${v.flags}`;return String(v??'');}
+  function __charByReq(name){
+    const c=__freshCtx();const chars=c.characters||[];
+    if(name==='current'||name==null){const cur=chars[c.characterId];if(cur)return{char:cur,idx:c.characterId};return null;}
+    const clean=String(name).replace(/\.png$/i,'');
+    let i=chars.findIndex(x=>x&&x.name===clean);
+    if(i<0)i=chars.findIndex(x=>x&&x.avatar===name);
+    return i>=0?{char:chars[i],idx:i}:null;
+  }
+  function __curCharAvatarFilename(){const f=__charByReq('current');try{return String(f.char.avatar||'').replace(/\.[^/.]+$/,'');}catch{return'';}}
+  if(typeof globalThis.getCharWorldbookNames!=='function'){
+    globalThis.getCharWorldbookNames=function(name){
+      const out={primary:null,additional:[]};
+      const f=__charByReq(name);
+      if(!f)return out;
+      try{const w=f.char.data&&f.char.data.extensions&&f.char.data.extensions.world;if(w)out.primary=String(w);}catch{}
+      try{const c=__freshCtx();const wi=c.worldInfoSettings||(globalThis.world_info_settings||null);
+        if(wi&&Array.isArray(wi.charLore)){const fn=__curCharAvatarFilename();const e=wi.charLore.find(x=>x&&x.name===fn);if(e&&Array.isArray(e.extraBooks))out.additional=e.extraBooks.slice();}
+      }catch{}
+      return out;
+    };
+  }
+  if(typeof globalThis.getWorldbookNames!=='function'){
+    globalThis.getWorldbookNames=function(){try{const c=__freshCtx();return c.getWorldInfoNames?c.getWorldInfoNames():[];}catch{return[];}};
+  }
+  function __toWbEntry(e,i){
+    const keys=Array.isArray(e.key)?e.key.map(__parseRe):[];
+    const keys2=Array.isArray(e.keysecondary)?e.keysecondary.map(__parseRe):[];
+    return{
+      uid:e.uid,name:e.comment||'',enabled:!e.disable,
+      strategy:{type:e.constant?'constant':(e.vectorized?'vectorized':'selective'),keys,keys_secondary:{logic:__WI_LOGIC[e.selectiveLogic]??'and_any',keys:keys2},scan_depth:e.scanDepth??'same_as_global'},
+      position:{type:__WI_POS[e.position]??'before_character_definition',role:__WI_ROLE[e.role??0]??'system',depth:e.depth??4,order:e.order??100},
+      content:e.content||'',probability:e.useProbability?(e.probability??100):100,
+      recursion:{prevent_incoming:!!e.excludeRecursion,prevent_outgoing:!!e.preventRecursion,delay_until:(typeof e.delayUntilRecursion==='number'&&e.delayUntilRecursion>0)?e.delayUntilRecursion:null},
+      effect:{sticky:(typeof e.sticky==='number'&&e.sticky>0)?e.sticky:null,cooldown:(typeof e.cooldown==='number'&&e.cooldown>0)?e.cooldown:null,delay:(typeof e.delay==='number'&&e.delay>0)?e.delay:null},
+      displayIndex:typeof e.displayIndex==='number'?e.displayIndex:i,extra:e.extra||{},__raw:e
+    };
+  }
+  function __fromWbEntry(wb,i){
+    const raw=wb.__raw?JSON.parse(JSON.stringify(wb.__raw)):{uid:wb.uid??i,comment:'',content:'',key:[],keysecondary:[],constant:false,selective:true,selectiveLogic:0,disable:false,excludeRecursion:false,preventRecursion:false,delayUntilRecursion:false,probability:100,useProbability:true,depth:4,order:100,position:0,role:0,addMemo:true,group:'',groupOverride:false,groupWeight:100,caseSensitive:null,matchWholeWords:null,useGroupScoring:null,automationId:'',sticky:null,cooldown:null,delay:null,scanDepth:null,vectorized:false};
+    raw.uid=wb.uid??raw.uid;raw.displayIndex=typeof wb.displayIndex==='number'?wb.displayIndex:i;
+    if(wb.name!==undefined)raw.comment=wb.name;
+    if(wb.enabled!==undefined)raw.disable=!wb.enabled;
+    if(wb.strategy){if(wb.strategy.type)raw.constant=wb.strategy.type==='constant',raw.selective=wb.strategy.type==='selective',raw.vectorized=wb.strategy.type==='vectorized';
+      if(wb.strategy.keys)raw.key=wb.strategy.keys.map(__strRe);
+      if(wb.strategy.keys_secondary){if(wb.strategy.keys_secondary.logic!==undefined)raw.selectiveLogic=__WI_LOGIC_R[wb.strategy.keys_secondary.logic]??0;if(wb.strategy.keys_secondary.keys)raw.keysecondary=wb.strategy.keys_secondary.keys.map(__strRe);}
+      if(wb.strategy.scan_depth!==undefined)raw.scanDepth=wb.strategy.scan_depth==='same_as_global'?null:wb.strategy.scan_depth;}
+    if(wb.position){if(wb.position.type)raw.position=__WI_POS_R[wb.position.type]??4;if(wb.position.role)raw.role=__WI_ROLE_R[wb.position.role]??0;if(wb.position.depth!==undefined)raw.depth=wb.position.depth;if(wb.position.order!==undefined)raw.order=wb.position.order;}
+    if(wb.content!==undefined)raw.content=wb.content;
+    if(wb.probability!==undefined){raw.probability=wb.probability;raw.useProbability=true;}
+    if(wb.recursion){if(wb.recursion.prevent_incoming!==undefined)raw.excludeRecursion=wb.recursion.prevent_incoming;if(wb.recursion.prevent_outgoing!==undefined)raw.preventRecursion=wb.recursion.prevent_outgoing;raw.delayUntilRecursion=wb.recursion.delay_until??false;}
+    if(wb.effect){raw.sticky=wb.effect.sticky??null;raw.cooldown=wb.effect.cooldown??null;raw.delay=wb.effect.delay??null;}
+    if(wb.extra!==undefined)raw.extra=wb.extra;
+    return raw;
+  }
+  if(typeof globalThis.getWorldbook!=='function'){
+    globalThis.getWorldbook=async function(name){
+      const c=__freshCtx();
+      if(!c.loadWorldInfo)throw Error('[AA] loadWorldInfo 不可用');
+      const data=await c.loadWorldInfo(name);
+      const entries=(data&&data.entries)||{};
+      return Object.values(entries).sort((a,b)=>(a.displayIndex??0)-(b.displayIndex??0)).map((e,i)=>__toWbEntry(e,i));
+    };
+  }
+  async function __saveWb(name,wbArr){
+    const c=__freshCtx();
+    const entries={};wbArr.forEach((wb,i)=>{const raw=__fromWbEntry(wb,i);entries[raw.uid]=raw;});
+    await c.saveWorldInfo(name,{entries},true);
+    try{c.reloadWorldInfoEditor&&c.reloadWorldInfoEditor(name);}catch{}
+  }
+  if(typeof globalThis.updateWorldbookWith!=='function'){
+    globalThis.updateWorldbookWith=async function(name,updater){
+      const cur=await globalThis.getWorldbook(name);
+      const next=await updater(cur);
+      await __saveWb(name,Array.isArray(next)?next:[]);
+      return await globalThis.getWorldbook(name);
+    };
+  }
+  if(typeof globalThis.createWorldbookEntries!=='function'){
+    globalThis.createWorldbookEntries=async function(name,newEntries){
+      let sliceStart=0;
+      const wb=await globalThis.updateWorldbookWith(name,data=>{sliceStart=data.length;return[...data,...(newEntries||[])];});
+      return{worldbook:wb,new_entries:wb.slice(sliceStart)};
+    };
+  }
+  if(typeof globalThis.deleteWorldbookEntries!=='function'){
+    globalThis.deleteWorldbookEntries=async function(name,pred){
+      let deleted=[];
+      const wb=await globalThis.updateWorldbookWith(name,data=>{const keep=[];for(const e of data){try{if(pred(e)){deleted.push(e);continue;}}catch{}keep.push(e);}return keep;});
+      return{worldbook:wb,deleted_entries:deleted};
+    };
+  }
+  if(typeof globalThis.reloadWorldInfoEditor!=='function'){
+    globalThis.reloadWorldInfoEditor=function(name){try{__freshCtx().reloadWorldInfoEditor&&__freshCtx().reloadWorldInfoEditor(name);}catch{}};
+  }
   // TavernRegex（空殼）
   if(typeof globalThis.importRawTavernRegex!=='function'){
     globalThis.importRawTavernRegex=function(){return Promise.resolve();};
