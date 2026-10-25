@@ -71348,6 +71348,7 @@ ${Qe().stringify(o)}</chat_history>`;if((0,Cn.Q)().chatAppendToLastMessage){cons
       }catch(e){console.warn('[AA] vars memory write failed:',e);}
       // 持久化：鏡像 Tavern Helper 的 /api/characters/edit 整體替換寫法（避免 merge-attributes 的 deepMerge 點號鍵/陣列問題）
       try{
+        const tok=(typeof globalThis.__aaPrefetchCsrf==='function')?await globalThis.__aaPrefetchCsrf():'';
         const d=ch.data||{};
         const fd=new FormData();
         const set=(k,val)=>fd.append(k,val===undefined||val===null?'':String(val));
@@ -71366,7 +71367,8 @@ ${Qe().stringify(o)}</chat_history>`;if((0,Cn.Q)().chatAppendToLastMessage){cons
         (Array.isArray(ch.tags)?ch.tags:[]).forEach(g=>fd.append('tags',g));
         const dp=(d.extensions&&d.extensions.depth_prompt)||{};
         set('depth_prompt_prompt',dp.prompt??'');set('depth_prompt_depth',dp.depth??4);set('depth_prompt_role',dp.role??'system');
-        const r=await fetch('/api/characters/edit',{method:'POST',credentials:'same-origin',body:fd});
+        const hdrs={};if(tok)hdrs['X-CSRF-Token']=tok;
+        const r=await fetch('/api/characters/edit',{method:'POST',credentials:'same-origin',headers:hdrs,body:fd});
         if(!r.ok)console.warn('[AA] /api/characters/edit failed:',r.status);
       }catch(e){console.warn('[AA] character edit request failed:',e);}
       return;
