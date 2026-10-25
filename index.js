@@ -71323,7 +71323,6 @@ ${Qe().stringify(o)}</chat_history>`;if((0,Cn.Q)().chatAppendToLastMessage){cons
     };
   }
   // 變量系統（真實現：讀寫 ST 角色卡 extensions.tavern_helper.variables / chat_metadata.variables / 全局）
-  const TH_FIELD='tavern_helper.variables';
   function __freshCtx(){try{return typeof ST.getContext==='function'?ST.getContext():ctx;}catch{return ctx;}}
   function __varsRead(opt){
     const t=(opt&&opt.type)||'chat';const c=__freshCtx();
@@ -71338,7 +71337,38 @@ ${Qe().stringify(o)}</chat_history>`;if((0,Cn.Q)().chatAppendToLastMessage){cons
   async function __varsWrite(vars,opt){
     const t=(opt&&opt.type)||'chat';const c=__freshCtx();const v=vars&&typeof vars==='object'?vars:{};
     if(t==='character'){
-      try{await c.writeExtensionField(c.characterId,TH_FIELD,v);}catch(e){console.warn('[AA] writeExtensionField failed:',e);}
+      const idx=Number(c.characterId);
+      const ch=c.characters&&c.characters[idx];
+      if(!ch){console.warn('[AA] character vars write: no character at index',idx);return;}
+      try{
+        ch.data=ch.data||{};ch.data.extensions=ch.data.extensions||{};
+        ch.data.extensions.tavern_helper=ch.data.extensions.tavern_helper||{};
+        ch.data.extensions.tavern_helper.variables=v;
+        if(ch.json_data){try{const jd=JSON.parse(ch.json_data);jd.data=jd.data||{};jd.data.extensions=jd.data.extensions||{};jd.data.extensions.tavern_helper=jd.data.extensions.tavern_helper||{};jd.data.extensions.tavern_helper.variables=v;ch.json_data=JSON.stringify(jd);}catch{}}
+      }catch(e){console.warn('[AA] vars memory write failed:',e);}
+      // 持久化：鏡像 Tavern Helper 的 /api/characters/edit 整體替換寫法（避免 merge-attributes 的 deepMerge 點號鍵/陣列問題）
+      try{
+        const d=ch.data||{};
+        const fd=new FormData();
+        const set=(k,val)=>fd.append(k,val===undefined||val===null?'':String(val));
+        set('ch_name',ch.name);set('avatar_url',ch.avatar);
+        set('character_version',d.character_version);
+        set('creator',d.creator);set('creator_notes',d.creator_notes);
+        set('description',d.description);set('first_mes',d.first_mes);
+        set('system_prompt',d.system_prompt);set('post_history_instructions',d.post_history_instructions);
+        (Array.isArray(d.alternate_greetings)?d.alternate_greetings:[]).forEach(g=>fd.append('alternate_greetings',g==null?'':String(g)));
+        set('world',(d.extensions&&d.extensions.world)||'');
+        fd.append('extensions',JSON.stringify(d.extensions||{}));
+        set('chat',ch.chat||'');set('create_date',ch.create_date||'');
+        set('personality',d.personality);set('scenario',d.scenario);set('mes_example',d.mes_example);
+        set('talkativeness',(d.extensions&&d.extensions.talkativeness)??0.5);
+        set('fav',(d.extensions&&d.extensions.fav)?'true':'false');
+        (Array.isArray(ch.tags)?ch.tags:[]).forEach(g=>fd.append('tags',g));
+        const dp=(d.extensions&&d.extensions.depth_prompt)||{};
+        set('depth_prompt_prompt',dp.prompt??'');set('depth_prompt_depth',dp.depth??4);set('depth_prompt_role',dp.role??'system');
+        const r=await fetch('/api/characters/edit',{method:'POST',credentials:'same-origin',body:fd});
+        if(!r.ok)console.warn('[AA] /api/characters/edit failed:',r.status);
+      }catch(e){console.warn('[AA] character edit request failed:',e);}
       return;
     }
     if(t==='global'){
