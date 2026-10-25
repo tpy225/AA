@@ -71250,10 +71250,49 @@ ${Qe().stringify(o)}</chat_history>`;if((0,Cn.Q)().chatAppendToLastMessage){cons
     };
   }
   if(typeof globalThis.setChatMessages!=='function'){
-    globalThis.setChatMessages=function(){return Promise.resolve();};
+    globalThis.setChatMessages=function(items,opt){
+      try{
+        const chat=__liveChat();const len=chat.length;
+        const list=Array.isArray(items)?items:[items];
+        const norm=n=>{let id=Number(n);if(!Number.isFinite(id))return -1;if(id<0)id=len+id;return id;};
+        const touched=[];
+        for(const it of list){
+          if(!it||typeof it!=='object')continue;
+          const id=norm(it.message_id);
+          if(id<0||id>=len||!chat[id])continue;
+          const data=chat[id];touched.push(id);
+          const swId=data.swipe_id??0;
+          if(it.name!==undefined)data.name=it.name;
+          if(it.role!==undefined){data.is_user=it.role==='user';if(it.role==='system'){data.extra=data.extra||{};data.extra.type='narrator';}else if(data.extra&&data.extra.type==='narrator')delete data.extra.type;}
+          if(it.is_hidden!==undefined)data.is_system=it.is_hidden;
+          if(it.message!==undefined){data.mes=it.message;if(Array.isArray(data.swipes))data.swipes[swId]=it.message;}
+          if(it.data!==undefined){if(!Array.isArray(data.variables))data.variables=Array.isArray(data.swipes)?data.swipes.map(()=>({})):[{}];data.variables[swId]=it.data;}
+          if(it.extra!==undefined){data.extra=it.extra;if(!Array.isArray(data.swipe_info))data.swipe_info=Array.isArray(data.swipes)?data.swipes.map(()=>({})):[{}];data.swipe_info[swId]=it.extra;}
+          if(it.swipes!==undefined||it.swipe_id!==undefined){
+            if(it.swipes!==undefined)data.swipes=it.swipes;
+            if(it.swipe_id!==undefined)data.swipe_id=it.swipe_id;
+            const sw=data.swipe_id??0;
+            if(Array.isArray(data.swipes))data.mes=data.swipes[sw]??data.mes;
+          }
+        }
+        const c=__freshCtx();
+        for(const id of touched){try{c.updateMessageBlock&&c.updateMessageBlock(id,chat[id]);}catch(e){}}
+        return (c.saveChatConditional?c.saveChatConditional():Promise.resolve()).catch(e=>console.warn('[AA] saveChatConditional failed:',e));
+      }catch(e){console.warn('[AA] setChatMessages failed:',e);return Promise.resolve();}
+    };
   }
   if(typeof globalThis.deleteChatMessages!=='function'){
-    globalThis.deleteChatMessages=function(){return Promise.resolve();};
+    globalThis.deleteChatMessages=function(ids,opt){
+      try{
+        const chat=__liveChat();const len=chat.length;
+        let list=(Array.isArray(ids)?ids:[ids]).map(Number).filter(n=>Number.isFinite(n)).map(n=>n<0?len+n:n).filter(n=>n>=0&&n<len);
+        if(list.length===0)return Promise.resolve();
+        list=Array.from(new Set(list)).sort((a,b)=>b-a);
+        for(const id of list)chat.splice(id,1);
+        const c=__freshCtx();
+        return (c.saveChatConditional?c.saveChatConditional():Promise.resolve()).then(()=>{try{c.reloadCurrentChat&&c.reloadCurrentChat();}catch(e){}}).catch(e=>{console.warn('[AA] delete save failed:',e);});
+      }catch(e){console.warn('[AA] deleteChatMessages failed:',e);return Promise.resolve();}
+    };
   }
   // 變量系統（真實現：讀寫 ST 角色卡 extensions.tavern_helper.variables / chat_metadata.variables / 全局）
   const TH_FIELD='tavern_helper.variables';
