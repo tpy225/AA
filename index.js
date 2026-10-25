@@ -71437,6 +71437,72 @@ ${Qe().stringify(o)}</chat_history>`;if((0,Cn.Q)().chatAppendToLastMessage){cons
   if(typeof globalThis.reloadWorldInfoEditor!=='function'){
     globalThis.reloadWorldInfoEditor=function(name){try{__freshCtx().reloadWorldInfoEditor&&__freshCtx().reloadWorldInfoEditor(name);}catch{}};
   }
+  // createChatMessages（語義對齊原版：轉換→splice→addOneMessage→事件→保存）
+  if(typeof globalThis.createChatMessages!=='function'){
+    globalThis.createChatMessages=function(chat_messages,opt){
+      try{
+        const chat=__liveChat();
+        const c=__freshCtx();
+        const o=opt||{};
+        let insert_before=(o.insert_at!==undefined?o.insert_at:(o.insert_before!==undefined?o.insert_before:'end'));
+        if(insert_before==='end')insert_before=chat.length;
+        insert_before=Math.max(-chat.length,Math.min(chat.length,Number(insert_before)||0));
+        if(insert_before<0)insert_before+=chat.length;
+        const is_at_end=insert_before===chat.length;
+        const list=Array.isArray(chat_messages)?chat_messages:[chat_messages];
+        const converted=list.map(cm=>{
+          const m={};
+          if(cm&&cm.name!==undefined)m.name=cm.name;
+          else if(cm&&cm.role==='system')m.name='system';
+          else if(cm&&cm.role==='user')m.name=c.name1||'User';
+          else m.name=c.name2||'Assistant';
+          m.is_user=!!(cm&&cm.role==='user');
+          if(cm&&cm.role==='system'){m.extra=Object.assign({},cm.extra||{},{type:'narrator'});}
+          m.is_system=!!(cm&&cm.is_hidden);
+          m.mes=(cm&&cm.message)||'';
+          m.swipes=[m.mes];m.swipe_id=0;
+          if(cm&&cm.data!==undefined)m.variables=[cm.data];
+          if(cm&&cm.extra!==undefined){m.extra=Object.assign({},m.extra||{},cm.extra);}
+          return m;
+        });
+        chat.splice(insert_before,0,...converted);
+        const emit=(type,id)=>{try{c.eventSource&&c.event_types&&c.eventSource.emit(type,id);}catch{}};
+        const refresh=async()=>{try{
+          for(let i=0;i<converted.length;i++){
+            const id=insert_before+i;
+            if(c.addOneMessage)c.addOneMessage(converted[i],is_at_end?undefined:{insertBefore:insert_before,forceId:id,scroll:false});
+            emit(converted[i].is_user?(c.event_types.MESSAGE_SENT||'message_sent'):(c.event_types.MESSAGE_RECEIVED||'message_received'),id);
+          }
+        }catch(e){console.warn('[AA] createChatMessages refresh failed:',e);}};
+        return Promise.resolve(refresh()).then(()=>(c.saveChatConditional?c.saveChatConditional():undefined)).catch(e=>{console.warn('[AA] createChatMessages save failed:',e);});
+      }catch(e){console.warn('[AA] createChatMessages failed:',e);return Promise.resolve();}
+    };
+  }
+  // updateVariablesWith（get→updater→replace，支持異步）
+  if(typeof globalThis.updateVariablesWith!=='function'){
+    globalThis.updateVariablesWith=function(updater,opt){
+      try{
+        const o=opt||{type:'chat'};
+        const vars=globalThis.getVariables(o);
+        const result=updater(vars);
+        if(result&&typeof result.then==='function'){
+          return result.then(r=>{globalThis.replaceVariables(r,o);return r;});
+        }
+        globalThis.replaceVariables(result,o);
+        return result;
+      }catch(e){console.warn('[AA] updateVariablesWith failed:',e);return Promise.resolve({});}
+    };
+  }
+  // getCharData（返回角色卡數據副本）
+  if(typeof globalThis.getCharData!=='function'){
+    globalThis.getCharData=function(name){
+      try{
+        const f=__charByReq(!name?'current':name);
+        if(!f)return null;
+        return JSON.parse(JSON.stringify(f.char));
+      }catch(e){console.warn('[AA] getCharData failed:',e);return null;}
+    };
+  }
   // TavernRegex（空殼）
   if(typeof globalThis.importRawTavernRegex!=='function'){
     globalThis.importRawTavernRegex=function(){return Promise.resolve();};
