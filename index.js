@@ -71219,6 +71219,29 @@ ${Qe().stringify(o)}</chat_history>`;if((0,Cn.Q)().chatAppendToLastMessage){cons
   if(typeof globalThis.getContext!=='function'){
     globalThis.getContext=function(){return __freshCtx();};
   }
+  // getRequestHeaders（同步緩存 + 預取 /csrf-token；上傳 403 的根因是 ST 全局無此函數）
+  if(typeof globalThis.getRequestHeaders!=='function'){
+    let __csrfToken='',__csrfFetching=null;
+    globalThis.__aaPrefetchCsrf=async function(){
+      if(__csrfToken)return __csrfToken;
+      if(!__csrfFetching){
+        __csrfFetching=(async()=>{try{
+          const r=await fetch('/csrf-token?_='+Date.now(),{credentials:'same-origin'});
+          if(r.ok){const j=await r.json().catch(()=>null);if(j&&j.token)__csrfToken=j.token;}
+        }catch(e){console.warn('[AA] csrf-token fetch failed:',e);}finally{__csrfFetching=null;}
+        return __csrfToken;})();
+      }
+      return __csrfFetching;
+    };
+    globalThis.getRequestHeaders=function(){
+      const h={'Content-Type':'application/json'};
+      if(__csrfToken)h['X-CSRF-Token']=__csrfToken;
+      else globalThis.__aaPrefetchCsrf();
+      return h;
+    };
+    globalThis.__aaPrefetchCsrf();
+    try{const st=globalThis.SillyTavern;if(st&&typeof st.getRequestHeaders!=='function')st.getRequestHeaders=globalThis.getRequestHeaders;}catch{}
+  }
   // 消息操作（每次現場取活 context.chat，語義對齊 Slash Runner getChatMessages(range)）
   function __liveChat(){try{return __freshCtx().chat||[];}catch{return[];}}
   if(typeof globalThis.getLastMessageId!=='function'){
