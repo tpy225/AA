@@ -71195,6 +71195,13 @@ ${Qe().stringify(o)}</chat_history>`;if((0,Cn.Q)().chatAppendToLastMessage){cons
   try{if(typeof ST.POPUP_TYPE==='undefined'&&typeof ctx.POPUP_TYPE!=='undefined')ST.POPUP_TYPE=ctx.POPUP_TYPE;}catch(e){}
   try{if(typeof ST.POPUP_RESULT==='undefined'&&typeof ctx.POPUP_RESULT!=='undefined')ST.POPUP_RESULT=ctx.POPUP_RESULT;}catch(e){}
   try{if(typeof ST.callGenericPopup!=='function'&&typeof ctx.callGenericPopup==='function')ST.callGenericPopup=function(){return ctx.callGenericPopup.apply(ctx,arguments);};}catch(e){}
+  // name1/name2/powerUserSettings：ST 插件全局沒有這些屬性，用動態 getter 從 context 實時取（切角色/換人設不失效）
+  try{
+    if(typeof ST.name1==='undefined')Object.defineProperty(ST,'name1',{get:function(){try{return ST.getContext().name1||'User';}catch{return'User';}},configurable:true});
+    if(typeof ST.name2==='undefined')Object.defineProperty(ST,'name2',{get:function(){try{return ST.getContext().name2||'';}catch{return'';}},configurable:true});
+    if(typeof ST.powerUserSettings==='undefined')Object.defineProperty(ST,'powerUserSettings',{get:function(){try{return ST.getContext().powerUserSettings||{};}catch{return{};}},configurable:true});
+    if(typeof ST.chat==='undefined')Object.defineProperty(ST,'chat',{get:function(){try{return ST.getContext().chat||[];}catch{return[];}},configurable:true});
+  }catch(e){}
   const es=ST.eventSource||ctx.eventSource;
   // 事件系統
   if(typeof globalThis.eventOn!=='function'){
@@ -71244,6 +71251,19 @@ ${Qe().stringify(o)}</chat_history>`;if((0,Cn.Q)().chatAppendToLastMessage){cons
   }
   // 消息操作（每次現場取活 context.chat，語義對齊 Slash Runner getChatMessages(range)）
   function __liveChat(){try{return __freshCtx().chat||[];}catch{return[];}}
+  // 宏展開 helper：對齊 Slash Runner 原版 substituteParamsExtended 語義
+  function __aaExpandMacros(s){
+    let out=String(s==null?'':s);
+    try{const c0=__freshCtx();if(c0&&typeof c0.substituteParams==='function')out=String(c0.substituteParams(out));}catch{}
+    try{if(typeof globalThis.substituteParamsExtended==='function')out=String(globalThis.substituteParamsExtended(out));}catch{}
+    try{
+      const chat=__liveChat();const len=chat.length;const last=Math.max(0,len-1);
+      out=out.replace(/\{\{lastMessageId\}\}/gi,String(last));
+      out=out.replace(/\{\{lastUserMessage\}\}/gi,(function(){for(let i=len-1;i>=0;i--){if(chat[i]&&chat[i].is_user)return String(chat[i].mes||'');}return'';})());
+      out=out.replace(/\{\{lastAssistantMessage\}\}/gi,(function(){for(let i=len-1;i>=0;i--){if(chat[i]&&!chat[i].is_user)return String(chat[i].mes||'');}return'';})());
+    }catch{}
+    return out;
+  }
   if(typeof globalThis.getLastMessageId!=='function'){
     globalThis.getLastMessageId=function(){try{return __liveChat().length-1;}catch{return-1;}};
   }
@@ -71253,15 +71273,7 @@ ${Qe().stringify(o)}</chat_history>`;if((0,Cn.Q)().chatAppendToLastMessage){cons
         const chat=__liveChat();const len=chat.length;
         const role=(opt&&opt.role)||'all',hide=(opt&&opt.hide_state)||'all',incSw=(opt&&opt.include_swipes)||false;
         // 宏展開：對齊 Slash Runner 原版（range 先過 substituteParamsExtended，如 {{lastMessageId}}）
-        let s=String(range==null?'':range).trim();
-        try{const c0=__freshCtx();if(c0&&typeof c0.substituteParams==='function')s=String(c0.substituteParams(s));}catch{}
-        try{if(typeof globalThis.substituteParamsExtended==='function')s=String(globalThis.substituteParamsExtended(s));}catch{}
-        try{
-          const last=len-1;
-          s=s.replace(/\{\{lastMessageId\}\}/gi,String(Math.max(0,last)));
-          s=s.replace(/\{\{lastUserMessage\}\}/gi,(function(){for(let i=len-1;i>=0;i--){if(chat[i]&&chat[i].is_user)return String(chat[i].mes||'');}return'';})());
-          s=s.replace(/\{\{lastAssistantMessage\}\}/gi,(function(){for(let i=len-1;i>=0;i--){if(chat[i]&&!chat[i].is_user)return String(chat[i].mes||'');}return'';})());
-        }catch{}
+        let s=__aaExpandMacros(range);
         let start=0,end=len-1;
         if(s){
           let m=s.match(/^(-?\d+)\s*-\s*(-?\d+)$/);
@@ -71302,7 +71314,7 @@ ${Qe().stringify(o)}</chat_history>`;if((0,Cn.Q)().chatAppendToLastMessage){cons
           if(it.name!==undefined)data.name=it.name;
           if(it.role!==undefined){data.is_user=it.role==='user';if(it.role==='system'){data.extra=data.extra||{};data.extra.type='narrator';}else if(data.extra&&data.extra.type==='narrator')delete data.extra.type;}
           if(it.is_hidden!==undefined)data.is_system=it.is_hidden;
-          if(it.message!==undefined){data.mes=it.message;if(Array.isArray(data.swipes))data.swipes[swId]=it.message;}
+          if(it.message!==undefined){const mes=__aaExpandMacros(it.message);data.mes=mes;if(Array.isArray(data.swipes))data.swipes[swId]=mes;}
           if(it.data!==undefined){if(!Array.isArray(data.variables))data.variables=Array.isArray(data.swipes)?data.swipes.map(()=>({})):[{}];data.variables[swId]=it.data;}
           if(it.extra!==undefined){data.extra=it.extra;if(!Array.isArray(data.swipe_info))data.swipe_info=Array.isArray(data.swipes)?data.swipes.map(()=>({})):[{}];data.swipe_info[swId]=it.extra;}
           if(it.swipes!==undefined||it.swipe_id!==undefined){
