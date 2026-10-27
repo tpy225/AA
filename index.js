@@ -71252,7 +71252,16 @@ ${Qe().stringify(o)}</chat_history>`;if((0,Cn.Q)().chatAppendToLastMessage){cons
       try{
         const chat=__liveChat();const len=chat.length;
         const role=(opt&&opt.role)||'all',hide=(opt&&opt.hide_state)||'all',incSw=(opt&&opt.include_swipes)||false;
-        const s=String(range==null?'':range).trim();
+        // 宏展開：對齊 Slash Runner 原版（range 先過 substituteParamsExtended，如 {{lastMessageId}}）
+        let s=String(range==null?'':range).trim();
+        try{const c0=__freshCtx();if(c0&&typeof c0.substituteParams==='function')s=String(c0.substituteParams(s));}catch{}
+        try{if(typeof globalThis.substituteParamsExtended==='function')s=String(globalThis.substituteParamsExtended(s));}catch{}
+        try{
+          const last=len-1;
+          s=s.replace(/\{\{lastMessageId\}\}/gi,String(Math.max(0,last)));
+          s=s.replace(/\{\{lastUserMessage\}\}/gi,(function(){for(let i=len-1;i>=0;i--){if(chat[i]&&chat[i].is_user)return String(chat[i].mes||'');}return'';})());
+          s=s.replace(/\{\{lastAssistantMessage\}\}/gi,(function(){for(let i=len-1;i>=0;i--){if(chat[i]&&!chat[i].is_user)return String(chat[i].mes||'');}return'';})());
+        }catch{}
         let start=0,end=len-1;
         if(s){
           let m=s.match(/^(-?\d+)\s*-\s*(-?\d+)$/);
