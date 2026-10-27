@@ -64052,7 +64052,7 @@ const T0=(0,Ye.A)(I0,[["__scopeId","data-v-0076818b"]]),j0={
 		},Ee=()=>{
 			Z.value=null 
 		},__lpPick=()=>{
-			if(__lpPick._b)return;const __i=document.createElement("input");__i.type="file";__i.accept="image/*";__i.onchange=async()=>{
+			if(__lpPick._b)return;const __i=document.createElement("input");__i.type="file";__i.accept="image/*";__i.style.display="none";try{document.body.appendChild(__i);}catch{}__i.onchange=async()=>{
 				const __f=__i.files&&__i.files[0];__i.value="";if(!__f)return;__lpPick._b=1;try{
 					const __du=await new Promise((rs,rj)=>{
 						const rd=new FileReader;rd.onload=()=>rs(rd.result);rd.onerror=rj;rd.readAsDataURL(__f)
@@ -67964,7 +67964,7 @@ const Gk=(0,Ye.A)(Yk,[["__scopeId","data-v-2ec91670"]]),Uk={
 			},c.value=!1) 
 		}
 		async function V(){
-			if(iu.value)return; const q=an().createElement("input"); q.type="file",q.accept="image/*",q.onchange=()=>{
+			if(iu.value)return; const q=an().createElement("input"); q.type="file",q.accept="image/*",q.style.display="none";try{an().body.appendChild(q);}catch{} q.onchange=()=>{
 				const v=q.files?.[0];if(!v)return; const x=new FileReader; x.onload=async()=>{
 					iu.value=!0; try{
 						const{
@@ -68284,7 +68284,7 @@ const _E=(0,Ye.A)(qE,[["__scopeId","data-v-714cb759"]]),$E={
 		},l=()=>{
 			o.value.trim()&&(n("select",o.value.trim()),n("update:visible",!1)) 
 		},c=(0,e.ref)(!1),A=()=>{
-			if(c.value)return;const p=document.createElement("input");p.type="file",p.accept="image/*",p.onchange=()=>{
+			if(c.value)return;const p=document.createElement("input");p.type="file",p.accept="image/*",p.style.display="none";try{document.body.appendChild(p);}catch{} p.onchange=()=>{
 				const C=p.files?.[0];if(!C)return;const E=new FileReader;E.onload=async()=>{
 					c.value=!0;try{
 						const $=await Cr(String(E.result));n("select",$),n("update:visible",!1) 
@@ -71390,7 +71390,7 @@ ${Qe().stringify(o)}</chat_history>`;if((0,Cn.Q)().chatAppendToLastMessage){cons
         set('depth_prompt_prompt',dp.prompt??'');set('depth_prompt_depth',dp.depth??4);set('depth_prompt_role',dp.role??'system');
         const hdrs={};if(tok)hdrs['X-CSRF-Token']=tok;
         const r=await fetch('/api/characters/edit',{method:'POST',credentials:'same-origin',headers:hdrs,body:fd});
-        if(!r.ok)console.warn('[AA] /api/characters/edit failed:',r.status);
+        if(!r.ok){const __t=await r.text().catch(()=>'');console.warn('[AA] /api/characters/edit failed:',r.status,__t.slice(0,200));try{globalThis.toastr&&toastr.error('角色数据保存失败 HTTP '+r.status+'（好友/头像等刷新后会丢失）','小手机',{timeOut:6000});}catch{}}
       }catch(e){console.warn('[AA] character edit request failed:',e);}
       return;
     }
