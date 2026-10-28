@@ -58380,6 +58380,9 @@ function Mo(a){
 		},0) 
 	}) 
 }
+function __phoneChatId(){try{return String(globalThis.getCurrentChatId?.()??globalThis.SillyTavern?.getCurrentChatId?.()??'')}catch{return ''}}
+async function __phoneMirrorSave(a,r){try{if(typeof insertOrAssignVariables!=='function'||!r)return;insertOrAssignVariables({['__phone_vc_'+String(a)]:{chatId:__phoneChatId(),ts:Date.now(),data:r}},{type:'character'})}catch(e){console.warn('[Mirror] 保存鏡像失敗:',e)}}
+function __phoneMirrorRead(a){try{if(typeof getVariables!=='function')return null;const v=getVariables({type:'character'})||{},e=v['__phone_vc_'+String(a)];if(!e||typeof e!=='object'||!e.data)return null;const cid=__phoneChatId();if(cid&&e.chatId&&String(e.chatId)!==cid)return null;return console.info(`[Mirror] ${a} 從角色變量鏡像恢復數據`),e.data}catch(e){return console.warn('[Mirror] 讀取鏡像失敗:',e),null}}
 async function fn(a,r){
 	try{
 		const t=Qe().stringify(r),n=`<phone_module type="${a}" timestamp="${Date.now()}">
@@ -58394,13 +58397,13 @@ ${t}</phone_module>`,o=(0,Cn.Q)();
 `+n;
 					return await setChatMessages([{
 						message_id:i,message:c 
-					}]),console.info(`[Cache] \u5DF2\u8FFD\u52A0 ${a} \u6570\u636E\u5230\u697C\u5C42 ${i}`),o.emitGenerationEnded&&(markSimulatedGenerationForCurrentChat(i),await eventEmit(tavern_events.GENERATION_STARTED,"normal",{},!1),console.info("[Cache] \u5DF2\u89E6\u53D1 GENERATION_STARTED \u4E8B\u4EF6\uFF08\u6A21\u62DF\u975Equiet\u751F\u6210\uFF09"),await eventEmit(tavern_events.GENERATION_ENDED,i),console.info(`[Cache] \u5DF2\u89E6\u53D1 GENERATION_ENDED \u4E8B\u4EF6\uFF0C\u697C\u5C42 ${i}`)),i 
+					}]),await __phoneMirrorSave(a,r),console.info(`[Cache] \u5DF2\u8FFD\u52A0 ${a} \u6570\u636E\u5230\u697C\u5C42 ${i}`),o.emitGenerationEnded&&(markSimulatedGenerationForCurrentChat(i),await eventEmit(tavern_events.GENERATION_STARTED,"normal",{},!1),console.info("[Cache] \u5DF2\u89E6\u53D1 GENERATION_STARTED \u4E8B\u4EF6\uFF08\u6A21\u62DF\u975Equiet\u751F\u6210\uFF09"),await eventEmit(tavern_events.GENERATION_ENDED,i),console.info(`[Cache] \u5DF2\u89E6\u53D1 GENERATION_ENDED \u4E8B\u4EF6\uFF0C\u697C\u5C42 ${i}`)),i 
 				} 
 			} 
 		}await createChatMessages([{
 			role:"assistant",message:n,is_hidden:!1 
 		}]);
-		const s=getLastMessageId();
+		const s=getLastMessageId();await __phoneMirrorSave(a,r);
 		return console.info(`[Cache] \u5DF2\u4FDD\u5B58 ${a} \u6570\u636E\u5230\u697C\u5C42 ${s}`),o.emitGenerationEnded&&(markSimulatedGenerationForCurrentChat(s),await eventEmit(tavern_events.GENERATION_STARTED,"normal",{},!1),console.info("[Cache] \u5DF2\u89E6\u53D1 GENERATION_STARTED \u4E8B\u4EF6\uFF08\u6A21\u62DF\u975Equiet\u751F\u6210\uFF09"),await eventEmit(tavern_events.GENERATION_ENDED,s),console.info(`[Cache] \u5DF2\u89E6\u53D1 GENERATION_ENDED \u4E8B\u4EF6\uFF0C\u697C\u5C42 ${s}`)),s 
 	}catch(t){
 		return console.error(`[Cache] \u4FDD\u5B58 ${a} \u6570\u636E\u5230\u697C\u5C42\u5931\u8D25:`,t),null 
@@ -58424,7 +58427,7 @@ function Rn(a){
 				}catch(n){
 					return console.error(`[History] ${t} - \u8BFB\u53D6\u697C\u5C42\u5386\u53F2\u5931\u8D25:`,n),null 
 				} 
-			})(a)) 
+			})(a)||__phoneMirrorRead(a)) 
 		},0) 
 	}) 
 }
@@ -58451,7 +58454,7 @@ ${i}</phone_module>`,c=new RegExp(`<phone_module\\b[^>]*\\btype="${a}"[^>]*>[\\s
 		const E=C+String(p[0]||"").length,$=s.slice(0,C)+l+s.slice(E);
 		return await setChatMessages([{
 			message_id:n,message:$ 
-		}]),console.info(`[History] ${a} - \u5DF2\u66F4\u65B0\u697C\u5C42 ${n}`),!0 
+		}]),await __phoneMirrorSave(a,r),console.info(`[History] ${a} - \u5DF2\u66F4\u65B0\u697C\u5C42 ${n}`),!0 
 	}catch(n){
 		return console.error(`[History] ${a} - \u66F4\u65B0\u697C\u5C42\u5931\u8D25:`,n),!1 
 	} 
