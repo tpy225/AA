@@ -58490,7 +58490,14 @@ function Rn(a){
 							} 
 						} 
 					}
-					return console.info(`[History] ${t} - \u672A\u5728\u697C\u5C42\u5386\u53F2\u4E2D\u627E\u5230\u6570\u636E`),null 
+					const F0=getChatMessages(`0-${n}`);if(F0&&F0.length)for(let c0=F0.length-1;c0>=0;c0--){
+                                                        const A0=F0[c0],p0=String(A0.message||""),C0=Array.from(p0.matchAll(l));if(C0.length)for(let E0=C0.length-1;E0>=0;E0--){
+                                                                const $0=C0[E0];try{
+                                                                        const O0=String($0?.[1]||"").trim();if(!O0)continue;const w0=Qe().parse(O0);return console.info(`[History] ${t} - \u5F9E\u5168\u91CF\u6A13\u5C64 ${A0.message_id} \u6062\u5FA9`),w0
+                                                                }catch(O0){}
+                                                        }
+                                                }
+                                                return console.info(`[History] ${t} - \u672A\u5728\u697C\u5C42\u5386\u53F2\u4E2D\u627E\u5230\u6570\u636E`),null 
 				}catch(n){
 					return console.error(`[History] ${t} - \u8BFB\u53D6\u697C\u5C42\u5386\u53F2\u5931\u8D25:`,n),null 
 				} 
