@@ -1946,7 +1946,7 @@ ${W.join(`
 			});const m=new Set;return b.filter(u=>!m.has(u)&&(m.add(u),!0)) 
 		})(y);
 		return{
-			promptText:T,referenceImages:N 
+			promptText:T,referenceImages:N,structured:B,mode:M 
 		} 
 	}
 	function S(...y){
@@ -2495,7 +2495,65 @@ ${W.join(`
 		const useBB=B.apiFormat==="baibai"&&B.baibaiEnabled===!0;
 		if(useBB){
 			if(!globalThis.STBaiBaiImage)throw new Error("\u67CF\u5B9D\u7ED8\u6269\u5C55\u672A\u52A0\u8F7D");
-			const r=await globalThis.STBaiBaiImage.generate({prompt:y,save:false});
+			const bbApi=globalThis.STBaiBaiImage;
+			const bbStatus=(()=>{try{return bbApi.getBackendStatus?.()||{}}catch{return{}}})();
+			const bbLib=(()=>{try{return bbApi.getCharacters?.()?.characters||[]}catch{return[]}})();
+			const bbSt=M?.bbStructured??null, bbMode=M?.bbMode??null;
+			// 1) 角色库匹配：从结构化 prompt 或 tag 串中识别角色名，用柏宝绘记录的官方 tag/nl 替换外貌
+			const bbMatched=[];
+			(()=>{try{
+				const norm=v=>String(v??"").trim().toLowerCase().replace(/\s+/g,"");
+				const byKey=new Map;bbLib.forEach(c=>{const k=norm(c.name);if(k&&!byKey.has(k))byKey.set(k,c)});
+				const seen=new Set;
+				const tryAdd=n=>{const k=norm(n);if(!k||seen.has(k)||!byKey.has(k))return;seen.add(k);bbMatched.push(byKey.get(k))};
+				if(bbSt&&typeof bbSt=="object"){
+					const chars=Array.isArray(bbSt.characters)?bbSt.characters:Array.isArray(bbSt["人物"])?bbSt["人物"]:[];
+					chars.forEach(c=>tryAdd(c?.name??c?.["姓名"]));
+				}
+				if(bbMatched.length===0&&typeof y=="string"){
+					bbLib.forEach(c=>{const k=norm(c.name);if(k.length>=2&&y.includes(c.name))tryAdd(c.name)});
+				}
+			}catch{} })();
+			// 2) 组装请求参数
+			const bbArgs={prompt:y,save:false};
+			try{
+				if(bbMatched.length===1){
+					// 单角色：把官方 tag 串替换进 prompt 开头，替换/注入外貌，避免模型自由发挥
+					const c=bbMatched[0];
+					if(c.tag){
+						let base=typeof y=="string"?y:"";
+						// 移除 prompt 中已由文本AI写的该角色外貌标签风险：直接以官方tag为前缀
+						bbArgs.prompt=c.tag+", "+base;
+					}
+					if(c.nl)bbArgs.nl=c.nl;
+				}else if(bbMatched.length>1){
+					// 多角色：仅用场景 prompt，角色走分槽（柏宝绘不降级拼接，防多躯干）
+					if(bbStatus.supportsCharacters){
+						bbArgs.characters=bbMatched.slice(0,6).map(c=>({name:c.name,tag:c.tag,nl:c.nl}));
+						if(typeof y=="string"){
+							// 从场景串中去掉已分槽角色可能造成的重复人物tag
+							bbArgs.prompt=y.replace(/^\s*1girl\s*,\s*|\b\d?girls?,\s*/i,"");
+						}
+					}else if(bbMatched[0]?.tag){
+						// 后端不支持分槽：只保证第一主角外貌正确
+						bbArgs.prompt=bbMatched[0].tag+", "+(typeof y=="string"?y:"");
+						if(bbMatched[0].nl)bbArgs.nl=bbMatched[0].nl;
+					}
+				}
+				// 3) 画幅方向
+				if(bbMode==="natural"&&bbSt&&typeof bbSt=="object"){
+					// 结构化里可能带画幅信息，暂不处理；保留 portrait 缺省
+				}
+				// 4) ComfyUI 动态负面词（NAI 的负面由柏宝绘渠道配置接管）
+				if(bbStatus.backend==="comfyui"){
+					const neg=(()=>{try{
+						const c=M?.config;const nv=String(c?.novelai?.negativePrompt??"").trim();
+						return nv||undefined
+					}catch{return undefined}})();
+					if(neg)bbArgs.negative=neg;
+				}
+			}catch(bbE){console.warn("[BB] 参数组装失败，退回裸prompt:",bbE)}
+			const r=await bbApi.generate(bbArgs);
 			return{dataUrl:r.dataUrl}
 		}
 		return B.apiFormat!=="novelai"?oe(y,{
@@ -58020,11 +58078,11 @@ ${BOARDS.map(b=>`- ${b.name}(${b.id})：${b.desc}`).join("\n")}
 				const provider=cfg.apiFormat==="novelai"?cfg.novelai:cfg.apiFormat==="openai"?cfg.openai:cfg.gemini;
 				if(!(cfg.apiFormat==="baibai"&&cfg.baibaiEnabled===!0)&&(!provider.url||!provider.key))return void toastr.warning(`请先在设置-绘图配置中填写 ${fmt} URL 和 Key`);
 				if((cfg.apiFormat==="openai"||cfg.apiFormat==="gemini")&&!String(provider.model||"").trim())return void toastr.warning(`请先在设置-绘图配置中填写 ${fmt} 模型`);
-				const{promptText:pt,referenceImages:ri}=Fn.buildPromptRequestByMode(post.prompt,cfg.promptComposeMode);
+				const{promptText:pt,referenceImages:ri,structured:BBst,mode:BBmd}=Fn.buildPromptRequestByMode(post.prompt,cfg.promptComposeMode);
 				if(!pt)return void toastr.warning("prompt 为空");
 				imgLoading.value[postIdx]=!0;
 				try{
-					const{dataUrl:du}=await Fn.queueNovelAiImageGeneration(pt,{config:cfg,referenceImages:ri});
+					const{dataUrl:du}=await Fn.queueNovelAiImageGeneration(pt,{bbStructured:BBst,bbMode:BBmd,config:cfg,referenceImages:ri});
 					post.imageUrl=du.startsWith("data:image/")?await tt.uploadImageDataUrlToSillyTavern(du,{characterName:"不夜城"}):du;
 					await saveNightPosts(posts.value,null);
 					toastr.success("生图完成");
@@ -62409,7 +62467,7 @@ ${Qe().stringify(Ae)}</chat_history>`,xe=(0,Cn.Q)();let ke=null;if(xe.chatAppend
 			}=(0,Fn.buildPromptRequestByMode)(I.prompt,Q.promptComposeMode);if(!Be)return void toastr.warning("prompt \u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u751F\u56FE");const ve=I.type==="image",Ve=String(I.description??"").trim()||(I.type==="text-image"?String(I.content??"").trim():"");I.isGeneratingImage=!0;try{
 				await(0,e.nextTick)();const{
 					dataUrl:ae 
-				}=await(0,Fn.queueNovelAiImageGeneration)(Be,{
+				}=await(0,Fn.queueNovelAiImageGeneration)(Be,{bbStructured:Be.__structured,bbMode:Be.__mode,
 					config:Q,referenceImages:ge 
 				}),W=ae.startsWith("data:image/")?await(0,tt.uploadImageDataUrlToSillyTavern)(ae,{
 					characterName:A.value.name 
@@ -63001,7 +63059,7 @@ const jm=(0,Ye.A)(Tm,[["__scopeId","data-v-63adae68"]]),Ym={
 				ce.value[v]=!0;try{
 					const{
 						dataUrl:F 
-					}=await(0,Fn.queueNovelAiImageGeneration)(j,{
+					}=await(0,Fn.queueNovelAiImageGeneration)(j,{bbStructured:j.__structured,bbMode:j.__mode,
 						config:f,referenceImages:g 
 					}),J=F.startsWith("data:image/")?await(0,tt.uploadImageDataUrlToSillyTavern)(F,{
 						characterName:t.userName 
@@ -64021,7 +64079,7 @@ const T0=(0,Ye.A)(I0,[["__scopeId","data-v-0076818b"]]),j0={
 				le.value[Be]=!0;try{
 					const{
 						dataUrl:ee 
-					}=await(0,Fn.queueNovelAiImageGeneration)(L,{
+					}=await(0,Fn.queueNovelAiImageGeneration)(L,{bbStructured:L.__structured,bbMode:L.__mode,
 						config:Ve,referenceImages:k 
 					}),ie=ee.startsWith("data:image/")?await(0,tt.uploadImageDataUrlToSillyTavern)(ee,{
 						characterName:String(ve.name||"") 
@@ -65298,7 +65356,7 @@ const ux=(0,Ye.A)(gx,[["__scopeId","data-v-7485b218"]]),fx={
 					}=(0,Fn.buildPromptRequestByMode)(ce.prompt,se.promptComposeMode);if(!M)return void toastr.warning("prompt \u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u751F\u56FE");const T=E(ce);C.value[T]=!0;try{
 						const{
 							dataUrl:N 
-						}=await(0,Fn.queueNovelAiImageGeneration)(M,{
+						}=await(0,Fn.queueNovelAiImageGeneration)(M,{bbStructured:M.__structured,bbMode:M.__mode,
 							config:se,referenceImages:B 
 						}),P=N.startsWith("data:image/")?await(0,tt.uploadImageDataUrlToSillyTavern)(N,{
 							characterName:String(ce.name||"") 
@@ -65511,7 +65569,7 @@ const qx=(0,Ye.A)(Px,[["__scopeId","data-v-9aadda54"]]),_x={
 				H.value=!0;try{
 					const{
 						dataUrl:q 
-					}=await(0,Fn.queueNovelAiImageGeneration)(u,{
+					}=await(0,Fn.queueNovelAiImageGeneration)(u,{bbStructured:u.__structured,bbMode:u.__mode,
 						config:d,referenceImages:G 
 					}),v=q.startsWith("data:image/")?await(0,tt.uploadImageDataUrlToSillyTavern)(q,{
 						characterName:t.streamerName||i.value.streamer 
