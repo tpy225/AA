@@ -656,24 +656,36 @@ import{v4 as wo}from"https://testingcf.jsdelivr.net/npm/uuid/+esm";var Fo={80(a,
 					};
 					return console.info("[AI] response",ze),ze 
 				}
-				// 直连失败（CORS/网络）时降级走酒馆后端代理（OpenAI 兼容源）
-				if(ee.apiFormat!=="gemini"&&!ee.streaming){
+				// 直连失败（CORS/网络）时降级走酒馆后端代理（对齐 LWB 可用路径：openai+reverse_proxy，失败再试 custom 源）
+				let __proxyErr="";
+				if(ee.apiFormat!=="gemini"){
 					try{
 						const __tok=(typeof globalThis.__aaPrefetchCsrf==="function")?await globalThis.__aaPrefetchCsrf():"";
 						const __h={"Content-Type":"application/json"};
 						__tok&&(__h["X-CSRF-Token"]=__tok);
-						const __r=await fetch("/api/backends/chat-completions/generate",{method:"POST",headers:__h,credentials:"same-origin",body:JSON.stringify({chat_completion_source:"openai",reverse_proxy:ee.url,proxy_password:ee.key,model:ee.model,messages:k,temperature:ee.temperature,stream:!1})});
-						const __j=await __r.json().catch(()=>null);
-						const __ct=__j&&__j.choices&&__j.choices[0]&&__j.choices[0].message?String(__j.choices[0].message.content??""):(__j&&typeof __j.content==="string"?__j.content:"");
-						if(__r.ok&&__ct!==""){
-							const __ok={success:!0,content:__ct};
-							return console.info("[AI] response (via backend)"),__ok
+						const __base={model:ee.model,messages:k,temperature:ee.temperature,max_tokens:65535,stream:!1,tool_choice:"none",presence_penalty:0,frequency_penalty:0};
+						const __tries=[
+							{chat_completion_source:"openai",reverse_proxy:ee.url,proxy_password:ee.key,...__base},
+							{chat_completion_source:"custom",custom_url:ee.url,custom_include_headers:JSON.stringify({Authorization:`Bearer ${ee.key||""}`}),...__base}
+						];
+						for(const __b of __tries){
+							try{
+								const __r=await fetch("/api/backends/chat-completions/generate",{method:"POST",headers:__h,credentials:"same-origin",body:JSON.stringify(__b)});
+								const __txt=await __r.text();
+								let __pj=null;try{__pj=__txt?JSON.parse(__txt):null}catch(__pe){}
+								const __ct=__pj&&__pj.choices&&__pj.choices[0]&&__pj.choices[0].message?String(__pj.choices[0].message.content??""):(__pj&&typeof __pj.content==="string"?__pj.content:"");
+								if(__r.ok&&__ct!==""){
+									const __ok={success:!0,content:__ct};
+									return console.info("[AI] response (via backend)"),__ok
+								}
+								__proxyErr=`${__b.chat_completion_source} HTTP ${__r.status} ${String(__txt||"").slice(0,160)}`;
+								console.warn("[AI] backend proxy failed:",__proxyErr);
+							}catch(__e2){__proxyErr=`${__b.chat_completion_source}: ${__e2 instanceof Error?__e2.message:"未知"}`;console.warn("[AI] backend proxy error:",__e2)}
 						}
-						console.warn("[AI] backend proxy failed:",__r.status,__j);
-					}catch(__e){console.warn("[AI] backend proxy error:",__e)}
+					}catch(__e){__proxyErr=__proxyErr||(__e instanceof Error?__e.message:"未知");console.warn("[AI] backend proxy outer error:",__e)}
 				}
 				const ke={
-					success:!1,content:"",error:`\u7F51\u7EDC\u9519\u8BEF: ${xe instanceof Error?xe.message:"\u672A\u77E5\u9519\u8BEF"}` 
+					success:!1,content:"",error:`\u7F51\u7EDC\u9519\u8BEF: ${xe instanceof Error?xe.message:"\u672A\u77E5\u9519\u8BEF"}${__proxyErr?`\uff5c\u4EE3\u7406: ${__proxyErr}`:""}` 
 				};
 				return console.info("[AI] response",ke),ke 
 			}finally{
