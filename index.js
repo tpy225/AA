@@ -71108,4 +71108,427 @@ ${Qe().stringify(o)}</chat_history>`;if((0,Cn.Q)().chatAppendToLastMessage){cons
 \u6700\u540E\u4E00\u5757\uFF1A${y}
 \u5F53\u524D\u5171 ${le.length} \u5757`,SillyTavern.POPUP_TYPE.CONFIRM,void 0,{okButton:"\u786E\u8BA4",cancelButton:"\u53D6\u6D88"})===SillyTavern.POPUP_RESULT.AFFIRMATIVE)try{if(H)return await deleteChatMessages([K]),toastr.success("\u5DF2\u5220\u9664\u6700\u540E\u4E00\u5C42\u6D88\u606F"),void console.log(`[Improved Phone] Deleted message #${K}`);const M=(function(B,T){if(!T.length)return String(B||"");const N=T[T.length-1],P=String(B||"");let U=P.slice(0,N.start)+P.slice(N.end);return U=U.replace(/\n{3,}/g,`
 
-`).trim(),U})(oe,le);if(!M)return await deleteChatMessages([K]),toastr.success("\u5DF2\u5220\u9664\u6700\u540E\u4E00\u5C42\u6D88\u606F"),void console.log(`[Improved Phone] Deleted message #${K} after trimming empty`);await setChatMessages([{message_id:K,message:M}]),toastr.success("\u5DF2\u5220\u9664\u6700\u540E\u4E00\u5757"),console.log(`[Improved Phone] Removed last block in message #${K}`)}catch(M){console.error("[Improved Phone] Failed to delete message:",M),toastr.error("\u5220\u9664\u5931\u8D25")}});const te=getButtonEvent("\u590D\u4F4D");eventOn(te,()=>{localStorage.removeItem("phone_drag_position"),toastr.success("\u624B\u673A\u4F4D\u7F6E\u5DF2\u590D\u4F4D"),console.log("[Improved Phone] Phone position reset"),window.location.reload()});const X=getButtonEvent("\u5237\u65B0");eventOn(X,()=>{window.location.reload()}),console.log("[AutoMessage] ========================================"),console.log("[AutoMessage] \u521D\u59CB\u5316\u81EA\u52A8\u56DE\u590D\u6A21\u5757"),console.log("[AutoMessage] \u8C03\u8BD5\u6A21\u5F0F:","\u5F00\u542F"),eventOn(tavern_events.GENERATION_ENDED,QT),console.log("[AutoMessage] \u5DF2\u6CE8\u518C\u4E8B\u4EF6: tavern_events.GENERATION_ENDED"),rz(),console.log("[AutoMessage] \u52A0\u597D\u53CB\u6A21\u5757\u5DF2\u521D\u59CB\u5316"),console.log("[AutoMessage] \u521D\u59CB\u5316\u5B8C\u6210"),console.log("[AutoMessage] ========================================"),(0,We.n6)(),console.log("[Improved Phone] Mounted successfully.")}function nj(){try{return typeof eventOn=="function"&&typeof tavern_events<"u"&&!!SillyTavern?.getCurrentChatId&&typeof replaceScriptButtons=="function"&&typeof getButtonEvent=="function"}catch{return!1}}(async function(){const a=Date.now();for(;!nj();){if(Date.now()-a>15e3)return void console.warn("[Improved Phone] Tavern APIs not ready, aborting init.");await new Promise(n=>setTimeout(n,50))}let r="";try{r=String(SillyTavern.getCurrentChatId?.()||"")}catch{r=""}eventOn(tavern_events.CHAT_CHANGED,async n=>{const o=String(n||"");console.log("[Improved Phone] CHAT_CHANGED event fired:",o),o!==r?(r=o,await mo("chat_changed"),So()):console.log("[Improved Phone] CHAT_CHANGED chat_id unchanged, skip reload.")});const t=SillyTavern.getCurrentChatId()||"";console.log("[Improved Phone] Script loaded, initial chat_id:",t),(function(){try{const n=window.parent;n&&n.toastr&&(window.toastr=n.toastr)}catch{}})(),(function(){try{const n=an();if(!n?.body)return;HT(n)}catch(n){console.warn("[InlineMsgStyle] init failed:",n)}})(),(function(){try{if(globalThis.__phoneAbsUrl)return;globalThis.__phoneAbsUrl=function(p){p=String(p==null?"":p);if(!p)return p;if(/^(https?:|data:|blob:|tauri:)/i.test(p))return p;var base="";try{base=document.baseURI||""}catch(e){}if(!base||/^about:/i.test(base)){try{base=window.parent&&window.parent!==window?window.parent.location.origin:location.origin||""}catch(e2){try{base=location.origin==="null"?"":location.origin||""}catch(e3){base=""}}}try{return new URL(p,base||"/").href}catch(e4){return p}};}catch(e){}})(),t&&ej(),(function(){try{var css="*{scrollbar-width:none!important;-ms-overflow-style:none!important}*::-webkit-scrollbar{width:0!important;height:0!important;display:none!important;background:0 0!important;-webkit-appearance:none!important}html,body{overflow-x:hidden!important;scrollbar-width:none!important;-ms-overflow-style:none!important}.phone-wrapper,.phone-container,.phone-screen{overflow-x:hidden!important}.nai-preset-group{margin:0 0 16px!important}.nai-preset-label{display:block!important;font-size:13px!important;font-weight:500!important;color:#64748b!important;margin:0 0 8px!important}.nai-preset-row{display:flex!important;align-items:center!important;gap:6px!important;margin-top:0!important}.nai-preset-select{flex:1 1 auto!important;min-width:0!important;width:auto!important;margin:0!important;height:36px!important;padding:0 12px!important;font-size:14px!important;color:#475569!important;background:#fff!important;border:1px solid rgba(143,184,237,.45)!important;border-radius:10px!important;box-sizing:border-box!important;-webkit-appearance:none!important;appearance:none!important}.nai-preset-btn{width:36px!important;height:36px!important;flex:0 0 36px!important;padding:0!important;border:none!important;border-radius:10px!important;background:linear-gradient(135deg,#8FB8ED,#7AA8E0)!important;color:#fff!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:14px!important;cursor:pointer!important;box-shadow:0 2px 8px rgba(143,184,237,.25)!important}.nai-preset-btn:active{transform:scale(.95)!important}.nai-preset-btn.danger{background:linear-gradient(135deg,#f87171,#ef4444)!important;box-shadow:0 2px 8px rgba(239,68,68,.25)!important}";var __docs=[];var __push=function(x){if(x&&x.head&&__docs.indexOf(x)<0)__docs.push(x)};__push(an());__push(document);try{window.parent&&window.parent!==window&&__push(window.parent.document)}catch(n1){}try{window.top&&window.top!==window&&__push(window.top.document)}catch(n2){}try{var __fr=document.querySelectorAll("iframe");for(var __fi=0;__fi<__fr.length;__fi++){try{__fr[__fi].contentDocument&&__push(__fr[__fi].contentDocument)}catch(n3){}}}catch(n4){}try{var __pf=window.parent&&window.parent.document;if(__pf){var __fr2=__pf.querySelectorAll("iframe");for(var __fi2=0;__fi2<__fr2.length;__fi2++){try{__fr2[__fi2].contentDocument&&__push(__fr2[__fi2].contentDocument)}catch(n5){}}}}catch(n6){}var __first=__docs[0];for(var __di=0;__di<__docs.length;__di++){var d=__docs[__di];if(d&&d.head&&!d.getElementById("phone-ui-scrollbar-fix")){var st=d.createElement("style");st.id="phone-ui-scrollbar-fix";st.textContent=css;d.head.appendChild(st);if(d===__first){var lk=d.createElement("link");lk.rel="preconnect";lk.href="https://files.catbox.moe";d.head.appendChild(lk)}}}}catch(n){console.warn("[PhoneUI] style init failed:",n)}})()})();
+`).trim(),U})(oe,le);if(!M)return await deleteChatMessages([K]),toastr.success("\u5DF2\u5220\u9664\u6700\u540E\u4E00\u5C42\u6D88\u606F"),void console.log(`[Improved Phone] Deleted message #${K} after trimming empty`);await setChatMessages([{message_id:K,message:M}]),toastr.success("\u5DF2\u5220\u9664\u6700\u540E\u4E00\u5757"),console.log(`[Improved Phone] Removed last block in message #${K}`)}catch(M){console.error("[Improved Phone] Failed to delete message:",M),toastr.error("\u5220\u9664\u5931\u8D25")}});const te=getButtonEvent("\u590D\u4F4D");eventOn(te,()=>{localStorage.removeItem("phone_drag_position"),toastr.success("\u624B\u673A\u4F4D\u7F6E\u5DF2\u590D\u4F4D"),console.log("[Improved Phone] Phone position reset"),window.location.reload()});const X=getButtonEvent("\u5237\u65B0");eventOn(X,()=>{window.location.reload()}),console.log("[AutoMessage] ========================================"),console.log("[AutoMessage] \u521D\u59CB\u5316\u81EA\u52A8\u56DE\u590D\u6A21\u5757"),console.log("[AutoMessage] \u8C03\u8BD5\u6A21\u5F0F:","\u5F00\u542F"),eventOn(tavern_events.GENERATION_ENDED,QT),console.log("[AutoMessage] \u5DF2\u6CE8\u518C\u4E8B\u4EF6: tavern_events.GENERATION_ENDED"),rz(),console.log("[AutoMessage] \u52A0\u597D\u53CB\u6A21\u5757\u5DF2\u521D\u59CB\u5316"),console.log("[AutoMessage] \u521D\u59CB\u5316\u5B8C\u6210"),console.log("[AutoMessage] ========================================"),(0,We.n6)(),console.log("[Improved Phone] Mounted successfully.")}// 插件模式兜底：腳本注入 API 在插件上下文不存在，補空殼
+// ========== 插件模式：Slash Runner globals 兼容層 ==========
+(function _phonePluginShim(){
+  const ST=globalThis.SillyTavern||{};
+  const ctx=typeof ST.getContext==='function'?ST.getContext():{};
+  // 舊版 ST 全局 SillyTavern 只有 {libs,getContext}：補齊守衛依賴的 getCurrentChatId 等
+  if(typeof ST.getCurrentChatId!=='function'){
+    try{ST.getCurrentChatId=function(){try{return ST.getContext().getCurrentChatId?.()||'';}catch{return'';}};}catch(e){}
+  }
+  try{if(typeof ST.POPUP_TYPE==='undefined'&&typeof ctx.POPUP_TYPE!=='undefined')ST.POPUP_TYPE=ctx.POPUP_TYPE;}catch(e){}
+  try{if(typeof ST.POPUP_RESULT==='undefined'&&typeof ctx.POPUP_RESULT!=='undefined')ST.POPUP_RESULT=ctx.POPUP_RESULT;}catch(e){}
+  try{if(typeof ST.callGenericPopup!=='function'&&typeof ctx.callGenericPopup==='function')ST.callGenericPopup=function(){return ctx.callGenericPopup.apply(ctx,arguments);};}catch(e){}
+  // name1/name2/powerUserSettings：ST 插件全局沒有這些屬性，用動態 getter 從 context 實時取（切角色/換人設不失效）
+  try{
+    if(typeof ST.name1==='undefined')Object.defineProperty(ST,'name1',{get:function(){try{return ST.getContext().name1||'User';}catch{return'User';}},configurable:true});
+    if(typeof ST.name2==='undefined')Object.defineProperty(ST,'name2',{get:function(){try{return ST.getContext().name2||'';}catch{return'';}},configurable:true});
+    if(typeof ST.powerUserSettings==='undefined')Object.defineProperty(ST,'powerUserSettings',{get:function(){try{return ST.getContext().powerUserSettings||{};}catch{return{};}},configurable:true});
+    if(typeof ST.chat==='undefined')Object.defineProperty(ST,'chat',{get:function(){try{return ST.getContext().chat||[];}catch{return[];}},configurable:true});
+  }catch(e){}
+  const es=ST.eventSource||ctx.eventSource;
+  // 事件系統
+  if(typeof globalThis.eventOn!=='function'){
+    globalThis.eventOn=function(ev,cb){try{if(es&&es.on)return es.on(ev,cb);}catch{}return()=>{};};
+  }
+  if(typeof globalThis.offEvent!=='function'){
+    globalThis.offEvent=function(ev,cb){try{if(es&&es.off)return es.off(ev,cb);}catch{}return;};
+  }
+  if(typeof globalThis.eventEmit!=='function'){
+    globalThis.eventEmit=function(ev){try{if(es&&es.emit)return es.emit(ev);}catch{}return;};
+  }
+  if(typeof globalThis.tavern_events==='undefined'){
+    globalThis.tavern_events=ST.event_types||ctx.event_types||{};
+  }
+  // toastr（插件模式下酒館全局已有，但保險）
+  try{if(!globalThis.toastr&&globalThis.window&&globalThis.window.toastr)globalThis.toastr=globalThis.window.toastr;}catch{}
+  // getCurrentChatId
+  if(typeof globalThis.getCurrentChatId!=='function'){
+    globalThis.getCurrentChatId=function(){try{return ST.getCurrentChatId?.()||'';}catch{return'';}};
+  }
+  // getContext
+  if(typeof globalThis.getContext!=='function'){
+    globalThis.getContext=function(){return __freshCtx();};
+  }
+  // getRequestHeaders（同步緩存 + 預取 /csrf-token；上傳 403 的根因是 ST 全局無此函數）
+  if(typeof globalThis.getRequestHeaders!=='function'){
+    let __csrfToken='',__csrfFetching=null;
+    globalThis.__aaPrefetchCsrf=async function(){
+      if(__csrfToken)return __csrfToken;
+      if(!__csrfFetching){
+        __csrfFetching=(async()=>{try{
+          const r=await fetch('/csrf-token?_='+Date.now(),{credentials:'same-origin'});
+          if(r.ok){const j=await r.json().catch(()=>null);if(j&&j.token)__csrfToken=j.token;}
+        }catch(e){console.warn('[AA] csrf-token fetch failed:',e);}finally{__csrfFetching=null;}
+        return __csrfToken;})();
+      }
+      return __csrfFetching;
+    };
+    globalThis.getRequestHeaders=function(){
+      const h={'Content-Type':'application/json'};
+      if(__csrfToken)h['X-CSRF-Token']=__csrfToken;
+      else globalThis.__aaPrefetchCsrf();
+      return h;
+    };
+    globalThis.__aaPrefetchCsrf();
+    try{const st=globalThis.SillyTavern;if(st&&typeof st.getRequestHeaders!=='function')st.getRequestHeaders=globalThis.getRequestHeaders;}catch{}
+  }
+  // 消息操作（每次現場取活 context.chat，語義對齊 Slash Runner getChatMessages(range)）
+  function __liveChat(){try{return __freshCtx().chat||[];}catch{return[];}}
+  // 宏展開 helper：對齊 Slash Runner 原版 substituteParamsExtended 語義
+  function __aaExpandMacros(s){
+    let out=String(s==null?'':s);
+    try{const c0=__freshCtx();if(c0&&typeof c0.substituteParams==='function')out=String(c0.substituteParams(out));}catch{}
+    try{if(typeof globalThis.substituteParamsExtended==='function')out=String(globalThis.substituteParamsExtended(out));}catch{}
+    try{
+      const chat=__liveChat();const len=chat.length;const last=Math.max(0,len-1);
+      out=out.replace(/\{\{lastMessageId\}\}/gi,String(last));
+      out=out.replace(/\{\{lastUserMessage\}\}/gi,(function(){for(let i=len-1;i>=0;i--){if(chat[i]&&chat[i].is_user)return String(chat[i].mes||'');}return'';})());
+      out=out.replace(/\{\{lastAssistantMessage\}\}/gi,(function(){for(let i=len-1;i>=0;i--){if(chat[i]&&!chat[i].is_user)return String(chat[i].mes||'');}return'';})());
+    }catch{}
+    return out;
+  }
+  if(typeof globalThis.getLastMessageId!=='function'){
+    globalThis.getLastMessageId=function(){try{return __liveChat().length-1;}catch{return-1;}};
+  }
+  if(typeof globalThis.getChatMessages!=='function'){
+    globalThis.getChatMessages=function(range,opt){
+      try{
+        const chat=__liveChat();const len=chat.length;
+        const role=(opt&&opt.role)||'all',hide=(opt&&opt.hide_state)||'all',incSw=(opt&&opt.include_swipes)||false;
+        // 宏展開：對齊 Slash Runner 原版（range 先過 substituteParamsExtended，如 {{lastMessageId}}）
+        let s=__aaExpandMacros(range);
+        let start=0,end=len-1;
+        if(s){
+          let m=s.match(/^(-?\d+)\s*-\s*(-?\d+)$/);
+          if(m){let a=parseInt(m[1],10),b=parseInt(m[2],10);if(a<0)a=len+a;if(b<0)b=len+b;if(a>b){const t=a;a=b;b=t;}a=Math.max(0,a);b=Math.min(len-1,b);if(len===0||a>b)return[];start=a;end=b;}
+          else if(/^-?\d+$/.test(s)){let n=parseInt(s,10);if(n<0)n=len+n;if(n<0)n=0;if(len>0&&n>len-1)n=len-1;if(len===0)return[];start=n;end=n;}
+          else return[];
+        } else return[];
+        const out=[];
+        for(let id=start;id<=end;id++){
+          const msg=chat[id];if(!msg)continue;
+          const role_of=msg.is_user?'user':(msg.extra&&msg.extra.type==='narrator'?'system':'assistant');
+          if(role!=='all'&&role_of!==role)continue;
+          if(hide!=='all'&&((hide==='hidden')!==!!msg.is_system))continue;
+          const swipe_id=msg.swipe_id??0;
+          const swipes=msg.swipes||[msg.mes];
+          const swipes_data=msg.variables||[{}];
+          const swipes_info=msg.swipe_info||[msg.extra||{}];
+          if(incSw){out.push({message_id:id,name:msg.name||'',role:role_of,is_hidden:!!msg.is_system,swipe_id,swipes,swipes_data,swipes_info});}
+          else{out.push({message_id:id,name:msg.name||'',role:role_of,is_hidden:!!msg.is_system,message:msg.mes??'',data:swipes_data[swipe_id]||{},extra:swipes_info[swipe_id]||{},swipe_id,swipes,swipes_data});}
+        }
+        return out;
+      }catch(e){console.warn('[AA] getChatMessages failed:',e);return[];}
+    };
+  }
+  if(typeof globalThis.setChatMessages!=='function'){
+    globalThis.setChatMessages=function(items,opt){
+      try{
+        const chat=__liveChat();const len=chat.length;
+        const list=Array.isArray(items)?items:[items];
+        const norm=n=>{let id=Number(n);if(!Number.isFinite(id))return -1;if(id<0)id=len+id;return id;};
+        const touched=[];
+        for(const it of list){
+          if(!it||typeof it!=='object')continue;
+          const id=norm(it.message_id);
+          if(id<0||id>=len||!chat[id])continue;
+          const data=chat[id];touched.push(id);
+          const swId=data.swipe_id??0;
+          if(it.name!==undefined)data.name=it.name;
+          if(it.role!==undefined){data.is_user=it.role==='user';if(it.role==='system'){data.extra=data.extra||{};data.extra.type='narrator';}else if(data.extra&&data.extra.type==='narrator')delete data.extra.type;}
+          if(it.is_hidden!==undefined)data.is_system=it.is_hidden;
+          if(it.message!==undefined){const mes=__aaExpandMacros(it.message);data.mes=mes;if(Array.isArray(data.swipes))data.swipes[swId]=mes;}
+          if(it.data!==undefined){if(!Array.isArray(data.variables))data.variables=Array.isArray(data.swipes)?data.swipes.map(()=>({})):[{}];data.variables[swId]=it.data;}
+          if(it.extra!==undefined){data.extra=it.extra;if(!Array.isArray(data.swipe_info))data.swipe_info=Array.isArray(data.swipes)?data.swipes.map(()=>({})):[{}];data.swipe_info[swId]=it.extra;}
+          if(it.swipes!==undefined||it.swipe_id!==undefined){
+            if(it.swipes!==undefined)data.swipes=it.swipes;
+            if(it.swipe_id!==undefined)data.swipe_id=it.swipe_id;
+            const sw=data.swipe_id??0;
+            if(Array.isArray(data.swipes))data.mes=data.swipes[sw]??data.mes;
+          }
+        }
+        const c=__freshCtx();
+        for(const id of touched){try{c.updateMessageBlock&&c.updateMessageBlock(id,chat[id]);}catch(e){}}
+        return (c.saveChatConditional?c.saveChatConditional():Promise.resolve()).catch(e=>console.warn('[AA] saveChatConditional failed:',e));
+      }catch(e){console.warn('[AA] setChatMessages failed:',e);return Promise.resolve();}
+    };
+  }
+  if(typeof globalThis.deleteChatMessages!=='function'){
+    globalThis.deleteChatMessages=function(ids,opt){
+      try{
+        const chat=__liveChat();const len=chat.length;
+        let list=(Array.isArray(ids)?ids:[ids]).map(Number).filter(n=>Number.isFinite(n)).map(n=>n<0?len+n:n).filter(n=>n>=0&&n<len);
+        if(list.length===0)return Promise.resolve();
+        list=Array.from(new Set(list)).sort((a,b)=>b-a);
+        for(const id of list)chat.splice(id,1);
+        const c=__freshCtx();
+        return (c.saveChatConditional?c.saveChatConditional():Promise.resolve()).then(()=>{try{c.reloadCurrentChat&&c.reloadCurrentChat();}catch(e){}}).catch(e=>{console.warn('[AA] delete save failed:',e);});
+      }catch(e){console.warn('[AA] deleteChatMessages failed:',e);return Promise.resolve();}
+    };
+  }
+  // 變量系統（真實現：讀寫 ST 角色卡 extensions.tavern_helper.variables / chat_metadata.variables / 全局）
+  function __freshCtx(){try{return typeof ST.getContext==='function'?ST.getContext():ctx;}catch{return ctx;}}
+  function __varsRead(opt){
+    const t=(opt&&opt.type)||'chat';const c=__freshCtx();
+    if(t==='character'){
+      try{return (c.characters&&c.characters[c.characterId]&&c.characters[c.characterId].data&&c.characters[c.characterId].data.extensions&&c.characters[c.characterId].data.extensions.tavern_helper&&c.characters[c.characterId].data.extensions.tavern_helper.variables)||{};}catch{return{}}
+    }
+    if(t==='global'){
+      try{return (c.extensionSettings&&c.extensionSettings.variables&&c.extensionSettings.variables.global)||{};}catch{return{}}
+    }
+    try{return (c.chatMetadata&&c.chatMetadata.variables)||{};}catch{return{}}
+  }
+  async function __varsWrite(vars,opt){
+    const t=(opt&&opt.type)||'chat';const c=__freshCtx();const v=vars&&typeof vars==='object'?vars:{};
+    if(t==='character'){
+      const idx=Number(c.characterId);
+      const ch=c.characters&&c.characters[idx];
+      if(!ch){console.warn('[AA] character vars write: no character at index',idx);return;}
+      try{
+        ch.data=ch.data||{};ch.data.extensions=ch.data.extensions||{};
+        ch.data.extensions.tavern_helper=ch.data.extensions.tavern_helper||{};
+        ch.data.extensions.tavern_helper.variables=v;
+        if(ch.json_data){try{const jd=JSON.parse(ch.json_data);jd.data=jd.data||{};jd.data.extensions=jd.data.extensions||{};jd.data.extensions.tavern_helper=jd.data.extensions.tavern_helper||{};jd.data.extensions.tavern_helper.variables=v;ch.json_data=JSON.stringify(jd);}catch{}}
+      }catch(e){console.warn('[AA] vars memory write failed:',e);}
+      // 持久化：鏡像 Tavern Helper 的 /api/characters/edit 整體替換寫法（避免 merge-attributes 的 deepMerge 點號鍵/陣列問題）
+      try{
+        const tok=(typeof globalThis.__aaPrefetchCsrf==='function')?await globalThis.__aaPrefetchCsrf():'';
+        const d=ch.data||{};
+        const fd=new FormData();
+        const set=(k,val)=>fd.append(k,val===undefined||val===null?'':String(val));
+        set('ch_name',ch.name);set('avatar_url',ch.avatar);
+        set('character_version',d.character_version);
+        set('creator',d.creator);set('creator_notes',d.creator_notes);
+        set('description',d.description);set('first_mes',d.first_mes);
+        set('system_prompt',d.system_prompt);set('post_history_instructions',d.post_history_instructions);
+        (Array.isArray(d.alternate_greetings)?d.alternate_greetings:[]).forEach(g=>fd.append('alternate_greetings',g==null?'':String(g)));
+        set('world',(d.extensions&&d.extensions.world)||'');
+        fd.append('extensions',JSON.stringify(d.extensions||{}));
+        set('chat',ch.chat||'');set('create_date',ch.create_date||'');
+        set('personality',d.personality);set('scenario',d.scenario);set('mes_example',d.mes_example);
+        set('talkativeness',(d.extensions&&d.extensions.talkativeness)??0.5);
+        set('fav',(d.extensions&&d.extensions.fav)?'true':'false');
+        (Array.isArray(ch.tags)?ch.tags:[]).forEach(g=>fd.append('tags',g));
+        const dp=(d.extensions&&d.extensions.depth_prompt)||{};
+        set('depth_prompt_prompt',dp.prompt??'');set('depth_prompt_depth',dp.depth??4);set('depth_prompt_role',dp.role??'system');
+        const hdrs={};if(tok)hdrs['X-CSRF-Token']=tok;
+        const r=await fetch('/api/characters/edit',{method:'POST',credentials:'same-origin',headers:hdrs,body:fd});
+        if(!r.ok){const __t=await r.text().catch(()=>'');console.warn('[AA] /api/characters/edit failed:',r.status,__t.slice(0,200));try{globalThis.toastr&&toastr.error('角色数据保存失败 HTTP '+r.status+'（好友/头像等刷新后会丢失）','小手机',{timeOut:6000});}catch{}}
+      }catch(e){console.warn('[AA] character edit request failed:',e);}
+      return;
+    }
+    if(t==='global'){
+      try{const es=c.extensionSettings;if(es){es.variables=es.variables||{};es.variables.global=v;c.saveSettingsDebounced&&c.saveSettingsDebounced();}}catch(e){}
+      return;
+    }
+    try{if(c.chatMetadata){c.chatMetadata.variables=v;c.saveMetadataDebounced&&c.saveMetadataDebounced();}}catch(e){}
+  }
+  if(typeof globalThis.getVariables!=='function'){
+    globalThis.getVariables=function(opt){try{return JSON.parse(JSON.stringify(__varsRead(opt)));}catch{return{};}};
+  }
+  if(typeof globalThis.replaceVariables!=='function'){
+    globalThis.replaceVariables=function(vars,opt){try{return __varsWrite(JSON.parse(JSON.stringify(vars||{})),opt);}catch(e){console.warn('[AA] replaceVariables failed:',e);return Promise.resolve();}};
+  }
+  if(typeof globalThis.insertOrAssignVariables!=='function'){
+    globalThis.insertOrAssignVariables=function(vars,opt){
+      try{
+        const inc=JSON.parse(JSON.stringify(vars||{}));const cur=__varsRead(opt);
+        Object.keys(inc).forEach(k=>{cur[k]=inc[k];});
+        return __varsWrite(cur,opt);
+      }catch(e){console.warn('[AA] insertOrAssignVariables failed:',e);return Promise.resolve();}
+    };
+  }
+  // 世界書（真實現：角色卡 data.extensions.world + loadWorldInfo/saveWorldInfo，條目格式雙向映射）
+  const __WI_POS={0:'before_character_definition',1:'after_character_definition',2:'before_author_note',3:'after_author_note',4:'at_depth',5:'before_example_messages',6:'after_example_messages',7:'outlet'};
+  const __WI_POS_R={before_character_definition:0,after_character_definition:1,before_author_note:2,after_author_note:3,at_depth:4,before_example_messages:5,after_example_messages:6,outlet:7};
+  const __WI_LOGIC={0:'and_any',1:'not_all',2:'not_any',3:'and_all'};
+  const __WI_LOGIC_R={and_any:0,not_all:1,not_any:2,and_all:3};
+  const __WI_ROLE={0:'system',1:'user',2:'assistant'};
+  const __WI_ROLE_R={system:0,user:1,assistant:2};
+  function __parseRe(v){if(v instanceof RegExp)return v;const s=String(v??'');const m=s.match(/^\/(.*)\/([gimsuy]*)$/s);if(m){try{return new RegExp(m[1],m[2]);}catch{}}return s;}
+  function __strRe(v){if(v instanceof RegExp)return `/${v.source}/${v.flags}`;return String(v??'');}
+  function __charByReq(name){
+    const c=__freshCtx();const chars=c.characters||[];
+    if(name==='current'||name==null){const cur=chars[c.characterId];if(cur)return{char:cur,idx:c.characterId};return null;}
+    const clean=String(name).replace(/\.png$/i,'');
+    let i=chars.findIndex(x=>x&&x.name===clean);
+    if(i<0)i=chars.findIndex(x=>x&&x.avatar===name);
+    return i>=0?{char:chars[i],idx:i}:null;
+  }
+  function __curCharAvatarFilename(){const f=__charByReq('current');try{return String(f.char.avatar||'').replace(/\.[^/.]+$/,'');}catch{return'';}}
+  if(typeof globalThis.getCharWorldbookNames!=='function'){
+    globalThis.getCharWorldbookNames=function(name){
+      const out={primary:null,additional:[]};
+      const f=__charByReq(name);
+      if(!f)return out;
+      try{const w=f.char.data&&f.char.data.extensions&&f.char.data.extensions.world;if(w)out.primary=String(w);}catch{}
+      try{const c=__freshCtx();const wi=c.worldInfoSettings||(globalThis.world_info_settings||null);
+        if(wi&&Array.isArray(wi.charLore)){const fn=__curCharAvatarFilename();const e=wi.charLore.find(x=>x&&x.name===fn);if(e&&Array.isArray(e.extraBooks))out.additional=e.extraBooks.slice();}
+      }catch{}
+      return out;
+    };
+  }
+  if(typeof globalThis.getWorldbookNames!=='function'){
+    globalThis.getWorldbookNames=function(){try{const c=__freshCtx();return c.getWorldInfoNames?c.getWorldInfoNames():[];}catch{return[];}};
+  }
+  function __toWbEntry(e,i){
+    const keys=Array.isArray(e.key)?e.key.map(__parseRe):[];
+    const keys2=Array.isArray(e.keysecondary)?e.keysecondary.map(__parseRe):[];
+    return{
+      uid:e.uid,name:e.comment||'',enabled:!e.disable,
+      strategy:{type:e.constant?'constant':(e.vectorized?'vectorized':'selective'),keys,keys_secondary:{logic:__WI_LOGIC[e.selectiveLogic]??'and_any',keys:keys2},scan_depth:e.scanDepth??'same_as_global'},
+      position:{type:__WI_POS[e.position]??'before_character_definition',role:__WI_ROLE[e.role??0]??'system',depth:e.depth??4,order:e.order??100},
+      content:e.content||'',probability:e.useProbability?(e.probability??100):100,
+      recursion:{prevent_incoming:!!e.excludeRecursion,prevent_outgoing:!!e.preventRecursion,delay_until:(typeof e.delayUntilRecursion==='number'&&e.delayUntilRecursion>0)?e.delayUntilRecursion:null},
+      effect:{sticky:(typeof e.sticky==='number'&&e.sticky>0)?e.sticky:null,cooldown:(typeof e.cooldown==='number'&&e.cooldown>0)?e.cooldown:null,delay:(typeof e.delay==='number'&&e.delay>0)?e.delay:null},
+      displayIndex:typeof e.displayIndex==='number'?e.displayIndex:i,extra:e.extra||{},__raw:e
+    };
+  }
+  function __fromWbEntry(wb,i){
+    const raw=wb.__raw?JSON.parse(JSON.stringify(wb.__raw)):{uid:wb.uid??i,comment:'',content:'',key:[],keysecondary:[],constant:false,selective:true,selectiveLogic:0,disable:false,excludeRecursion:false,preventRecursion:false,delayUntilRecursion:false,probability:100,useProbability:true,depth:4,order:100,position:0,role:0,addMemo:true,group:'',groupOverride:false,groupWeight:100,caseSensitive:null,matchWholeWords:null,useGroupScoring:null,automationId:'',sticky:null,cooldown:null,delay:null,scanDepth:null,vectorized:false};
+    raw.uid=wb.uid??raw.uid;raw.displayIndex=typeof wb.displayIndex==='number'?wb.displayIndex:i;
+    if(wb.name!==undefined)raw.comment=wb.name;
+    if(wb.enabled!==undefined)raw.disable=!wb.enabled;
+    if(wb.strategy){if(wb.strategy.type)raw.constant=wb.strategy.type==='constant',raw.selective=wb.strategy.type==='selective',raw.vectorized=wb.strategy.type==='vectorized';
+      if(wb.strategy.keys)raw.key=wb.strategy.keys.map(__strRe);
+      if(wb.strategy.keys_secondary){if(wb.strategy.keys_secondary.logic!==undefined)raw.selectiveLogic=__WI_LOGIC_R[wb.strategy.keys_secondary.logic]??0;if(wb.strategy.keys_secondary.keys)raw.keysecondary=wb.strategy.keys_secondary.keys.map(__strRe);}
+      if(wb.strategy.scan_depth!==undefined)raw.scanDepth=wb.strategy.scan_depth==='same_as_global'?null:wb.strategy.scan_depth;}
+    if(wb.position){if(wb.position.type)raw.position=__WI_POS_R[wb.position.type]??4;if(wb.position.role)raw.role=__WI_ROLE_R[wb.position.role]??0;if(wb.position.depth!==undefined)raw.depth=wb.position.depth;if(wb.position.order!==undefined)raw.order=wb.position.order;}
+    if(wb.content!==undefined)raw.content=wb.content;
+    if(wb.probability!==undefined){raw.probability=wb.probability;raw.useProbability=true;}
+    if(wb.recursion){if(wb.recursion.prevent_incoming!==undefined)raw.excludeRecursion=wb.recursion.prevent_incoming;if(wb.recursion.prevent_outgoing!==undefined)raw.preventRecursion=wb.recursion.prevent_outgoing;raw.delayUntilRecursion=wb.recursion.delay_until??false;}
+    if(wb.effect){raw.sticky=wb.effect.sticky??null;raw.cooldown=wb.effect.cooldown??null;raw.delay=wb.effect.delay??null;}
+    if(wb.extra!==undefined)raw.extra=wb.extra;
+    return raw;
+  }
+  if(typeof globalThis.getWorldbook!=='function'){
+    globalThis.getWorldbook=async function(name){
+      const c=__freshCtx();
+      if(!c.loadWorldInfo)throw Error('[AA] loadWorldInfo 不可用');
+      const data=await c.loadWorldInfo(name);
+      const entries=(data&&data.entries)||{};
+      return Object.values(entries).sort((a,b)=>(a.displayIndex??0)-(b.displayIndex??0)).map((e,i)=>__toWbEntry(e,i));
+    };
+  }
+  async function __saveWb(name,wbArr){
+    const c=__freshCtx();
+    const entries={};wbArr.forEach((wb,i)=>{const raw=__fromWbEntry(wb,i);entries[raw.uid]=raw;});
+    await c.saveWorldInfo(name,{entries},true);
+    try{c.reloadWorldInfoEditor&&c.reloadWorldInfoEditor(name);}catch{}
+  }
+  if(typeof globalThis.updateWorldbookWith!=='function'){
+    globalThis.updateWorldbookWith=async function(name,updater){
+      const cur=await globalThis.getWorldbook(name);
+      const next=await updater(cur);
+      await __saveWb(name,Array.isArray(next)?next:[]);
+      return await globalThis.getWorldbook(name);
+    };
+  }
+  if(typeof globalThis.createWorldbookEntries!=='function'){
+    globalThis.createWorldbookEntries=async function(name,newEntries){
+      let sliceStart=0;
+      const wb=await globalThis.updateWorldbookWith(name,data=>{sliceStart=data.length;return[...data,...(newEntries||[])];});
+      return{worldbook:wb,new_entries:wb.slice(sliceStart)};
+    };
+  }
+  if(typeof globalThis.deleteWorldbookEntries!=='function'){
+    globalThis.deleteWorldbookEntries=async function(name,pred){
+      let deleted=[];
+      const wb=await globalThis.updateWorldbookWith(name,data=>{const keep=[];for(const e of data){try{if(pred(e)){deleted.push(e);continue;}}catch{}keep.push(e);}return keep;});
+      return{worldbook:wb,deleted_entries:deleted};
+    };
+  }
+  if(typeof globalThis.reloadWorldInfoEditor!=='function'){
+    globalThis.reloadWorldInfoEditor=function(name){try{__freshCtx().reloadWorldInfoEditor&&__freshCtx().reloadWorldInfoEditor(name);}catch{}};
+  }
+  // createChatMessages（語義對齊原版：轉換→splice→addOneMessage→事件→保存）
+  if(typeof globalThis.createChatMessages!=='function'){
+    globalThis.createChatMessages=function(chat_messages,opt){
+      try{
+        const chat=__liveChat();
+        const c=__freshCtx();
+        const o=opt||{};
+        let insert_before=(o.insert_at!==undefined?o.insert_at:(o.insert_before!==undefined?o.insert_before:'end'));
+        if(insert_before==='end')insert_before=chat.length;
+        insert_before=Math.max(-chat.length,Math.min(chat.length,Number(insert_before)||0));
+        if(insert_before<0)insert_before+=chat.length;
+        const is_at_end=insert_before===chat.length;
+        const list=Array.isArray(chat_messages)?chat_messages:[chat_messages];
+        const converted=list.map(cm=>{
+          const m={};
+          if(cm&&cm.name!==undefined)m.name=cm.name;
+          else if(cm&&cm.role==='system')m.name='system';
+          else if(cm&&cm.role==='user')m.name=c.name1||'User';
+          else m.name=c.name2||'Assistant';
+          m.is_user=!!(cm&&cm.role==='user');
+          if(cm&&cm.role==='system'){m.extra=Object.assign({},cm.extra||{},{type:'narrator'});}
+          m.is_system=!!(cm&&cm.is_hidden);
+          m.mes=(cm&&cm.message)||'';
+          m.swipes=[m.mes];m.swipe_id=0;
+          if(cm&&cm.data!==undefined)m.variables=[cm.data];
+          if(cm&&cm.extra!==undefined){m.extra=Object.assign({},m.extra||{},cm.extra);}
+          return m;
+        });
+        chat.splice(insert_before,0,...converted);
+        const emit=(type,id)=>{try{c.eventSource&&c.event_types&&c.eventSource.emit(type,id);}catch{}};
+        const refresh=async()=>{try{
+          for(let i=0;i<converted.length;i++){
+            const id=insert_before+i;
+            if(c.addOneMessage)c.addOneMessage(converted[i],is_at_end?undefined:{insertBefore:insert_before,forceId:id,scroll:false});
+            emit(converted[i].is_user?(c.event_types.MESSAGE_SENT||'message_sent'):(c.event_types.MESSAGE_RECEIVED||'message_received'),id);
+          }
+        }catch(e){console.warn('[AA] createChatMessages refresh failed:',e);}};
+        return Promise.resolve(refresh()).then(()=>(c.saveChatConditional?c.saveChatConditional():undefined)).catch(e=>{console.warn('[AA] createChatMessages save failed:',e);});
+      }catch(e){console.warn('[AA] createChatMessages failed:',e);return Promise.resolve();}
+    };
+  }
+  // updateVariablesWith（get→updater→replace，支持異步）
+  if(typeof globalThis.updateVariablesWith!=='function'){
+    globalThis.updateVariablesWith=function(updater,opt){
+      try{
+        const o=opt||{type:'chat'};
+        const vars=globalThis.getVariables(o);
+        const result=updater(vars);
+        if(result&&typeof result.then==='function'){
+          return result.then(r=>{globalThis.replaceVariables(r,o);return r;});
+        }
+        globalThis.replaceVariables(result,o);
+        return result;
+      }catch(e){console.warn('[AA] updateVariablesWith failed:',e);return Promise.resolve({});}
+    };
+  }
+  // getCharData（返回角色卡數據副本）
+  if(typeof globalThis.getCharData!=='function'){
+    globalThis.getCharData=function(name){
+      try{
+        const f=__charByReq(!name?'current':name);
+        if(!f)return null;
+        return JSON.parse(JSON.stringify(f.char));
+      }catch(e){console.warn('[AA] getCharData failed:',e);return null;}
+    };
+  }
+  // TavernRegex（空殼）
+  if(typeof globalThis.importRawTavernRegex!=='function'){
+    globalThis.importRawTavernRegex=function(){return Promise.resolve();};
+  }
+  if(typeof globalThis.getTavernRegexes!=='function'){
+    globalThis.getTavernRegexes=function(){return [];};
+  }
+  if(typeof globalThis.updateTavernRegexesWith!=='function'){
+    globalThis.updateTavernRegexesWith=function(fn){fn([]);return Promise.resolve();};
+  }
+  // 腳本按鈕（空殼）
+  if(typeof globalThis.replaceScriptButtons!=='function'){
+    globalThis.replaceScriptButtons=function(){};
+  }
+  if(typeof globalThis.getButtonEvent!=='function'){
+    globalThis.getButtonEvent=function(){return{addEventListener:function(){},removeEventListener:function(){}};};
+  }
+  if(typeof globalThis.loadApiConfig!=='function'){
+    globalThis.loadApiConfig=function(){};
+  }
+})();
+
+function nj(){try{return typeof eventOn=="function"&&typeof tavern_events<"u"&&!!SillyTavern?.getCurrentChatId&&typeof replaceScriptButtons=="function"&&typeof getButtonEvent=="function"}catch{return!1}}(async function(){const a=Date.now();for(;!nj();){if(Date.now()-a>15e3)return void console.warn("[Improved Phone] Tavern APIs not ready, aborting init.");await new Promise(n=>setTimeout(n,50))}let r="";try{r=String(SillyTavern.getCurrentChatId?.()||"")}catch{r=""}eventOn(tavern_events.CHAT_CHANGED,async n=>{const o=String(n||"");console.log("[Improved Phone] CHAT_CHANGED event fired:",o),o!==r?(r=o,await mo("chat_changed"),So()):console.log("[Improved Phone] CHAT_CHANGED chat_id unchanged, skip reload.")});const t=SillyTavern.getCurrentChatId()||"";console.log("[Improved Phone] Script loaded, initial chat_id:",t),(function(){try{const n=window.parent;n&&n.toastr&&(window.toastr=n.toastr)}catch{}})(),(function(){try{const n=an();if(!n?.body)return;HT(n)}catch(n){console.warn("[InlineMsgStyle] init failed:",n)}})(),(function(){try{if(globalThis.__phoneAbsUrl)return;globalThis.__phoneAbsUrl=function(p){p=String(p==null?"":p);if(!p)return p;if(/^(https?:|data:|blob:|tauri:)/i.test(p))return p;var base="";try{base=document.baseURI||""}catch(e){}if(!base||/^about:/i.test(base)){try{base=window.parent&&window.parent!==window?window.parent.location.origin:location.origin||""}catch(e2){try{base=location.origin==="null"?"":location.origin||""}catch(e3){base=""}}}try{return new URL(p,base||"/").href}catch(e4){return p}};}catch(e){}})(),t&&ej(),(function(){try{var css="*{scrollbar-width:none!important;-ms-overflow-style:none!important}*::-webkit-scrollbar{width:0!important;height:0!important;display:none!important;background:0 0!important;-webkit-appearance:none!important}html,body{overflow-x:hidden!important;scrollbar-width:none!important;-ms-overflow-style:none!important}.phone-wrapper,.phone-container,.phone-screen{overflow-x:hidden!important}.nai-preset-group{margin:0 0 16px!important}.nai-preset-label{display:block!important;font-size:13px!important;font-weight:500!important;color:#64748b!important;margin:0 0 8px!important}.nai-preset-row{display:flex!important;align-items:center!important;gap:6px!important;margin-top:0!important}.nai-preset-select{flex:1 1 auto!important;min-width:0!important;width:auto!important;margin:0!important;height:36px!important;padding:0 12px!important;font-size:14px!important;color:#475569!important;background:#fff!important;border:1px solid rgba(143,184,237,.45)!important;border-radius:10px!important;box-sizing:border-box!important;-webkit-appearance:none!important;appearance:none!important}.nai-preset-btn{width:36px!important;height:36px!important;flex:0 0 36px!important;padding:0!important;border:none!important;border-radius:10px!important;background:linear-gradient(135deg,#8FB8ED,#7AA8E0)!important;color:#fff!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:14px!important;cursor:pointer!important;box-shadow:0 2px 8px rgba(143,184,237,.25)!important}.nai-preset-btn:active{transform:scale(.95)!important}.nai-preset-btn.danger{background:linear-gradient(135deg,#f87171,#ef4444)!important;box-shadow:0 2px 8px rgba(239,68,68,.25)!important}";var __docs=[];var __push=function(x){if(x&&x.head&&__docs.indexOf(x)<0)__docs.push(x)};__push(an());__push(document);try{window.parent&&window.parent!==window&&__push(window.parent.document)}catch(n1){}try{window.top&&window.top!==window&&__push(window.top.document)}catch(n2){}try{var __fr=document.querySelectorAll("iframe");for(var __fi=0;__fi<__fr.length;__fi++){try{__fr[__fi].contentDocument&&__push(__fr[__fi].contentDocument)}catch(n3){}}}catch(n4){}try{var __pf=window.parent&&window.parent.document;if(__pf){var __fr2=__pf.querySelectorAll("iframe");for(var __fi2=0;__fi2<__fr2.length;__fi2++){try{__fr2[__fi2].contentDocument&&__push(__fr2[__fi2].contentDocument)}catch(n5){}}}}catch(n6){}var __first=__docs[0];for(var __di=0;__di<__docs.length;__di++){var d=__docs[__di];if(d&&d.head&&!d.getElementById("phone-ui-scrollbar-fix")){var st=d.createElement("style");st.id="phone-ui-scrollbar-fix";st.textContent=css;d.head.appendChild(st);if(d===__first){var lk=d.createElement("link");lk.rel="preconnect";lk.href="https://files.catbox.moe";d.head.appendChild(lk)}}}}catch(n){console.warn("[PhoneUI] style init failed:",n)}})()})();
