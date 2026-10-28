@@ -4411,11 +4411,11 @@ ${Q.join(`
 				Ee&&re.push(Ee) 
 			} 
 		}
-		return F&&re.push(F),re.push(`## \u8F93\u51FA\u683C\u5F0F\u8981\u6C42
+		return F&&re.push(F),(()=>{try{const __v=typeof getVariables=="function"?getVariables({type:"character"})||{}:{};const __cs=(__v&&__v.phone_data&&__v.phone_data.characters)||[];const __rows=[];for(const __c of (Array.isArray(__cs)?__cs:[]).slice(0,15)){const __nm=[__c&&__c.name,__c&&__c.nickname].filter(Boolean).join("/");if(!__nm)continue;const __ig=(__c&&__c.imageGen)||{};const __ap=(__c&&__c.appearance&&__c.appearance.common)||{};const __tags=[String(__ig.traitsTags||"").trim(),[__ap.hairColor,__ap.hairStyle,__ap.bangs,__ap.eyeColor,__ap.skinTone,__ap.height,__ap.build].filter(x=>x&&x!=="\u5F85\u5B9A").join(",")].filter(Boolean).join(", ");const __nat=String(__ig.traitsNatural||"").trim();const __rels=(Array.isArray(__c&&__c.relationships)?__c.relationships:[]).map(r=>{const w=r&&r.with||"";const t=r&&r.type||"";const st=r&&r.status||"";return w?`${w}(${t}${st?", "+st:""})`:""}).filter(x=>x&&x!=="()").slice(0,6).join("; ");const __seg=[`- ${__nm}`];__tags&&__seg.push(`\u5916\u8c8ctag: ${__tags.slice(0,240)}`);__nat&&__seg.push(`\u5916\u8c8c\u63cf\u8ff0: ${__nat.slice(0,180)}`);__rels&&__seg.push(`\u4eba\u7269\u5173\u7cfb: ${__rels.slice(0,220)}`);__rows.push(__seg.join(" | "))}__rows.length&&re.push(`## \u89d2\u8272\u8bbe\u5b9a\u901f\u67e5\uff08\u751f\u56fe\u5916\u8c8c\u4e0e\u4eba\u7269\u5173\u7cfb\u5fc5\u987b\u4ee5\u6b64\u4e3a\u51c6\uff1b\u7981\u6b62\u7f16\u9020\u901f\u67e5\u4e2d\u6ca1\u6709\u7684\u5173\u7cfb\u8bcd\u5982 younger brother\uff0c\u6216\u901f\u67e5\u4e2d\u6ca1\u6709\u7684\u5916\u8c8c\uff1b\u901f\u67e5\u6ca1\u6709\u7684\u5b57\u6bb5\u7559\u7a7a\uff09
 
-${J}`),re.join(`
+${__rows.join("\n")}`)}catch{}})(),re.push(`## \u8F93\u51FA\u683C\u5F0F\u8981\u6C42
 
-`) 
+${J}`),re.join(`\n\n`) 
 	}
 	function v(D,Y){
 		if(!Y)return"";
