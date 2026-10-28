@@ -10414,7 +10414,7 @@ const handleGenerateCover = async (room: LiveRoom) => {
   const cfg = loadNovelAiConfig();
   const fmtLabel = cfg.apiFormat === 'openai' ? 'OpenAI' : cfg.apiFormat === 'gemini' ? 'Gemini' : 'NovelAI';
   const apiCfg = cfg.apiFormat === 'novelai' ? cfg.novelai : cfg.apiFormat === 'openai' ? cfg.openai : cfg.gemini;
-  if (!apiCfg.url || !apiCfg.key) {
+  if (!(cfg.apiFormat === 'baibai' && cfg.baibaiEnabled) && (!apiCfg.url || !apiCfg.key)) {
     toastr.warning(\`\u8BF7\u5148\u5728\u8BBE\u7F6E-\u7ED8\u56FE\u914D\u7F6E\u4E2D\u586B\u5199 \${fmtLabel} URL \u548C Key\`);
     return;
   }
@@ -14580,7 +14580,7 @@ const handleGenerateImage = async (msg: Message) => {
   const cfg = loadNovelAiConfig();
   const fmtLabel = cfg.apiFormat === 'openai' ? 'OpenAI' : cfg.apiFormat === 'gemini' ? 'Gemini' : 'NovelAI';
   const apiCfg = cfg.apiFormat === 'novelai' ? cfg.novelai : cfg.apiFormat === 'openai' ? cfg.openai : cfg.gemini;
-  if (!apiCfg.url || !apiCfg.key) {
+  if (!(cfg.apiFormat === 'baibai' && cfg.baibaiEnabled) && (!apiCfg.url || !apiCfg.key)) {
     toastr.warning(\`\u8BF7\u5148\u5728\u8BBE\u7F6E-\u7ED8\u56FE\u914D\u7F6E\u4E2D\u586B\u5199 \${fmtLabel} URL \u548C Key\`);
     return;
   }
@@ -22424,7 +22424,7 @@ const handleGeneratePostImage = async (index: number) => {
   const cfg = loadNovelAiConfig();
   const fmtLabel = cfg.apiFormat === 'openai' ? 'OpenAI' : cfg.apiFormat === 'gemini' ? 'Gemini' : 'NovelAI';
   const apiCfg = cfg.apiFormat === 'novelai' ? cfg.novelai : cfg.apiFormat === 'openai' ? cfg.openai : cfg.gemini;
-  if (!apiCfg.url || !apiCfg.key) {
+  if (!(cfg.apiFormat === 'baibai' && cfg.baibaiEnabled) && (!apiCfg.url || !apiCfg.key)) {
     toastr.warning(\`\u8BF7\u5148\u5728\u8BBE\u7F6E-\u7ED8\u56FE\u914D\u7F6E\u4E2D\u586B\u5199 \${fmtLabel} URL \u548C Key\`);
     return;
   }
@@ -24252,7 +24252,7 @@ const handleGeneratePostImage = async (index: number) => {
   const cfg = loadNovelAiConfig();
   const fmtLabel = cfg.apiFormat === 'openai' ? 'OpenAI' : cfg.apiFormat === 'gemini' ? 'Gemini' : 'NovelAI';
   const apiCfg = cfg.apiFormat === 'novelai' ? cfg.novelai : cfg.apiFormat === 'openai' ? cfg.openai : cfg.gemini;
-  if (!apiCfg.url || !apiCfg.key) {
+  if (!(cfg.apiFormat === 'baibai' && cfg.baibaiEnabled) && (!apiCfg.url || !apiCfg.key)) {
     toastr.warning(\`\u8BF7\u5148\u5728\u8BBE\u7F6E-\u7ED8\u56FE\u914D\u7F6E\u4E2D\u586B\u5199 \${fmtLabel} URL \u548C Key\`);
     return;
   }
@@ -29753,7 +29753,7 @@ const handleGenerateLiveImage = async () => {
   const cfg = loadNovelAiConfig();
   const fmtLabel = cfg.apiFormat === 'openai' ? 'OpenAI' : cfg.apiFormat === 'gemini' ? 'Gemini' : 'NovelAI';
   const apiCfg = cfg.apiFormat === 'novelai' ? cfg.novelai : cfg.apiFormat === 'openai' ? cfg.openai : cfg.gemini;
-  if (!apiCfg.url || !apiCfg.key) {
+  if (!(cfg.apiFormat === 'baibai' && cfg.baibaiEnabled) && (!apiCfg.url || !apiCfg.key)) {
     toastr.warning(\`\u8BF7\u5148\u5728\u8BBE\u7F6E-\u7ED8\u56FE\u914D\u7F6E\u4E2D\u586B\u5199 \${fmtLabel} URL \u548C Key\`);
     return;
   }
@@ -32160,7 +32160,7 @@ const handleGenerateLiveImage = async () => {
   const cfg = loadNovelAiConfig();
   const fmtLabel = cfg.apiFormat === 'openai' ? 'OpenAI' : cfg.apiFormat === 'gemini' ? 'Gemini' : 'NovelAI';
   const apiCfg = cfg.apiFormat === 'novelai' ? cfg.novelai : cfg.apiFormat === 'openai' ? cfg.openai : cfg.gemini;
-  if (!apiCfg.url || !apiCfg.key) {
+  if (!(cfg.apiFormat === 'baibai' && cfg.baibaiEnabled) && (!apiCfg.url || !apiCfg.key)) {
     toastr.warning(\`\u8BF7\u5148\u5728\u8BBE\u7F6E-\u7ED8\u56FE\u914D\u7F6E\u4E2D\u586B\u5199 \${fmtLabel} URL \u548C Key\`);
     return;
   }
@@ -42328,7 +42328,7 @@ async function handleGenerateImage(): Promise<void> {
     const fmtLabel = cfg.apiFormat === 'openai' ? 'OpenAI' : cfg.apiFormat === 'gemini' ? 'Gemini' : 'NovelAI';
     const apiCfg = cfg.apiFormat === 'novelai' ? cfg.novelai : cfg.apiFormat === 'openai' ? cfg.openai : cfg.gemini;
 
-    if (!apiCfg.url || !apiCfg.key) {
+    if (!(cfg.apiFormat === 'baibai' && cfg.baibaiEnabled) && (!apiCfg.url || !apiCfg.key)) {
       errorMessage.value = \`\u8BF7\u5148\u5728\u8BBE\u7F6E-\u7ED8\u56FE\u914D\u7F6E\u4E2D\u586B\u5199 \${fmtLabel} URL \u548C Key\`;
       return;
     }
@@ -54069,7 +54069,7 @@ const handleGenerateImage = async (msg: GroupMessage) => {
   const cfg = loadNovelAiConfig();
   const fmtLabel = cfg.apiFormat === 'openai' ? 'OpenAI' : cfg.apiFormat === 'gemini' ? 'Gemini' : 'NovelAI';
   const apiCfg = cfg.apiFormat === 'novelai' ? cfg.novelai : cfg.apiFormat === 'openai' ? cfg.openai : cfg.gemini;
-  if (!apiCfg.url || !apiCfg.key) {
+  if (!(cfg.apiFormat === 'baibai' && cfg.baibaiEnabled) && (!apiCfg.url || !apiCfg.key)) {
     toastr.warning(\`\u8BF7\u5148\u5728\u8BBE\u7F6E-\u7ED8\u56FE\u914D\u7F6E\u4E2D\u586B\u5199 \${fmtLabel} URL \u548C Key\`);
     return;
   }
@@ -58018,7 +58018,7 @@ ${BOARDS.map(b=>`- ${b.name}(${b.id})：${b.desc}`).join("\n")}
 				const cfg=En.loadNovelAiConfig();
 				const fmt=cfg.apiFormat==="openai"?"OpenAI":cfg.apiFormat==="gemini"?"Gemini":"NovelAI";
 				const provider=cfg.apiFormat==="novelai"?cfg.novelai:cfg.apiFormat==="openai"?cfg.openai:cfg.gemini;
-				if(!provider.url||!provider.key)return void toastr.warning(`请先在设置-绘图配置中填写 ${fmt} URL 和 Key`);
+				if(!(cfg.apiFormat==="baibai"&&cfg.baibaiEnabled===!0)&&(!provider.url||!provider.key))return void toastr.warning(`请先在设置-绘图配置中填写 ${fmt} URL 和 Key`);
 				if((cfg.apiFormat==="openai"||cfg.apiFormat==="gemini")&&!String(provider.model||"").trim())return void toastr.warning(`请先在设置-绘图配置中填写 ${fmt} 模型`);
 				const{promptText:pt,referenceImages:ri}=Fn.buildPromptRequestByMode(post.prompt,cfg.promptComposeMode);
 				if(!pt)return void toastr.warning("prompt 为空");
