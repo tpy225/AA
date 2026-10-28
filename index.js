@@ -656,6 +656,22 @@ import{v4 as wo}from"https://testingcf.jsdelivr.net/npm/uuid/+esm";var Fo={80(a,
 					};
 					return console.info("[AI] response",ze),ze 
 				}
+				// 直连失败（CORS/网络）时降级走酒馆后端代理（OpenAI 兼容源）
+				if(ee.apiFormat!=="gemini"&&!ee.streaming){
+					try{
+						const __tok=(typeof globalThis.__aaPrefetchCsrf==="function")?await globalThis.__aaPrefetchCsrf():"";
+						const __h={"Content-Type":"application/json"};
+						__tok&&(__h["X-CSRF-Token"]=__tok);
+						const __r=await fetch("/api/backends/chat-completions/generate",{method:"POST",headers:__h,credentials:"same-origin",body:JSON.stringify({chat_completion_source:"openai",reverse_proxy:ee.url,proxy_password:ee.key,model:ee.model,messages:k,temperature:ee.temperature,stream:!1})});
+						const __j=await __r.json().catch(()=>null);
+						const __ct=__j&&__j.choices&&__j.choices[0]&&__j.choices[0].message?String(__j.choices[0].message.content??""):(__j&&typeof __j.content==="string"?__j.content:"");
+						if(__r.ok&&__ct!==""){
+							const __ok={success:!0,content:__ct};
+							return console.info("[AI] response (via backend)"),__ok
+						}
+						console.warn("[AI] backend proxy failed:",__r.status,__j);
+					}catch(__e){console.warn("[AI] backend proxy error:",__e)}
+				}
 				const ke={
 					success:!1,content:"",error:`\u7F51\u7EDC\u9519\u8BEF: ${xe instanceof Error?xe.message:"\u672A\u77E5\u9519\u8BEF"}` 
 				};
