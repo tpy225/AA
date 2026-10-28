@@ -440,7 +440,7 @@ import{v4 as wo}from"https://testingcf.jsdelivr.net/npm/uuid/+esm";var Fo={80(a,
 	const l=i 
 },112(a,r,t){
 	t.d(r,{
-		callAiWithPreset:()=>M,e_:()=>Ve,fetchBrowserDataFromAi:()=>Q,fetchCalendarDataFromAi:()=>ge,fetchDiaryDataFromAi:()=>ve,fetchDynamicDataFromAi:()=>j,fetchDynamicHomeDataFromAi:()=>g,fetchEmailDataFromAi:()=>I,fetchForumDataFromAi:()=>F,fetchForumPostDataFromAi:()=>J,fetchGroupChatDataFromAi:()=>Se,fetchLiveDataFromAi:()=>Ce,fetchLiveListDataFromAi:()=>re,fetchMapDataFromAi:()=>Y,fetchPhoneDataFromAi:()=>D,fetchPrivateChatDataFromAi:()=>be,fetchVoiceCallDataFromAi:()=>Be,generateDynamicReplyFromAi:()=>v,generateForumPostForumCommentFromAi:()=>q,loadActivePreset:()=>H,loadApiConfigForView:()=>K,parseJsonFromResponse:()=>f,parseYamlFromResponse:()=>x,postUserDynamic:()=>Ee,postUserForumPost:()=>fe,sendUserEmail:()=>ne 
+		callAiWithPreset:()=>M,e_:()=>Ve,requestTextAi:()=>y,fetchBrowserDataFromAi:()=>Q,fetchCalendarDataFromAi:()=>ge,fetchDiaryDataFromAi:()=>ve,fetchDynamicDataFromAi:()=>j,fetchDynamicHomeDataFromAi:()=>g,fetchEmailDataFromAi:()=>I,fetchForumDataFromAi:()=>F,fetchForumPostDataFromAi:()=>J,fetchGroupChatDataFromAi:()=>Se,fetchLiveDataFromAi:()=>Ce,fetchLiveListDataFromAi:()=>re,fetchMapDataFromAi:()=>Y,fetchPhoneDataFromAi:()=>D,fetchPrivateChatDataFromAi:()=>be,fetchVoiceCallDataFromAi:()=>Be,generateDynamicReplyFromAi:()=>v,generateForumPostForumCommentFromAi:()=>q,loadActivePreset:()=>H,loadApiConfigForView:()=>K,parseJsonFromResponse:()=>f,parseYamlFromResponse:()=>x,postUserDynamic:()=>Ee,postUserForumPost:()=>fe,sendUserEmail:()=>ne 
 	});
 	var n=t(7856),o=t.n(n),s=t(2224),i=t.n(s),l=t(1243),c=t(2213),A=t(4592),p=t(5130),C=t(5756),E=t(8700),$=t(920);
 	function O(){
@@ -1802,7 +1802,7 @@ ${W.join(`
 	t.d(r,{
 		buildNaturalPromptText:()=>$,buildPromptRequestByMode:()=>w,buildPromptText:()=>p,buildPromptTextByMode:()=>O,clearImageGenerationQueue:()=>R,generateNovelAiImage:()=>oe,getImageGenerationQueueLength:()=>se,queueNovelAiImageGeneration:()=>H 
 	}),t.r(r);
-	var n=t(920);
+	var n=t(920),Ft=t(112);
 	function o(y){
 		const M=String(y??"").trim();
 		if(!M)return"";
@@ -2515,7 +2515,16 @@ ${W.join(`
 				}
 			}catch{} })();
 			// 2) 组装请求参数
-			const bbArgs={prompt:y,save:false};
+			let bbBase=y;
+			try{
+				const cjk=(String(y).match(/[\u4e00-\u9fff]/g)||[]).length, lat=(String(y).match(/[A-Za-z]/g)||[]).length;
+				if(cjk>20&&cjk>lat){ // 旧帖纯中文描述：走一次文本AI转译成英文tag
+					const tr=await Ft.requestTextAi([{role:"system",content:"\u4f60\u662f\u751f\u56fe\u63d0\u793a\u8bcd\u8f6c\u8bd1\u5668\u3002\u628a\u7528\u6237\u7684\u4e2d\u6587\u753b\u9762\u63cf\u8ff0\u8f6c\u6210\u82f1\u6587Danbooru\u98ce\u683c\u6807\u7b7e\uff0c\u9017\u53f7\u5206\u9694\uff0c\u4e0d\u5199\u53e5\u5b50\u4e0d\u89e3\u91ca\uff0c\u4e0d\u52a0\u8d28\u91cf\u8bcd\uff0c\u53ea\u8f93\u51fa\u6807\u7b7e"},{role:"user",content:String(y).slice(0,800)}],void 0,"dynamic");
+					const tx=String(tr?.choices?.[0]?.message?.content||"").trim();
+					if(tx&&lat===0)bbBase=tx;
+				}
+			}catch(bbT){console.warn("[BB] prompt\u8f6c\u8bd1\u5931\u8d25\uff0c\u7528\u539f\u6587",bbT)}
+			const bbArgs={prompt:((()=>{try{const cf=M&&M.config||B;const pre=String(cf&&cf.promptPrefix||"").trim(),suf=String(cf&&cf.promptSuffix||"").trim();return[pre,bbBase,suf].filter(Boolean).join(", ")}catch{return bbBase}})()),save:false};
 			try{
 				if(bbMatched.length===1){
 					// 单角色：把官方 tag 串替换进 prompt 开头，替换/注入外貌，避免模型自由发挥
