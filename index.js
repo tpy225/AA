@@ -655,8 +655,7 @@ import{v4 as wo}from"https://testingcf.jsdelivr.net/npm/uuid/+esm";var Fo={80(a,
 						success:!1,content:"",error:"\u8BF7\u6C42\u5DF2\u88AB\u7528\u6237\u7EC8\u6B62" 
 					};
 					return console.info("[AI] response",ze),ze 
-				}
-				// 直连失败（CORS/网络）时降级走酒馆后端代理（对齐 LWB 可用路径：openai+reverse_proxy，失败再试 custom 源）
+				} // 直连失败（CORS/网络）时降级走酒馆后端代理（对齐 LWB 可用路径：openai+reverse_proxy，失败再试 custom 源）
 				let __proxyErr="";
 				if(ee.apiFormat!=="gemini"){
 					try{
@@ -2155,33 +2154,33 @@ ${W.join(`
 		const __b=String(__ep).replace(/\/chat\/completions$/i,"").replace(/\/+$/,"");
 		const __p=Object.assign({
 			chat_completion_source:"openai",reverse_proxy:__b,custom_url:__ep,proxy_password:__cfg.key||"",custom_include_headers:{
-				"Content-Type":"application/json",Authorization:"Bearer "+(__cfg.key||"")
-			}
+				"Content-Type":"application/json",Authorization:"Bearer "+(__cfg.key||"") 
+			} 
 		},__body||{},{
-			mode:"chat",instruction_mode:"chat"
+			mode:"chat",instruction_mode:"chat" 
 		});
 		const __h={
-			"Content-Type":"application/json","X-ST-Phone-Internal-API":"1"
+			"Content-Type":"application/json","X-ST-Phone-Internal-API":"1" 
 		};
 		let __t="";
 		try{
 			const __w=(window.getRequestHeaders&&window.getRequestHeaders())||{};
-			__t=__w["X-CSRF-Token"]||__w["x-csrf-token"]||""
+			__t=__w["X-CSRF-Token"]||__w["x-csrf-token"]||"" 
 		}catch(__e){}
 		if(!__t){
 			try{
 				const __r=await fetch("/csrf-token",{
-					credentials:"include",cache:"no-store"
+					credentials:"include",cache:"no-store" 
 				});
 				if(__r.ok){
 					const __j=await __r.json().catch(()=>null);
-					__t=__j&&__j.token||""
-				}
-			}catch(__e){}
+					__t=__j&&__j.token||"" 
+				} 
+			}catch(__e){} 
 		}
 		if(__t)__h["X-CSRF-Token"]=__t;
 		return fetch("/api/backends/chat-completions/generate",{
-			method:"POST",headers:__h,credentials:"include",body:JSON.stringify(__p),signal:__sig
+			method:"POST",headers:__h,credentials:"include",body:JSON.stringify(__p),signal:__sig 
 		});
 		
 	}
@@ -2283,37 +2282,37 @@ ${W.join(`
 						},body:JSON.stringify(Ve),signal:M?.signal 
 					}) 
 				}catch(__df){
-					W=null
+					W=null 
 				}
 				if(!W){
 					try{
 						W=await __oaiProxy(be,ne,Ve,M?.signal);
 						__pr=!0;
-						if(!W||W.status===404)throw new Error("proxy404")
+						if(!W||W.status===404)throw new Error("proxy404") 
 					}catch(__pe){
-						throw new Error("\u76F4\u8FDE\u88AB\u62E6\u622A\u4E14\u9152\u9986\u540E\u7AEF\u4EE3\u7406\u4E0D\u53EF\u7528\uFF0C\u8BF7\u68C0\u67E5\u7AEF\u70B9/CORS\u6216\u5347\u7EA7\u9152\u9986")
-					}
+						throw new Error("\u76F4\u8FDE\u88AB\u62E6\u622A\u4E14\u9152\u9986\u540E\u7AEF\u4EE3\u7406\u4E0D\u53EF\u7528\uFF0C\u8BF7\u68C0\u67E5\u7AEF\u70B9/CORS\u6216\u5347\u7EA7\u9152\u9986") 
+					} 
 				}
 				if(__pr){
 					const __tx=await W.text();
 					if(!W.ok)throw new Error(String(__tx||("HTTP "+W.status)).slice(0,300));
 					let __u=null,__j=null;
 					try{
-						__j=JSON.parse(__tx)
+						__j=JSON.parse(__tx) 
 					}catch(__e){}
 					if(__j)__u=K(__j);
 					if(!__u&&/(?:^|\n)data:|\[DONE\]/.test(__tx)){
 						let __a="";
 						__tx.split(/\r?\n/).forEach(__ln=>{
-							const __mm=/^data:\s?(.+)$/.exec(__ln);if(__mm&&__mm[1]!=="[DONE]")__a+=__mm[1]
+							const __mm=/^data:\s?(.+)$/.exec(__ln);if(__mm&&__mm[1]!=="[DONE]")__a+=__mm[1] 
 						});
 						try{
-							__u=K(JSON.parse(__a))
-						}catch(__e){}
+							__u=K(JSON.parse(__a)) 
+						}catch(__e){} 
 					}
 					if(!__u)throw new Error("\u672A\u8BC6\u522B\u7684\u751F\u56FE\u8FD4\u56DE\u683C\u5F0F\uFF08\u540E\u7AEF\u4EE3\u7406\uFF09");
 					L={
-						dataUrl:__u
+						dataUrl:__u 
 					};
 					
 				}else{
@@ -2483,17 +2482,17 @@ ${W.join(`
 				}catch(ne){
 					throw(()=>{
 						try{
-							return new URL(v).origin!==window.location.origin
+							return new URL(v).origin!==window.location.origin 
 						}catch{
-							return!1
-						}
-					})()?new Error("\u8BF7\u6C42\u88AB\u6D4F\u89C8\u5668\u62E6\u622A\uFF08\u8DE8\u57DF/CORS\uFF09"):ne
+							return!1 
+						} 
+					})()?new Error("\u8BF7\u6C42\u88AB\u6D4F\u89C8\u5668\u62E6\u622A\uFF08\u8DE8\u57DF/CORS\uFF09"):ne 
 				}
 				if(re.status===409&&__att<6){
 					console.warn("[NovelAI] concurrent lock, retry",__att);
 					await new Promise(r=>setTimeout(r,3000*__att));
 					Ee=(()=>{
-						const ne="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";let I="";for(let Q=0;Q<6;Q++)I+=ne[Math.floor(62*Math.random())];return I
+						const ne="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";let I="";for(let Q=0;Q<6;Q++)I+=ne[Math.floor(62*Math.random())];return I 
 					})();
 					continue;
 					
@@ -2502,7 +2501,7 @@ ${W.join(`
 				
 			} 
 		}catch(__e){
-			throw __e
+			throw __e 
 		}
 		try{
 			const ne=await h(re);
@@ -2524,8 +2523,20 @@ ${W.join(`
 		if(useBB){
 			if(!globalThis.STBaiBaiImage)throw new Error("\u67CF\u5B9D\u7ED8\u6269\u5C55\u672A\u52A0\u8F7D");
 			const bbApi=globalThis.STBaiBaiImage;
-			const bbStatus=(()=>{try{return bbApi.getBackendStatus?.()||{}}catch{return{}}})();
-			const bbLib=(()=>{try{return bbApi.getCharacters?.()?.characters||[]}catch{return[]}})();
+			const bbStatus=(()=>{
+				try{
+					return bbApi.getBackendStatus?.()||{}
+				}catch{
+					return{}
+				}
+			})();
+			const bbLib=(()=>{
+				try{
+					return bbApi.getCharacters?.()?.characters||[]
+				}catch{
+					return[]
+				}
+			})();
 			const bbSt=M?.bbStructured??null, bbMode=M?.bbMode??null;
 			// 1) 角色库匹配：从结构化 prompt 或 tag 串中识别角色名，用柏宝绘记录的官方 tag/nl 替换外貌
 			const bbMatched=[];
@@ -4187,37 +4198,45 @@ ${j.join(`
 		return F 
 	}
 	async function W(){
-							const Ee=new Map;try{
-								const I=getCharWorldbookNames("current"),Q=[];I.primary&&Q.push(I.primary),Q.push(...I.additional);for(const be of Q)try{
-									const Se=await getWorldbook(be);for(const Be of Se){
-										const ge=le(Be.name);if(ge&&Be.content.trim())for(const ve of ge.characterNames){
-											const Ve=Ee.get(ve)||[];Ve.push({
-												order:Be.position.order,content:Be.content 
-											}),Ee.set(ve,Ve) 
-										} 
-									} 
-								}catch(Se){
-									console.warn(`[AutoFill] \u8BFB\u53D6\u4E16\u754C\u4E66 "${be}" \u5931\u8D25:`,Se) 
-								} 
-							}catch(I){
-								console.error("[AutoFill] \u83B7\u53D6\u4EBA\u7269\u4E16\u754C\u4E66\u5185\u5BB9\u5931\u8D25:",I) 
-							}
-							const fe=[],ne=Array.from(Ee.keys()).sort((I,Q)=>I.localeCompare(Q,"zh-Hans-CN"));for(const I of ne){
-								const Q=Ee.get(I)||[],be=o().sortBy(Q,"order").map(Se=>C(Se.content));be.length>0&&fe.push(`## ${I}
+		const Ee=new Map;
+		try{
+			const I=getCharWorldbookNames("current"),Q=[];
+			I.primary&&Q.push(I.primary),Q.push(...I.additional);
+			for(const be of Q)try{
+				const Se=await getWorldbook(be);
+				for(const Be of Se){
+					const ge=le(Be.name);
+					if(ge&&Be.content.trim())for(const ve of ge.characterNames){
+						const Ve=Ee.get(ve)||[];
+						Ve.push({
+							order:Be.position.order,content:Be.content 
+						}),Ee.set(ve,Ve) 
+					} 
+				} 
+			}catch(Se){
+				console.warn(`[AutoFill] \u8BFB\u53D6\u4E16\u754C\u4E66 "${be}" \u5931\u8D25:`,Se) 
+			} 
+		}catch(I){
+			console.error("[AutoFill] \u83B7\u53D6\u4EBA\u7269\u4E16\u754C\u4E66\u5185\u5BB9\u5931\u8D25:",I) 
+		}
+		const fe=[],ne=Array.from(Ee.keys()).sort((I,Q)=>I.localeCompare(Q,"zh-Hans-CN"));
+		for(const I of ne){
+			const Q=Ee.get(I)||[],be=o().sortBy(Q,"order").map(Se=>C(Se.content));
+			be.length>0&&fe.push(`## ${I}
 
 ${be.join(`
 
 `)}`) 
-							}
-							return fe.length===0?"":`# \u4EBA\u7269\u6307\u5BFC
+		}
+		return fe.length===0?"":`# \u4EBA\u7269\u6307\u5BFC
 
 ${fe.join(`
 
 ---
 
 `)}` 
-						}
-async function h(D,Y,j){
+	}
+	async function h(D,Y,j){
 		if(!D||D.length===0)return"";
 		const g=await U(D,Y||{},j),F=[];
 		for(const[J,re]of g)re.length>0&&F.push(`## ${J}
@@ -4470,9 +4489,20 @@ ${Q.join(`
 				Ee&&re.push(Ee) 
 			} 
 		}
-		return F&&re.push(F),(()=>{try{const __v=typeof getVariables=="function"?getVariables({type:"character"})||{}:{};const __cs=(__v&&__v.phone_data&&__v.phone_data.characters)||[];const __rows=[];for(const __c of (Array.isArray(__cs)?__cs:[]).slice(0,15)){const __nm=[__c&&__c.name,__c&&__c.nickname].filter(Boolean).join("/");if(!__nm)continue;const __ig=(__c&&__c.imageGen)||{};const __ap=(__c&&__c.appearance&&__c.appearance.common)||{};const __tags=[String(__ig.traitsTags||"").trim(),[__ap.hairColor,__ap.hairStyle,__ap.bangs,__ap.eyeColor,__ap.skinTone,__ap.height,__ap.build].filter(x=>x&&x!=="\u5F85\u5B9A").join(",")].filter(Boolean).join(", ");const __nat=String(__ig.traitsNatural||"").trim();const __rels=(Array.isArray(__c&&__c.relationships)?__c.relationships:[]).map(r=>{const w=r&&r.with||"";const t=r&&r.type||"";const st=r&&r.status||"";return w?`${w}(${t}${st?", "+st:""})`:""}).filter(x=>x&&x!=="()").slice(0,6).join("; ");const __seg=[`- ${__nm}`];__tags&&__seg.push(`\u5916\u8c8ctag: ${__tags.slice(0,240)}`);__nat&&__seg.push(`\u5916\u8c8c\u63cf\u8ff0: ${__nat.slice(0,180)}`);__rels&&__seg.push(`\u4eba\u7269\u5173\u7cfb: ${__rels.slice(0,220)}`);__rows.push(__seg.join(" | "))}__rows.length&&re.push(`## \u89d2\u8272\u8bbe\u5b9a\u901f\u67e5\uff08\u751f\u56fe\u5916\u8c8c\u4e0e\u4eba\u7269\u5173\u7cfb\u5fc5\u987b\u4ee5\u6b64\u4e3a\u51c6\uff1b\u7981\u6b62\u7f16\u9020\u901f\u67e5\u4e2d\u6ca1\u6709\u7684\u5173\u7cfb\u8bcd\u5982 younger brother\uff0c\u6216\u901f\u67e5\u4e2d\u6ca1\u6709\u7684\u5916\u8c8c\uff1b\u901f\u67e5\u6ca1\u6709\u7684\u5b57\u6bb5\u7559\u7a7a\uff09
+		return F&&re.push(F),(()=>{
+			try{
+				const __v=typeof getVariables=="function"?getVariables({
+					type:"character"
+				})||{}:{};const __cs=(__v&&__v.phone_data&&__v.phone_data.characters)||[];const __rows=[];for(const __c of (Array.isArray(__cs)?__cs:[]).slice(0,15)){
+					const __nm=[__c&&__c.name,__c&&__c.nickname].filter(Boolean).join("/");if(!__nm)continue;const __ig=(__c&&__c.imageGen)||{};const __ap=(__c&&__c.appearance&&__c.appearance.common)||{};const __tags=[String(__ig.traitsTags||"").trim(),[__ap.hairColor,__ap.hairStyle,__ap.bangs,__ap.eyeColor,__ap.skinTone,__ap.height,__ap.build].filter(x=>x&&x!=="\u5F85\u5B9A").join(",")].filter(Boolean).join(", ");const __nat=String(__ig.traitsNatural||"").trim();const __rels=(Array.isArray(__c&&__c.relationships)?__c.relationships:[]).map(r=>{
+						const w=r&&r.with||"";const t=r&&r.type||"";const st=r&&r.status||"";return w?`${w}(${t}${st?", "+st:""})`:""
+					}).filter(x=>x&&x!=="()").slice(0,6).join("; ");const __seg=[`- ${__nm}`];__tags&&__seg.push(`\u5916\u8c8ctag: ${__tags.slice(0,240)}`);__nat&&__seg.push(`\u5916\u8c8c\u63cf\u8ff0: ${__nat.slice(0,180)}`);__rels&&__seg.push(`\u4eba\u7269\u5173\u7cfb: ${__rels.slice(0,220)}`);__rows.push(__seg.join(" | "))
+				}
+				__rows.length&&re.push(`## \u89d2\u8272\u8bbe\u5b9a\u901f\u67e5\uff08\u751f\u56fe\u5916\u8c8c\u4e0e\u4eba\u7269\u5173\u7cfb\u5fc5\u987b\u4ee5\u6b64\u4e3a\u51c6\uff1b\u7981\u6b62\u7f16\u9020\u901f\u67e5\u4e2d\u6ca1\u6709\u7684\u5173\u7cfb\u8bcd\u5982 younger brother\uff0c\u6216\u901f\u67e5\u4e2d\u6ca1\u6709\u7684\u5916\u8c8c\uff1b\u901f\u67e5\u6ca1\u6709\u7684\u5b57\u6bb5\u7559\u7a7a\uff09
 
-${__rows.join("\n")}`)}catch{}})(),re.push(`## \u8F93\u51FA\u683C\u5F0F\u8981\u6C42
+${__rows.join("\n")}`)
+			}catch{}
+		})(),re.push(`## \u8F93\u51FA\u683C\u5F0F\u8981\u6C42
 
 ${J}`),re.join(`\n\n`) 
 	}
@@ -4547,9 +4577,9 @@ ${Y.slice(F)}`:Y+j
 					}else if(Y.targetCharacters&&Y.targetCharacters.length>0){
 						const Ce=await h(Y.targetCharacters,j);Ce&&J.push(Ce) 
 					}else{
-const Ce=await W();Ce&&J.push(Ce)
-}
-F.content=J.join(`
+						const Ce=await W();Ce&&J.push(Ce) 
+					}
+					F.content=J.join(`
 
 `) 
 				}
@@ -57776,11 +57806,11 @@ const submit = () => {
 `],sourceRoot:"" 
 	}]);
 	const l=i 
-},9970(a,r,t){	t.d(r,{
-		NightCityApp:()=>Nc,fetchNightCityDataFromAi:()=>nc
+},9970(a,r,t){
+	t.d(r,{
+		NightCityApp:()=>Nc,fetchNightCityDataFromAi:()=>nc 
 	});
 	var n=t(4061),o=t(112),s=t(2224),i=t.n(s),l=t(7856),c=t.n(l),a=t(8700),p=t(9852),En=t(920),Fn=t(685),tt=t(4660);
-
 	// 不夜城板块定义
 	const BOARDS=[
 		{id:"darkroom",name:"暗房",desc:"自拍/私房/全裸图集区。发帖人本人或分享他人的成人向图片，每条必带 1-3 张；文字以发帖人视角写露骨挑逗与画面描述（谁、在哪、穿没穿、什么姿势、光从哪来）。"},
@@ -58478,9 +58508,41 @@ function Mo(a){
 		},0) 
 	}) 
 }
-function __phoneChatId(){try{return String(globalThis.getCurrentChatId?.()??globalThis.SillyTavern?.getCurrentChatId?.()??'')}catch{return ''}}
-async function __phoneMirrorSave(a,r){try{if(typeof insertOrAssignVariables!=='function'||!r)return;insertOrAssignVariables({['__phone_vc_'+String(a)]:{chatId:__phoneChatId(),ts:Date.now(),data:r}},{type:'character'})}catch(e){console.warn('[Mirror] 保存鏡像失敗:',e)}}
-function __phoneMirrorRead(a){try{if(typeof getVariables!=='function')return null;const v=getVariables({type:'character'})||{},e=v['__phone_vc_'+String(a)];if(!e||typeof e!=='object'||!e.data)return null;const cid=__phoneChatId();if(cid&&e.chatId&&String(e.chatId)!==cid)return null;return console.info(`[Mirror] ${a} 從角色變量鏡像恢復數據`),e.data}catch(e){return console.warn('[Mirror] 讀取鏡像失敗:',e),null}}
+function __phoneChatId(){
+	try{
+		return String(globalThis.getCurrentChatId?.()??globalThis.SillyTavern?.getCurrentChatId?.()??'')
+	}catch{
+		return ''
+	}
+}
+async function __phoneMirrorSave(a,r){
+	try{
+		if(typeof insertOrAssignVariables!=='function'||!r)return;
+		insertOrAssignVariables({
+			['__phone_vc_'+String(a)]:{
+				chatId:__phoneChatId(),ts:Date.now(),data:r
+			}
+		},{
+			type:'character'
+		})
+	}catch(e){
+		console.warn('[Mirror] 保存鏡像失敗:',e)
+	}
+}
+function __phoneMirrorRead(a){
+	try{
+		if(typeof getVariables!=='function')return null;
+		const v=getVariables({
+			type:'character'
+		})||{},e=v['__phone_vc_'+String(a)];
+		if(!e||typeof e!=='object'||!e.data)return null;
+		const cid=__phoneChatId();
+		if(cid&&e.chatId&&String(e.chatId)!==cid)return null;
+		return console.info(`[Mirror] ${a} 從角色變量鏡像恢復數據`),e.data
+	}catch(e){
+		return console.warn('[Mirror] 讀取鏡像失敗:',e),null
+	}
+}
 async function fn(a,r){
 	try{
 		const t=Qe().stringify(r),n=`<phone_module type="${a}" timestamp="${Date.now()}">
@@ -58501,7 +58563,8 @@ ${t}</phone_module>`,o=(0,Cn.Q)();
 		}await createChatMessages([{
 			role:"assistant",message:n,is_hidden:!1 
 		}]);
-		const s=getLastMessageId();await __phoneMirrorSave(a,r);
+		const s=getLastMessageId();
+		await __phoneMirrorSave(a,r);
 		return console.info(`[Cache] \u5DF2\u4FDD\u5B58 ${a} \u6570\u636E\u5230\u697C\u5C42 ${s}`),o.emitGenerationEnded&&(markSimulatedGenerationForCurrentChat(s),await eventEmit(tavern_events.GENERATION_STARTED,"normal",{},!1),console.info("[Cache] \u5DF2\u89E6\u53D1 GENERATION_STARTED \u4E8B\u4EF6\uFF08\u6A21\u62DF\u975Equiet\u751F\u6210\uFF09"),await eventEmit(tavern_events.GENERATION_ENDED,s),console.info(`[Cache] \u5DF2\u89E6\u53D1 GENERATION_ENDED \u4E8B\u4EF6\uFF0C\u697C\u5C42 ${s}`)),s 
 	}catch(t){
 		return console.error(`[Cache] \u4FDD\u5B58 ${a} \u6570\u636E\u5230\u697C\u5C42\u5931\u8D25:`,t),null 
@@ -58522,13 +58585,13 @@ function Rn(a){
 						} 
 					}
 					const F0=getChatMessages(`0-${n}`);if(F0&&F0.length)for(let c0=F0.length-1;c0>=0;c0--){
-                                                        const A0=F0[c0],p0=String(A0.message||""),C0=Array.from(p0.matchAll(l));if(C0.length)for(let E0=C0.length-1;E0>=0;E0--){
-                                                                const $0=C0[E0];try{
-                                                                        const O0=String($0?.[1]||"").trim();if(!O0)continue;const w0=Qe().parse(O0);return console.info(`[History] ${t} - \u5F9E\u5168\u91CF\u6A13\u5C64 ${A0.message_id} \u6062\u5FA9`),w0
-                                                                }catch(O0){}
-                                                        }
-                                                }
-                                                return console.info(`[History] ${t} - \u672A\u5728\u697C\u5C42\u5386\u53F2\u4E2D\u627E\u5230\u6570\u636E`),null 
+						const A0=F0[c0],p0=String(A0.message||""),C0=Array.from(p0.matchAll(l));if(C0.length)for(let E0=C0.length-1;E0>=0;E0--){
+							const $0=C0[E0];try{
+								const O0=String($0?.[1]||"").trim();if(!O0)continue;const w0=Qe().parse(O0);return console.info(`[History] ${t} - \u5F9E\u5168\u91CF\u6A13\u5C64 ${A0.message_id} \u6062\u5FA9`),w0 
+							}catch(O0){} 
+						} 
+					}
+					return console.info(`[History] ${t} - \u672A\u5728\u697C\u5C42\u5386\u53F2\u4E2D\u627E\u5230\u6570\u636E`),null 
 				}catch(n){
 					return console.error(`[History] ${t} - \u8BFB\u53D6\u697C\u5C42\u5386\u53F2\u5931\u8D25:`,n),null 
 				} 
@@ -62514,8 +62577,8 @@ ${Qe().stringify(Ae)}</chat_history>`,xe=(0,Cn.Q)();let ke=null;if(xe.chatAppend
 			}=(0,Fn.buildPromptRequestByMode)(I.prompt,Q.promptComposeMode);if(!Be)return void toastr.warning("prompt \u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u751F\u56FE");const ve=I.type==="image",Ve=String(I.description??"").trim()||(I.type==="text-image"?String(I.content??"").trim():"");I.isGeneratingImage=!0;try{
 				await(0,e.nextTick)();const{
 					dataUrl:ae 
-				}=await(0,Fn.queueNovelAiImageGeneration)(Be,{bbStructured:Be.__structured,bbMode:Be.__mode,
-					config:Q,referenceImages:ge 
+				}=await(0,Fn.queueNovelAiImageGeneration)(Be,{
+					bbStructured:Be.__structured,bbMode:Be.__mode, config:Q,referenceImages:ge 
 				}),W=ae.startsWith("data:image/")?await(0,tt.uploadImageDataUrlToSillyTavern)(ae,{
 					characterName:A.value.name 
 				}):ae;await(async(L,k,ee)=>{
@@ -63096,7 +63159,7 @@ const jm=(0,Ye.A)(Tm,[["__scopeId","data-v-63adae68"]]),Ym={
 			}:{} 
 		},y=v=>{
 			const __u=String(v?.imageUrl||"").trim();let x=__u; if(!x){
-				const __t=String(v?.image||"").trim();if(/^(https?:|data:|blob:|tauri:|\/|\.\/)/i.test(__t)||/\.(png|jpe?g|gif|webp|avif|bmp|svg)(\?|#|$)/i.test(__t))x=__t
+				const __t=String(v?.image||"").trim();if(/^(https?:|data:|blob:|tauri:|\/|\.\/)/i.test(__t)||/\.(png|jpe?g|gif|webp|avif|bmp|svg)(\?|#|$)/i.test(__t))x=__t 
 			}
 			if(!x)return""; if(/^(https?:|data:|blob:|tauri:)/i.test(x))return x; if(x[0]==="/"||x.slice(0,2)==="./")return(globalThis.__phoneAbsUrl||(z=>z))(x); return"" 
 		},M=async v=>{
@@ -63106,8 +63169,8 @@ const jm=(0,Ye.A)(Tm,[["__scopeId","data-v-63adae68"]]),Ym={
 				ce.value[v]=!0;try{
 					const{
 						dataUrl:F 
-					}=await(0,Fn.queueNovelAiImageGeneration)(j,{bbStructured:j.__structured,bbMode:j.__mode,
-						config:f,referenceImages:g 
+					}=await(0,Fn.queueNovelAiImageGeneration)(j,{
+						bbStructured:j.__structured,bbMode:j.__mode, config:f,referenceImages:g 
 					}),J=F.startsWith("data:image/")?await(0,tt.uploadImageDataUrlToSillyTavern)(F,{
 						characterName:t.userName 
 					}):F;x.imageUrl=J,await Ta("dynamicHome",t.userName,l.value)||console.warn("[Profile] \u672A\u627E\u5230 dynamicHome \u539F\u697C\u5C42\uFF0C\u751F\u56FE\u7ED3\u679C\u4E0D\u4F1A\u6301\u4E45\u5316"),toastr.success("\u751F\u56FE\u5B8C\u6210") 
@@ -64116,7 +64179,7 @@ const T0=(0,Ye.A)(I0,[["__scopeId","data-v-0076818b"]]),j0={
 			}:{} 
 		},q=Be=>{
 			const __u=String(Be?.imageUrl||"").trim();let ge=__u; if(!ge){
-				const __t=String(Be?.image||"").trim();if(/^(https?:|data:|blob:|tauri:|\/|\.\/)/i.test(__t)||/\.(png|jpe?g|gif|webp|avif|bmp|svg)(\?|#|$)/i.test(__t))ge=__t
+				const __t=String(Be?.image||"").trim();if(/^(https?:|data:|blob:|tauri:|\/|\.\/)/i.test(__t)||/\.(png|jpe?g|gif|webp|avif|bmp|svg)(\?|#|$)/i.test(__t))ge=__t 
 			}
 			if(!ge)return""; if(/^(https?:|data:|blob:|tauri:)/i.test(ge))return ge; if(ge[0]==="/"||ge.slice(0,2)==="./")return(globalThis.__phoneAbsUrl||(z=>z))(ge); return"" 
 		},v=async Be=>{
@@ -64126,8 +64189,8 @@ const T0=(0,Ye.A)(I0,[["__scopeId","data-v-0076818b"]]),j0={
 				le.value[Be]=!0;try{
 					const{
 						dataUrl:ee 
-					}=await(0,Fn.queueNovelAiImageGeneration)(L,{bbStructured:L.__structured,bbMode:L.__mode,
-						config:Ve,referenceImages:k 
+					}=await(0,Fn.queueNovelAiImageGeneration)(L,{
+						bbStructured:L.__structured,bbMode:L.__mode, config:Ve,referenceImages:k 
 					}),ie=ee.startsWith("data:image/")?await(0,tt.uploadImageDataUrlToSillyTavern)(ee,{
 						characterName:String(ve.name||"") 
 					}):ee;ve.imageUrl=ie,await dt("dynamic",ge)||console.warn("[Dynamic] \u672A\u627E\u5230 dynamic \u539F\u697C\u5C42\uFF0C\u751F\u56FE\u7ED3\u679C\u4E0D\u4F1A\u6301\u4E45\u5316"),toastr.success("\u751F\u56FE\u5B8C\u6210") 
@@ -64170,21 +64233,24 @@ const T0=(0,Ye.A)(I0,[["__scopeId","data-v-0076818b"]]),j0={
 		},Ee=()=>{
 			Z.value=null 
 		},__lpPick=()=>{
-			if(__lpPick._b)return;const __i=document.createElement("input");__i.type="file";__i.accept="image/*";__i.style.display="none";try{document.body.appendChild(__i);}catch{}__i.onchange=async()=>{
+			if(__lpPick._b)return;const __i=document.createElement("input");__i.type="file";__i.accept="image/*";__i.style.display="none";try{
+				document.body.appendChild(__i);
+			}catch{}
+			__i.onchange=async()=>{
 				const __f=__i.files&&__i.files[0];__i.value="";if(!__f)return;__lpPick._b=1;try{
 					const __du=await new Promise((rs,rj)=>{
-						const rd=new FileReader;rd.onload=()=>rs(rd.result);rd.onerror=rj;rd.readAsDataURL(__f)
+						const rd=new FileReader;rd.onload=()=>rs(rd.result);rd.onerror=rj;rd.readAsDataURL(__f) 
 					});const __u=await(0,tt.uploadImageDataUrlToSillyTavern)(__du,{
-						characterName:"dynamic"
+						characterName:"dynamic" 
 					});Z.value={
-						url:__u,content:""
-					};S.value=!1;toastr&&toastr.success&&toastr.success("\u56FE\u7247\u5DF2\u4E0A\u4F20");
+						url:__u,content:"" 
+					};S.value=!1;toastr&&toastr.success&&toastr.success("\u56FE\u7247\u5DF2\u4E0A\u4F20"); 
 				}catch(__e){
-					toastr&&toastr.error&&toastr.error("\u4E0A\u4F20\u5931\u8D25: "+(__e&&__e.message||__e));
+					toastr&&toastr.error&&toastr.error("\u4E0A\u4F20\u5931\u8D25: "+(__e&&__e.message||__e)); 
 				}finally{
-					__lpPick._b=0;
-				}
-			};__i.click();
+					__lpPick._b=0; 
+				} 
+			};__i.click(); 
 		},fe=Be=>H.value.findIndex(ge=>ge.content===Be.content&&ge.name===Be.name),ne=Be=>{
 			const ge=q(Be);ge?I(ge):(ve=>{
 				const Ve=fe(ve);if(Ve===-1)return;const ae=oe.value.get(Ve)||{
@@ -64377,15 +64443,15 @@ const T0=(0,Ye.A)(I0,[["__scopeId","data-v-0076818b"]]),j0={
 			},null,512),[[e.vModelText,E.value]]),(0,e.createElementVNode)("div",Vf,[(0,e.createElementVNode)("div",Df,[ge[26]||(ge[26]=(0,e.createElementVNode)("div",{
 				class:"post-image-title" 
 			},"\u914D\u56FE\uFF08\u53EF\u9009\uFF09",-1)),(0,e.createElementVNode)("div",{
-				class:"post-image-actions"
+				class:"post-image-actions" 
 			},[(0,e.createElementVNode)("button",{
-				class:"post-image-pick-btn",type:"button",title:"\u5F9E\u5716\u5EAB\u9078\u64C7",onClick:Ce
+				class:"post-image-pick-btn",type:"button",title:"\u5F9E\u5716\u5EAB\u9078\u64C7",onClick:Ce 
 			},[ge[25]||(ge[25]=(0,e.createElementVNode)("i",{
-				class:"fas fa-images"
+				class:"fas fa-images" 
 			},null,-1))]),(0,e.createElementVNode)("button",{
-				class:"post-image-pick-btn",type:"button",title:"\u672C\u5730\u4E0A\u50B3",onClick:__lpPick
+				class:"post-image-pick-btn",type:"button",title:"\u672C\u5730\u4E0A\u50B3",onClick:__lpPick 
 			},[(0,e.createElementVNode)("i",{
-				class:"fas fa-upload"
+				class:"fas fa-upload" 
 			})])])]),Z.value?((0,e.openBlock)(),(0,e.createElementBlock)("div",Sf,[(0,e.createElementVNode)("img",{
 				src:Z.value.url,class:"post-image-thumb",alt:"selected",draggable:"false" 
 			},null,8,zf),(0,e.createElementVNode)("div",Mf,[(0,e.createElementVNode)("div",If,(0,e.toDisplayString)(Z.value.content||"\uFF08\u65E0\u63CF\u8FF0\uFF09"),1),(0,e.createElementVNode)("button",{
@@ -65245,7 +65311,13 @@ const ox=(0,Ye.A)(rx,[["__scopeId","data-v-b06db7de"]]),ix={
 			class:"icon-container" 
 		},[(0,e.createCommentVNode)(" Assist Icon "),(0,e.createElementVNode)("i",{
 			class:"fas fa-toolbox" 
-		})],-1),(0,e.createElementVNode)("span",null,"\u8F85\u52A9\u529F\u80FD",-1)])]),(0,e.createElementVNode)("div",{class:"app-block",onClick:o[91]||(o[91]=s=>r("night"))},[...o[92]||(o[92]=[(0,e.createElementVNode)("div",{class:"icon-container"},[(0,e.createCommentVNode)(" NightCity Icon "),(0,e.createElementVNode)("i",{class:"fas fa-moon"})],-1),(0,e.createElementVNode)("span",null,"\u4E0D\u591C\u57CE",-1)])])]),(0,e.createCommentVNode)(" Bottom Dock "),(0,e.createElementVNode)("div",mx,[(0,e.createElementVNode)("div",{
+		})],-1),(0,e.createElementVNode)("span",null,"\u8F85\u52A9\u529F\u80FD",-1)])]),(0,e.createElementVNode)("div",{
+			class:"app-block",onClick:o[91]||(o[91]=s=>r("night"))
+		},[...o[92]||(o[92]=[(0,e.createElementVNode)("div",{
+			class:"icon-container"
+		},[(0,e.createCommentVNode)(" NightCity Icon "),(0,e.createElementVNode)("i",{
+			class:"fas fa-moon"
+		})],-1),(0,e.createElementVNode)("span",null,"\u4E0D\u591C\u57CE",-1)])])]),(0,e.createCommentVNode)(" Bottom Dock "),(0,e.createElementVNode)("div",mx,[(0,e.createElementVNode)("div",{
 			class:"app",onClick:o[10]||(o[10]=s=>r("phone")) 
 		},[...o[24]||(o[24]=[(0,e.createElementVNode)("div",{
 			class:"icon-container" 
@@ -65387,10 +65459,12 @@ const ux=(0,Ye.A)(gx,[["__scopeId","data-v-7485b218"]]),fx={
 					console.log("\u8FDB\u5165\u76F4\u64AD\u95F4:",ce.name),t("enter-room",ce) 
 				})(te) 
 			},[(0,e.createCommentVNode)(" \u5C01\u9762\u56FE "),(0,e.createElementVNode)("div",Ex,[((oe=te.image,r=(0,Ue.jH)(oe)||(/^(https?:|data:|blob:|tauri:)/.test(oe)?oe:""))?((0,e.openBlock)(),(0,e.createElementBlock)("img",{
-				src:r,alt:"cover"
+				src:r,alt:"cover" 
 			},null,8,wx)):((0,e.openBlock)(),(0,e.createElementBlock)("div",{
-				style:"position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a1a2e,#16213e)"
-			},[(0,e.createElementVNode)("i",{class:"fas fa-image",style:"font-size:30px;color:rgba(255,255,255,0.2)"})]))),(0,e.createElementVNode)("div",{
+				style:"position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a1a2e,#16213e)" 
+			},[(0,e.createElementVNode)("i",{
+				class:"fas fa-image",style:"font-size:30px;color:rgba(255,255,255,0.2)"
+			})]))),(0,e.createElementVNode)("div",{
 				class:(0,e.normalizeClass)(["live-badge",{
 					ended:te.status==="\u5DF2\u7ED3\u675F" 
 				}]) 
@@ -65403,8 +65477,8 @@ const ux=(0,Ye.A)(gx,[["__scopeId","data-v-7485b218"]]),fx={
 					}=(0,Fn.buildPromptRequestByMode)(ce.prompt,se.promptComposeMode);if(!M)return void toastr.warning("prompt \u4E3A\u7A7A\uFF0C\u65E0\u6CD5\u751F\u56FE");const T=E(ce);C.value[T]=!0;try{
 						const{
 							dataUrl:N 
-						}=await(0,Fn.queueNovelAiImageGeneration)(M,{bbStructured:M.__structured,bbMode:M.__mode,
-							config:se,referenceImages:B 
+						}=await(0,Fn.queueNovelAiImageGeneration)(M,{
+							bbStructured:M.__structured,bbMode:M.__mode, config:se,referenceImages:B 
 						}),P=N.startsWith("data:image/")?await(0,tt.uploadImageDataUrlToSillyTavern)(N,{
 							characterName:String(ce.name||"") 
 						}):N;ce.image=P,await dt("liveList",H)||console.warn("[LiveList] \u672A\u627E\u5230 liveList \u539F\u697C\u5C42\uFF0C\u5C01\u9762\u66F4\u65B0\u4E0D\u4F1A\u6301\u4E45\u5316"),toastr.success("\u5C01\u9762\u5DF2\u66F4\u65B0") 
@@ -65616,8 +65690,8 @@ const qx=(0,Ye.A)(Px,[["__scopeId","data-v-9aadda54"]]),_x={
 				H.value=!0;try{
 					const{
 						dataUrl:q 
-					}=await(0,Fn.queueNovelAiImageGeneration)(u,{bbStructured:u.__structured,bbMode:u.__mode,
-						config:d,referenceImages:G 
+					}=await(0,Fn.queueNovelAiImageGeneration)(u,{
+						bbStructured:u.__structured,bbMode:u.__mode, config:d,referenceImages:G 
 					}),v=q.startsWith("data:image/")?await(0,tt.uploadImageDataUrlToSillyTavern)(q,{
 						characterName:t.streamerName||i.value.streamer 
 					}):q;i.value.image=v,await Ta("live",t.streamerName||i.value.streamer,i.value)||console.warn("[LiveRoom] \u672A\u627E\u5230 live \u539F\u697C\u5C42\uFF0C\u753B\u9762\u66F4\u65B0\u4E0D\u4F1A\u6301\u4E45\u5316"),toastr.success("\u753B\u9762\u5DF2\u66F4\u65B0") 
@@ -65707,11 +65781,13 @@ const qx=(0,Ye.A)(Px,[["__scopeId","data-v-9aadda54"]]),_x={
 				}]),onClick:R 
 			},(0,e.toDisplayString)(c.value?"\u5DF2\u5173\u6CE8":"+ \u5173\u6CE8"),3)]),(0,e.createCommentVNode)(" \u76F4\u64AD\u89C6\u9891\u533A\u57DF "),(0,e.createElementVNode)("div",Hx,[((b=i.value.image,r=(0,Ue.jH)(b)||(/^(https?:|data:|blob:|tauri:)/.test(b)?b:""))?((0,e.openBlock)(),(0,e.createElementBlock)("img",{
 				src:r,alt:"直播画面",style:{
-					width:"100%",height:"100%","object-fit":"cover",display:"block"
-				},onError:P,onLoad:U
+					width:"100%",height:"100%","object-fit":"cover",display:"block" 
+				},onError:P,onLoad:U 
 			},null,40,Jx)):((0,e.openBlock)(),(0,e.createElementBlock)("div",{
-				style:"position:absolute;inset:0;display:flex;align-items:center;justify-content:center"
-			},[(0,e.createElementVNode)("i",{class:"fas fa-image",style:"font-size:42px;color:rgba(255,255,255,0.22)"})]))),i.value.prompt?((0,e.openBlock)(),(0,e.createElementBlock)("button",{
+				style:"position:absolute;inset:0;display:flex;align-items:center;justify-content:center" 
+			},[(0,e.createElementVNode)("i",{
+				class:"fas fa-image",style:"font-size:42px;color:rgba(255,255,255,0.22)"
+			})]))),i.value.prompt?((0,e.openBlock)(),(0,e.createElementBlock)("button",{
 				key:0,class:"live-image-generate-btn",disabled:H.value,title:"\u91CD\u65B0\u751F\u6210\u753B\u9762",onClick:(0,e.withModifiers)(se,["stop"]) 
 			},[H.value?((0,e.openBlock)(),(0,e.createElementBlock)("i",n1)):((0,e.openBlock)(),(0,e.createElementBlock)("i",e1))],8,Kx)):(0,e.createCommentVNode)("v-if",!0),d[18]||(d[18]=(0,e.createElementVNode)("div",{
 				class:"live-indicator" 
@@ -68082,7 +68158,10 @@ const Gk=(0,Ye.A)(Yk,[["__scopeId","data-v-2ec91670"]]),Uk={
 			},c.value=!1) 
 		}
 		async function V(){
-			if(iu.value)return; const q=an().createElement("input"); q.type="file",q.accept="image/*",q.style.display="none";try{an().body.appendChild(q);}catch{} q.onchange=()=>{
+			if(iu.value)return; const q=an().createElement("input"); q.type="file",q.accept="image/*",q.style.display="none";try{
+				an().body.appendChild(q);
+			}catch{}
+			q.onchange=()=>{
 				const v=q.files?.[0];if(!v)return; const x=new FileReader; x.onload=async()=>{
 					iu.value=!0; try{
 						const{
@@ -68402,7 +68481,10 @@ const _E=(0,Ye.A)(qE,[["__scopeId","data-v-714cb759"]]),$E={
 		},l=()=>{
 			o.value.trim()&&(n("select",o.value.trim()),n("update:visible",!1)) 
 		},c=(0,e.ref)(!1),A=()=>{
-			if(c.value)return;const p=document.createElement("input");p.type="file",p.accept="image/*",p.style.display="none";try{document.body.appendChild(p);}catch{} p.onchange=()=>{
+			if(c.value)return;const p=document.createElement("input");p.type="file",p.accept="image/*",p.style.display="none";try{
+				document.body.appendChild(p);
+			}catch{}
+			p.onchange=()=>{
 				const C=p.files?.[0];if(!C)return;const E=new FileReader;E.onload=async()=>{
 					c.value=!0;try{
 						const $=await Cr(String(E.result));n("select",$),n("update:visible",!1) 
@@ -69978,72 +70060,72 @@ async function Br(a){
 				const __ac=new AbortController;
 				const __tm=setTimeout(()=>__ac.abort(),__ms);
 				try{
-					__ac.signal.addEventListener("abort",()=>clearTimeout(__tm))
+					__ac.signal.addEventListener("abort",()=>clearTimeout(__tm)) 
 				}catch{}
-				return __ac.signal
+				return __ac.signal 
 			};
 			const __direct=async()=>{
 				const c=await fetch(s,{
 					method:"GET",headers:r.apiFormat==="gemini"?{}:{
-						Authorization:`Bearer ${r.key}`
-					},signal:__mksig(12000)
+						Authorization:`Bearer ${r.key}` 
+					},signal:__mksig(12000) 
 				});
 				const txt=await c.text();
 				if(!c.ok)throw new Error(`HTTP ${c.status} ${txt.slice(0,150)}`);
-				return pm(JSON.parse(txt))
+				return pm(JSON.parse(txt)) 
 			};
 			if(r.apiFormat==="gemini"){
-				A=await __direct()
+				A=await __direct() 
 			}else{
 				try{
-					A=await __direct()
+					A=await __direct() 
 				}catch(q){
-					q&&q.name==="AbortError"&&(q=new Error("\u76F4\u9023\u8D85\u6642\uFF0812\u79D2\uFF09")),be=q
+					q&&q.name==="AbortError"&&(q=new Error("\u76F4\u9023\u8D85\u6642\uFF0812\u79D2\uFF09")),be=q 
 				}
 				if(!A.length){
 					const base=r.url.trim().replace(/\/+$/,"").replace(/\/(chat\/completions|models)$/i,"");
 					const getCsrf=async()=>{
 						try{
 							const wh=window.getRequestHeaders&&window.getRequestHeaders(),tk=wh&&(wh["X-CSRF-Token"]||wh["x-csrf-token"]);
-							if(tk)return tk
+							if(tk)return tk 
 						}catch{}
 						try{
 							const j=await(await fetch(`/csrf-token?_=${Date.now()}`,{
-								credentials:"include",cache:"no-store"
+								credentials:"include",cache:"no-store" 
 							})).json();
-							return j.token||""
+							return j.token||"" 
 						}catch{
-							return""
-						}
+							return"" 
+						} 
 					};
 					const viaBackend=async __b=>{
 						const h={
-							"Content-Type":"application/json"
+							"Content-Type":"application/json" 
 						},tk=await getCsrf();
 						if(tk)h["X-CSRF-Token"]=tk;
 						let __ab=!1;
 						const resp=await fetch("/api/backends/chat-completions/status",{
 							method:"POST",headers:h,credentials:"include",signal:__mksig(25000),body:JSON.stringify({
-								chat_completion_source:"openai",custom_url:__b,reverse_proxy:__b,proxy_password:r.key
-							})
+								chat_completion_source:"openai",custom_url:__b,reverse_proxy:__b,proxy_password:r.key 
+							}) 
 						}).catch(__e=>{
-							throw __e&&__e.name==="AbortError"?new Error("\u5F8C\u7AEF\u4EE3\u7406\u8D85\u6642\uFF0825\u79D2\uFF09"):__e
+							throw __e&&__e.name==="AbortError"?new Error("\u5F8C\u7AEF\u4EE3\u7406\u8D85\u6642\uFF0825\u79D2\uFF09"):__e 
 						});
 						const txt=await resp.text();
 						if(!resp.ok)throw new Error(`HTTP ${resp.status} ${txt.slice(0,200)}`);
-						return pm(JSON.parse(txt))
+						return pm(JSON.parse(txt)) 
 					};
 					try{
-						A=await viaBackend(base)
+						A=await viaBackend(base) 
 					}catch(q){
-						be=q
+						be=q 
 					}
 					if(!A.length&&!/\/v\d+/i.test(base)){
 						try{
-							A=await viaBackend(base+"/v1")
+							A=await viaBackend(base+"/v1") 
 						}catch(q){
-							be=q
-						}
+							be=q 
+						} 
 					} 
 				} 
 			}
@@ -70790,8 +70872,11 @@ const PF=(0,Ye.A)(WF,[["__scopeId","data-v-66fc3ffb"]]),qF=[{
 	class:"char-prompt-actions" 
 },c7=["disabled"],A7=["disabled"],d7=(0,e.defineComponent)({
 	__name:"ImageGenSettings",emits:["back"],setup(a){
-		const r=(0,e.ref)((0,En.loadNovelAiConfig)());
-		if(!String(r.value.novelai.url||"").trim()){r.value.novelai.url="https://image.novelai.net";try{(0,En.saveNovelAiConfig)(r.value)}catch(__naie){}}
+		const r=(0,e.ref)((0,En.loadNovelAiConfig)()); if(!String(r.value.novelai.url||"").trim()){
+			r.value.novelai.url="https://image.novelai.net";try{
+				(0,En.saveNovelAiConfig)(r.value)
+			}catch(__naie){}
+		}
 		const t=(0,e.ref)(!1),n=(0,e.computed)(()=>String(r.value.novelai.model||"").includes("nai-diffusion-4-5"));(0,e.watch)(()=>r.value.novelai.model,()=>{
 			!n.value&&r.value.novelai.characterReferenceEnabled&&(r.value.novelai.characterReferenceEnabled=!1,r.value.novelai.characterReferenceStyleAware&&(r.value.novelai.characterReferenceStyleAware=!1)) 
 		}),(0,e.watch)(()=>r.value.novelai.characterReferenceEnabled,j=>{
