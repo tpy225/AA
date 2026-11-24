@@ -57854,27 +57854,36 @@ const submit = () => {
 			if(lastId<0)return[];
 			const readCount=(0,p.Q)().historyReadCount;
 			const start=readCount===0?0:Math.max(0,lastId-readCount+1);
-			const msgs=getChatMessages(`${start}-${lastId}`);
-			if(!msgs||!msgs.length)return[];
 			const re=new RegExp(`<phone_module\\b[^>]*\\btype="night"[^>]*>([\\s\\S]*?)</phone_module>`,"g");
 			const posts=[];
-			for(let idx=msgs.length-1;idx>=0;idx--){
-				const msg=msgs[idx];
-				const text=String(msg.message||"");
-				const matches=Array.from(text.matchAll(re));
-				for(let mi=matches.length-1;mi>=0;mi--){
-					try{
-						const data=c().parse(String(matches[mi][1]||"").trim());
-						if(Array.isArray(data.posts)){
-							for(const post of data.posts){
-								posts.push({...post,time:data.time||post.time||""});
+			// 从一组消息里解析 night module（从新到旧）
+			const parseFrom=(msgs)=>{
+				if(!msgs||!msgs.length)return!1;
+				let found=!1;
+				for(let idx=msgs.length-1;idx>=0;idx--){
+					const msg=msgs[idx];
+					const text=String(msg.message||"");
+					const matches=Array.from(text.matchAll(re));
+					for(let mi=matches.length-1;mi>=0;mi--){
+						try{
+							const data=c().parse(String(matches[mi][1]||"").trim());
+							if(Array.isArray(data.posts)){
+								for(const post of data.posts){
+									posts.push({...post,time:data.time||post.time||""});
+								}
+								found=!0;
 							}
+						}catch(e){
+							console.warn("[NightCity] 解析历史帖子失败:",e);
 						}
-					}catch(e){
-						console.warn("[NightCity] 解析历史帖子失败:",e);
 					}
 				}
-			}
+				return found;
+			};
+			// 先读读取窗口内的楼层
+			parseFrom(getChatMessages(`${start}-${lastId}`));
+			// 窗口内没找到（楼层被剧情顶出窗口）→ 全量扫描整个聊天记录兜底
+			if(!posts.length)parseFrom(getChatMessages(`0-${lastId}`));
 			return posts;
 		}catch(e){
 			console.warn("[NightCity] 读取历史帖子失败:",e);
@@ -57882,43 +57891,76 @@ const submit = () => {
 		}
 	}
 
-	// 查找并删除已有的 night module 消息
+	// 清理历史楼层里的旧 night module：有其他内容的楼层原地剥离模块，纯不夜城楼层才整楼删除
 	async function deleteExistingNightMessages(){
 		try{
 			const lastId=getLastMessageId();
 			if(lastId<0)return;
-			const readCount=(0,p.Q)().historyReadCount;
-			const start=readCount===0?0:Math.max(0,lastId-readCount+1);
-			const msgs=getChatMessages(`${start}-${lastId}`);
+			// 全量扫描，避免旧模块落在读取窗口外漏删
+			const msgs=getChatMessages(`0-${lastId}`);
 			if(!msgs||!msgs.length)return;
-			const re=/<phone_module\b[^>]*\btype="night"[^>]*>/g;
-			const toDelete=[];
+			const modRe=/<phone_module\b[^>]*\btype="night"[^>]*>[\s\S]*?<\/phone_module>/g;
+			const hasRe=/<phone_module\b[^>]*\btype="night"[^>]*>/;
+			const toDelete=[],rewrites=[];
 			for(const msg of msgs){
-				if(re.test(String(msg.message||""))){
+				const text=String(msg.message||"");
+				if(!hasRe.test(text))continue;
+				const stripped=text.replace(modRe,"").replace(/\n{3,}/g,"\n\n").trim();
+				if(stripped){
+					// 楼层里还有别的内容（如 chat_history），只剥离模块，不动整楼
+					rewrites.push({message_id:msg.message_id,message:stripped});
+				}else{
 					toDelete.push(msg.message_id);
 				}
-				re.lastIndex=0;
+			}
+			if(rewrites.length){
+				await setChatMessages(rewrites);
+				console.info("[NightCity] 已从 "+rewrites.length+" 条消息中剥离旧不夜城模块");
 			}
 			if(toDelete.length){
 				await deleteChatMessages(toDelete);
-				console.info("[NightCity] 已删除 "+toDelete.length+" 条旧消息");
+				console.info("[NightCity] 已删除 "+toDelete.length+" 条旧不夜城楼层");
 			}
 		}catch(e){
-			console.warn("[NightCity] 删除旧消息失败:",e);
+			console.warn("[NightCity] 清理旧消息失败:",e);
 		}
 	}
 
-	// 保存不夜城帖子到聊天历史（先删旧的再创建，避免重复）
+	// 保存不夜城帖子：已有楼层优先原地更新；无旧楼层时跟随「追加到最后楼层」设置（关=新开一层）
 	async function saveNightPosts(posts,boards){
 		try{
-			await deleteExistingNightMessages();
 			const data={boards:boards||BOARDS.map(b=>b.id),posts:posts.slice(0,100),time:new Date().toLocaleString("zh-CN")};
 			const t=c().stringify(data);
 			const msg=`<phone_module type="night" timestamp="${Date.now()}">\n${t}\n</phone_module>`;
-			await createChatMessages([{role:"assistant",message:msg,is_hidden:!1}]);
-			console.info("[NightCity] 已保存帖子到聊天历史");
+			const lastId=getLastMessageId();
+			if(lastId>=0){
+				// 原地更新：把最新内容写回已有 night module 所在楼层（不删楼、不新建，图片与楼层都稳定）
+				const msgs=getChatMessages(`0-${lastId}`)||[];
+				const modRe=/<phone_module\b[^>]*\btype="night"[^>]*>[\s\S]*?<\/phone_module>/;
+				for(let i=msgs.length-1;i>=0;i--){
+					const text=String(msgs[i]&&msgs[i].message||"");
+					if(!modRe.test(text))continue;
+					const updated=text.replace(modRe,msg);
+					await setChatMessages([{message_id:msgs[i].message_id,message:updated}]);
+					console.info("[NightCity] 已原地更新不夜城楼层 #"+msgs[i].message_id);
+					return;
+				}
+			}
+			if((0,p.Q)().appendToLastMessage&&lastId>=0){
+				// 跟随设置：追加到最后楼层末尾
+				const cur=getChatMessages(String(lastId));
+				const base=cur&&cur[0]?String(cur[0].message||""):"";
+				await setChatMessages([{message_id:lastId,message:(base?base+"\n\n":"")+msg}]);
+				console.info("[NightCity] 已追加到最后一层 #"+lastId);
+			}else{
+				// 新开一层：先清理旧楼层再创建
+				await deleteExistingNightMessages();
+				await createChatMessages([{role:"assistant",message:msg,is_hidden:!1}]);
+				console.info("[NightCity] 已保存帖子到新楼层");
+			}
 		}catch(e){
 			console.error("[NightCity] 保存帖子失败:",e);
+			try{toastr.error("保存不夜城数据失败: "+(e instanceof Error?e.message:"未知错误"));}catch(ge){}
 		}
 	}
 
@@ -58155,6 +58197,11 @@ ${BOARDS.map(b=>`- ${b.name}(${b.id})：${b.desc}`).join("\n")}
 					const{dataUrl:du}=await Fn.queueNovelAiImageGeneration(pt,{bbStructured:BBst,bbMode:BBmd,config:cfg,referenceImages:ri});
 					post.imageUrl=du.startsWith("data:image/")?await tt.uploadImageDataUrlToSillyTavern(du,{characterName:"不夜城"}):du;
 					await saveNightPosts(posts.value,null);
+					// 收进共享图库（相机/相册），供百宝汇查看
+					try{
+						const add=globalThis.__phoneAddToGallery;
+						if(typeof add==="function"&&post.imageUrl)add({url:String(post.imageUrl),content:String(post.title||post.content||"").slice(0,60)});
+					}catch(ge){console.warn("[NightCity] 写入图库失败(忽略):",ge);}
 					toastr.success("生图完成");
 				}catch(e){
 					console.error("[NightCity] 生图失败:",e);
@@ -58795,7 +58842,7 @@ async function Ra(a=!1){
 	else{
 		if(!a){
 			const r=await Rn("dynamic");
-			if(r)return console.info("[Store] \u4ECE\u697C\u5C42\u5386\u53F2\u52A0\u8F7D\u52A8\u6001\u6570\u636E"),Le.data=r,void(Le.loaded=!0) 
+			if(r)return console.info("[Store] \u4ECE\u697C\u5C42\u5386\u53F2\u52A0\u8F7D\u52A8\u6001\u6570\u636E"),Le.data=r,__phoneCollectPostImages(r?.posts),void(Le.loaded=!0)
 		}
 		Le.isLoading=!0,Le.error=null;
 		try{
@@ -58807,8 +58854,8 @@ async function Ra(a=!1){
 			const o=await r();
 			if(o.success&&o.data){
 				const s=o.data;
-				Le.data=s,Le.loaded=!0,console.info("[Store] \u52A8\u6001\u6570\u636E\u52A0\u8F7D\u6210\u529F:",s),await fn("dynamic",s) 
-			}else Le.error=o.error||"\u83B7\u53D6\u52A8\u6001\u6570\u636E\u5931\u8D25",console.error("[Store] \u52A8\u6001\u6570\u636E\u52A0\u8F7D\u5931\u8D25:",o.error) 
+				Le.data=s,Le.loaded=!0,__phoneCollectPostImages(s?.posts),console.info("[Store] \u52A8\u6001\u6570\u636E\u52A0\u8F7D\u6210\u529F:",s),await fn("dynamic",s);
+			}else Le.error=o.error||"\u83B7\u53D6\u52A8\u6001\u6570\u636E\u5931\u8D25",console.error("[Store] \u52A8\u6001\u6570\u636E\u52A0\u8F7D\u5931\u8D25:",o.error);
 		}catch(r){
 			Le.error=r instanceof Error?r.message:"\u52A0\u8F7D\u52A8\u6001\u6570\u636E\u65F6\u53D1\u751F\u672A\u77E5\u9519\u8BEF",console.error("[Store] \u52A8\u6001\u6570\u636E\u52A0\u8F7D\u5F02\u5E38:",r) 
 		}finally{
@@ -60817,6 +60864,31 @@ function Vt(a){
 	})(o),{
 		status:"added",items:o 
 	} 
+}
+// 供独立模块（不夜城等）写入共享图库
+globalThis.__phoneAddToGallery=Vt;
+// 从帖子数组收集可访问 URL 的图片进图库（去重，幂等，供动态/主页等载入后批量归集）
+function __phoneCollectPostImages(a){
+	try{
+		if(!Array.isArray(a))return;
+		for(const r of a){
+			try{
+				const t=String(r?.imageUrl||"").trim();
+				let n=t;
+				if(!n){
+					const o=String(r?.image||"").trim();
+					if(/^(https?:|data:|blob:|tauri:|\/|\.\/)/i.test(o)||/\.(png|jpe?g|gif|webp|avif|bmp|svg)(\?|#|$)/i.test(o))n=o;
+				}
+				if(!n)continue;
+				if(!/^(https?:|data:|blob:|tauri:)/i.test(n)&&("/"===n[0]||"./"===n.slice(0,2)))n=(globalThis.__phoneAbsUrl||(x=>x))(n);
+				if(n&&/^(https?:|data:|blob:|tauri:)/i.test(n))Vt({
+					url:n,content:String(r?.content||r?.title||"").slice(0,60)
+				});
+			}catch(s){}
+		}
+	}catch(r){
+		console.warn("[chatGallery] \u6536\u96C6\u5E16\u5B50\u56FE\u7247\u5931\u8D25(\u5FFD\u7565):",r);
+	}
 }
 const Cc={
 	key:0,class:"date-separator" 
@@ -63054,7 +63126,7 @@ const jm=(0,Ye.A)(Tm,[["__scopeId","data-v-63adae68"]]),Ym={
 			c.value=!0,l.value=o;try{
 				const{
 					fetchDynamicHomeDataFromAi:v 
-				}=await Promise.resolve().then(Fe.bind(Fe,112)),x=await v(t.userName);x.success&&x.data?(l.value=x.data,(0,We.uH)(x.data),await Wn("dynamicHome",t.userName,x.data),P("\u5237\u65B0\u6210\u529F")):P(x.error||"\u5237\u65B0\u5931\u8D25") 
+				}=await Promise.resolve().then(Fe.bind(Fe,112)),x=await v(t.userName);x.success&&x.data?(l.value=x.data,__phoneCollectPostImages(x.data?.posts),(0,We.uH)(x.data),await Wn("dynamicHome",t.userName,x.data),P("\u5237\u65B0\u6210\u529F")):P(x.error||"\u5237\u65B0\u5931\u8D25") 
 			}catch{
 				P("\u5237\u65B0\u5931\u8D25") 
 			}finally{
@@ -63086,16 +63158,16 @@ const jm=(0,Ye.A)(Tm,[["__scopeId","data-v-63adae68"]]),Ym={
 					...Y,time:D||Y.time||"\u5386\u53F2\u52A8\u6001",isHistory:!0 
 				}) 
 			}
-			p.value=x,console.info("[Profile] \u52A0\u8F7D\u5386\u53F2\u52A8\u6001:",x.length,"\u6761") 
+			p.value=x,__phoneCollectPostImages(x),console.info("[Profile] \u52A0\u8F7D\u5386\u53F2\u52A8\u6001:",x.length,"\u6761") 
 		}(0,e.onMounted)(()=>{
 			(async function(){
-				console.info("[Profile] \u5F00\u59CB\u52A0\u8F7D\u52A8\u6001\u4E3B\u9875\u6570\u636E\uFF0C\u4EBA\u7269:",t.userName);const v=t.userName,x=await ja("dynamicHome",v);if(x)return console.info("[Profile] \u4ECE\u697C\u5C42\u5386\u53F2\u52A0\u8F7D\u5230\u6570\u636E"),l.value=x,void(0,We.uH)(x);const f=(0,Ue.nC)(v),D=f?.name&&f.name!==v?f.name:f?.nickname&&f.nickname!==v?f.nickname:"";if(D){
-					const Y=await ja("dynamicHome",D);if(Y)return console.info("[Profile] \u4ECE\u697C\u5C42\u5386\u53F2(\u517C\u5BB9key)\u52A0\u8F7D\u5230\u6570\u636E:",D),l.value=Y,void(0,We.uH)(Y) 
+				console.info("[Profile] \u5F00\u59CB\u52A0\u8F7D\u52A8\u6001\u4E3B\u9875\u6570\u636E\uFF0C\u4EBA\u7269:",t.userName);const v=t.userName,x=await ja("dynamicHome",v);if(x)return console.info("[Profile] \u4ECE\u697C\u5C42\u5386\u53F2\u52A0\u8F7D\u5230\u6570\u636E"),l.value=x,__phoneCollectPostImages(x?.posts),void(0,We.uH)(x);const f=(0,Ue.nC)(v),D=f?.name&&f.name!==v?f.name:f?.nickname&&f.nickname!==v?f.nickname:"";if(D){
+					const Y=await ja("dynamicHome",D);if(Y)return console.info("[Profile] \u4ECE\u697C\u5C42\u5386\u53F2(\u517C\u5BB9key)\u52A0\u8F7D\u5230\u6570\u636E:",D),l.value=Y,__phoneCollectPostImages(Y?.posts),void(0,We.uH)(Y) 
 				}
 				console.info("[Profile] \u65E0\u5386\u53F2\u6570\u636E\uFF0C\u89E6\u53D1 AI \u751F\u6210"),s.value=!0,i.value=null;try{
 					const{
 						fetchDynamicHomeDataFromAi:Y,loadApiConfigForView:j 
-					}=await Promise.resolve().then(Fe.bind(Fe,112)),g=j("dynamicHome");if(!g.url||!g.key||!g.model)return void(i.value="\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u914D\u7F6E API");const F=await Y(t.userName);F.success&&F.data?(console.info("[Profile] AI \u751F\u6210\u6210\u529F:",F.data),l.value=F.data,(0,We.uH)(F.data),await Wn("dynamicHome",t.userName,F.data)):(i.value=F.error||"\u52A0\u8F7D\u5931\u8D25",console.error("[Profile] AI \u751F\u6210\u5931\u8D25:",F.error)) 
+					}=await Promise.resolve().then(Fe.bind(Fe,112)),g=j("dynamicHome");if(!g.url||!g.key||!g.model)return void(i.value="\u8BF7\u5148\u5728\u8BBE\u7F6E\u4E2D\u914D\u7F6E API");const F=await Y(t.userName);F.success&&F.data?(console.info("[Profile] AI \u751F\u6210\u6210\u529F:",F.data),l.value=F.data,__phoneCollectPostImages(F.data?.posts),(0,We.uH)(F.data),await Wn("dynamicHome",t.userName,F.data)):(i.value=F.error||"\u52A0\u8F7D\u5931\u8D25",console.error("[Profile] AI \u751F\u6210\u5931\u8D25:",F.error)) 
 				}catch(Y){
 					i.value=Y instanceof Error?Y.message:"\u52A0\u8F7D\u65F6\u53D1\u751F\u672A\u77E5\u9519\u8BEF",console.error("[Profile] \u52A0\u8F7D\u5F02\u5E38:",Y) 
 				}finally{
@@ -63173,7 +63245,9 @@ const jm=(0,Ye.A)(Tm,[["__scopeId","data-v-63adae68"]]),Ym={
 						bbStructured:j.__structured,bbMode:j.__mode, config:f,referenceImages:g 
 					}),J=F.startsWith("data:image/")?await(0,tt.uploadImageDataUrlToSillyTavern)(F,{
 						characterName:t.userName 
-					}):F;x.imageUrl=J,await Ta("dynamicHome",t.userName,l.value)||console.warn("[Profile] \u672A\u627E\u5230 dynamicHome \u539F\u697C\u5C42\uFF0C\u751F\u56FE\u7ED3\u679C\u4E0D\u4F1A\u6301\u4E45\u5316"),toastr.success("\u751F\u56FE\u5B8C\u6210") 
+					}):F;x.imageUrl=J,Vt({
+					url:J,content:String(x.content||"").slice(0,60) 
+				}),await Ta("dynamicHome",t.userName,l.value)||console.warn("[Profile] \u672A\u627E\u5230 dynamicHome \u539F\u697C\u5C42\uFF0C\u751F\u56FE\u7ED3\u679C\u4E0D\u4F1A\u6301\u4E45\u5316"),toastr.success("\u751F\u56FE\u5B8C\u6210") 
 				}catch(F){
 					console.error("[Profile] \u751F\u56FE\u5931\u8D25:",F),toastr.error("\u751F\u56FE\u5931\u8D25: "+(F instanceof Error?F.message:"\u672A\u77E5\u9519\u8BEF")) 
 				}finally{
@@ -64112,7 +64186,7 @@ const T0=(0,Ye.A)(I0,[["__scopeId","data-v-0076818b"]]),j0={
 					...W,time:ae||W.time||"\u5386\u53F2\u52A8\u6001",isHistory:!0 
 				}) 
 			}
-			i.value=ge,console.info("[Dynamic] \u52A0\u8F7D\u5386\u53F2\u52A8\u6001:",ge.length,"\u6761") 
+			i.value=ge,__phoneCollectPostImages(ge),console.info("[Dynamic] \u52A0\u8F7D\u5386\u53F2\u52A8\u6001:",ge.length,"\u6761") 
 		}(0,e.onMounted)(()=>{
 			console.info("[Dynamic] onMounted \u89E6\u53D1"),console.info("[Dynamic] dynamicState.loaded:",Le.loaded),console.info("[Dynamic] dynamicState.isLoading:",Le.isLoading),l(),Le.loaded||Le.isLoading?console.info("[Dynamic] \u8DF3\u8FC7\u52A0\u8F7D\uFF08\u5DF2\u52A0\u8F7D\u6216\u6B63\u5728\u52A0\u8F7D\uFF09"):(console.info("[Dynamic] \u5F00\u59CB\u8C03\u7528 loadDynamicDataFromAi"),Ra()) 
 		}),(0,e.watch)(()=>Le.data,Be=>{
@@ -64193,7 +64267,9 @@ const T0=(0,Ye.A)(I0,[["__scopeId","data-v-0076818b"]]),j0={
 						bbStructured:L.__structured,bbMode:L.__mode, config:Ve,referenceImages:k 
 					}),ie=ee.startsWith("data:image/")?await(0,tt.uploadImageDataUrlToSillyTavern)(ee,{
 						characterName:String(ve.name||"") 
-					}):ee;ve.imageUrl=ie,await dt("dynamic",ge)||console.warn("[Dynamic] \u672A\u627E\u5230 dynamic \u539F\u697C\u5C42\uFF0C\u751F\u56FE\u7ED3\u679C\u4E0D\u4F1A\u6301\u4E45\u5316"),toastr.success("\u751F\u56FE\u5B8C\u6210") 
+					}):ee;ve.imageUrl=ie,Vt({
+						url:ie,content:String(ve.content||"").slice(0,60) 
+					}),await dt("dynamic",ge)||console.warn("[Dynamic] \u672A\u627E\u5230 dynamic \u539F\u697C\u5C42\uFF0C\u751F\u56FE\u7ED3\u679C\u4E0D\u4F1A\u6301\u4E45\u5316"),toastr.success("\u751F\u56FE\u5B8C\u6210") 
 				}catch(ee){
 					console.error("[Dynamic] \u751F\u56FE\u5931\u8D25:",ee),toastr.error("\u751F\u56FE\u5931\u8D25: "+(ee instanceof Error?ee.message:"\u672A\u77E5\u9519\u8BEF")) 
 				}finally{
