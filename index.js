@@ -2563,7 +2563,7 @@ ${W.join(`
 					if(tx&&lat===0)bbBase=tx;
 				}
 			}catch(bbT){console.warn("[BB] prompt\u8f6c\u8bd1\u5931\u8d25\uff0c\u7528\u539f\u6587",bbT)}
-			const bbArgs={prompt:((()=>{try{const cf=M&&M.config||B;const pre=String(cf&&cf.promptPrefix||"").trim(),suf=String(cf&&cf.promptSuffix||"").trim();return[pre,bbBase,suf].filter(Boolean).join(", ")}catch{return bbBase}})()),save:false};
+			const bbArgs={prompt:((()=>{try{const cf=M&&M.config||B;const pre=String(cf&&cf.promptPrefix||"").trim(),suf=String(cf&&cf.promptSuffix||"").trim();return[pre,bbBase,suf].filter(Boolean).join(", ")}catch{return bbBase}})()),save:!0};
 			try{
 				if(bbMatched.length===1){
 					// 单角色：把官方 tag 串替换进 prompt 开头，替换/注入外貌，避免模型自由发挥
