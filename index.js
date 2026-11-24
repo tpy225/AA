@@ -70081,7 +70081,7 @@ const x6=(0,Ye.A)(v6,[["__scopeId","data-v-d27d4150"]]),h6={
 	} 
 });
 Fe(982);
-const Y6=(0,Ye.A)(j6,[["__scopeId","data-v-bd5030a0"]]),ur="phone_api_config",fr="phone_api_models",br="phone_api_models_secondary",da=["data","plotCharacters","privateChat","groupChat","voiceCall","dynamic","dynamicHome","dynamicReply","browser","forum","forumPost","forumComment","liveList","live","map","email","diary","calendar","listenTogether","camera"],pa={
+const Y6=(0,Ye.A)(j6,[["__scopeId","data-v-bd5030a0"]]),ur="phone_api_config",fr="phone_api_models",br="phone_api_models_secondary",da=["data","plotCharacters","privateChat","groupChat","voiceCall","dynamic","dynamicHome","dynamicReply","browser","forum","forumPost","forumComment","liveList","live","map","email","diary","calendar","listenTogether","camera","night"],pa={
 	url:"",key:"",model:"",apiFormat:"openai",streaming:!1,temperature:1 
 },Ca=()=>Object.fromEntries(da.map(a=>[a,"primary"]));
 function ma(a){
@@ -70411,7 +70411,7 @@ const W6={
 		const{
 			enableSecondApi:r,viewKeys:t,getProfileForView:n,setProfileForView:o,primaryApiConfig:s,primaryShowApiKey:i,primaryModelList:l,primaryModelFilter:c,primaryShowModelDropdown:A,primaryIsLoadingModels:p,primaryFilteredModels:C,secondaryApiConfig:E,secondaryShowApiKey:$,secondaryModelList:O,secondaryModelFilter:w,secondaryShowModelDropdown:S,secondaryIsLoadingModels:Z,secondaryFilteredModels:te,saveApiConfig:X,fetchPrimaryModels:K,fetchSecondaryModels:oe,togglePrimaryModelDropdown:le,toggleSecondaryModelDropdown:ce,selectPrimaryModel:H,selectSecondaryModel:se,apiProfiles:Ne,primaryPresetId:Ve,secondaryPresetId:De,selectPrimaryPreset:Ze,selectSecondaryPreset:Je,saveApiPreset:Ue,saveApiAsPreset:ke,deleteApiPreset:Ge,apiPresetModalVisible:Qe,apiPresetModalTarget:Xe,confirmApiPresetAs:Me 
 		}=yr(),R={
-			data:"\u6570\u636E",plotCharacters:"\u4EBA\u7269\u751F\u6210",privateChat:"\u79C1\u804A",groupChat:"\u7FA4\u804A",voiceCall:"\u901A\u8BDD",dynamic:"\u52A8\u6001",dynamicHome:"\u52A8\u6001\u4E3B\u9875",dynamicReply:"\u52A8\u6001\u56DE\u590D",browser:"\u6D4F\u89C8\u5668",forum:"\u8BBA\u575B",forumPost:"\u8BBA\u575B\u5E16\u5B50",forumComment:"\u8BBA\u575B\u8BC4\u8BBA",liveList:"\u76F4\u64AD\u5217\u8868",live:"\u76F4\u64AD",map:"\u5730\u56FE",email:"\u90AE\u4EF6",diary:"\u65E5\u8BB0",calendar:"\u65E5\u5386",listenTogether:"\u4E00\u8D77\u542C",camera:"\u76F8\u673A" 
+			data:"\u6570\u636E",plotCharacters:"\u4EBA\u7269\u751F\u6210",privateChat:"\u79C1\u804A",groupChat:"\u7FA4\u804A",voiceCall:"\u901A\u8BDD",dynamic:"\u52A8\u6001",dynamicHome:"\u52A8\u6001\u4E3B\u9875",dynamicReply:"\u52A8\u6001\u56DE\u590D",browser:"\u6D4F\u89C8\u5668",forum:"\u8BBA\u575B",forumPost:"\u8BBA\u575B\u5E16\u5B50",forumComment:"\u8BBA\u575B\u8BC4\u8BBA",liveList:"\u76F4\u64AD\u5217\u8868",live:"\u76F4\u64AD",map:"\u5730\u56FE",email:"\u90AE\u4EF6",diary:"\u65E5\u8BB0",calendar:"\u65E5\u5386",listenTogether:"\u4E00\u8D77\u542C",camera:"\u76F8\u673A",night:"\u4E0D\u591C\u57CE" 
 		},y=M=>n(M)==="secondary";return(M,B)=>((0,e.openBlock)(),(0,e.createElementBlock)("div",W6,[(0,e.createElementVNode)("div",P6,[(0,e.createElementVNode)("div",q6,[(0,e.createElementVNode)("button",{
 			class:"nav-back",onClick:B[0]||(B[0]=T=>M.$emit("back")) 
 		},[...B[27]||(B[27]=[(0,e.createElementVNode)("i",{
